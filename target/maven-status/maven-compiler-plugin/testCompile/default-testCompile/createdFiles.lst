@@ -1,7 +1,0 @@
-org/owasp/validator/html/model/TagTest.class
-org/owasp/validator/html/TagMatcherTest.class
-org/owasp/validator/html/test/PolicyTest.class
-org/owasp/validator/html/test/AntiSamyPerformanceTest.class
-org/owasp/validator/html/test/LiteralTest.class
-org/owasp/validator/html/test/AntiSamyTest.class
-org/owasp/validator/html/test/TestPolicy.class
