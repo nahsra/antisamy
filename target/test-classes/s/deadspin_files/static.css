@@ -1,0 +1,90 @@
+/* site specific stuff -- deadspin */
+.site-forecolor,
+.ui-dropdown ul li a,
+#thread_navigation ul,
+#live_interview .entry.interviewee .entry_header a,
+a { color: #0B7B70; }
+
+#page .share_menu ul li a { color: #0F4561 !important; }
+
+#rightbar .timestamp.highlight{ color: #0F4561 !important;}
+#rightbar .date.highlight{ color: #0F4561 !important;}
+
+#frontpage {
+	background: url("../img/logo-deadspin.png") no-repeat scroll left top transparent;
+	height: 50px;
+	left: 8px;
+	top: -7px;
+	width: 338px;
+	background-size: 338px 50px;
+}
+
+.tagpage #frontpage {
+	background: transparent url("../img/logo-tagpage.png") 12px -2px no-repeat;
+	height:35px;
+	width:187px;
+	background-size: 175px 37px;
+}
+
+/* retina logos */
+@media screen and (-webkit-min-device-pixel-ratio: 2) {
+
+	#frontpage {
+		background-image: url('../img/logo-deadspin@2x.png');
+	}
+	
+	.tagpage #frontpage {
+		background-image: url('../img/logo-tagpage@2x.png');
+	}
+
+}
+
+/* OPEN DESIGN PER SITE STYLES */
+
+#site.marked-head, #rightbar-header.marked-head { background-color: #0F456E; border-color: #0F456E !important; }
+#site.marked-head a, #site.marked-head, #rightbar-header.marked-head .date { color: #fff; }
+
+.marked-head { background-color: #F2F4F7;border-color: #0B7B70; }
+
+.tagpage #site.marked-head { background-color: #0B7B70;border-color: #0B7B70 !important; }
+.tagpage #switch_view li a{ color:#fff;background-color:transparent;border-color:transparent;}
+
+.ui-shade { background-color: #F2F4F7 !important; }
+
+.ad-shade { background-color: #ebedf4 !important; }
+
+.ui-border { border-color: #0B7B70 !important; }
+.ui-background { background-color: #0B7B70 !important; }
+.threadbullet { background-color: #4f778b; }
+
+.ui-border-light { border-color: #f0f0f0 !important; }
+.ui-light, .ui-light a { color: #c0c0c8 !important; }
+	.ui-shade .ui-light, .ui-shade .ui-light a,
+	.ui-shade.ui-light, .ui-shade.ui-light a { color: #52576E !important; }
+
+
+.site-bg-color,
+li.selected a,
+.classic_frontpage .post.sponsored .taglink,
+#thread_navigation a.selected {
+	background-color: #0B7B70;
+	border-color: #0B7B70;
+	color: #fff;
+}
+
+#thumbList .thumb.current { border-color: #0F4561; }
+
+.post-body li, ul.related li {  list-style-image: url('../img/bullet.png'); }
+
+.airport.views.highlight { background-image: url("../img/icon-flame.png") !important; }
+.airport.comments.highlight { background-image: url("../img/icon-comment.png") !important; }
+
+.post-supp .post-meta #author-menu li span,
+.post-supp .post-meta #author-menu a { color: #0F4561 !important;}
+
+#tomorrowsnews span { padding-top: 105px; }
+#tomorrowsnews { background-color: #F2F4F7; }
+
+.social .fb_iframe_widget {
+	top: -5px;
+}

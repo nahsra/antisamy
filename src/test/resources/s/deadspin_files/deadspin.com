@@ -1,0 +1,1 @@
+PARSELY.pInit({"apikey":"deadspin.com","customizations":null,"bundle":"/code/ptrack_v18.js","settings":{"debug":false,"widget":false,"tracker":true},"uuid":"4503F7D1-EA88-437B-93C7-4CDCDF89EA60"});

@@ -1,0 +1,126 @@
+document.write("<meta HTTP-EQUIV='expires' CONTENT='0'></meta>");
+document.write("<meta HTTP-EQUIV='Pragma' CONTENT='no-cache'></meta>");
+	  
+var nRequiredVersion = 8; 
+var bIsRightVersion = false;	
+var isIE = (navigator.appVersion.indexOf("MSIE") != -1) ? true : false;
+var isWin = (navigator.appVersion.toLowerCase().indexOf("win") != -1) ? true : false;
+var isOpera = (navigator.userAgent.indexOf("Opera") != -1) ? true : false;
+if(isIE && isWin){
+document.writeln('<SCR' + 'IPT LANGUAGE=VBScript\>');
+document.writeln('on error resume next');
+document.writeln('Set oFlashPlayer = CreateObject("ShockwaveFlash.ShockwaveFlash." & nRequiredVersion)');
+document.writeln('If IsObject(oFlashPlayer) Then');
+document.writeln('bIsRightVersion = True');
+document.writeln('End If');
+document.writeln('If (Not bIsRightVersion) And (nRequiredVersion < 3) Then');
+document.writeln('Set oFlashPlayer = CreateObject("ShockwaveFlash.ShockwaveFlash")');
+document.writeln('If IsObject(oFlashPlayer) Then');
+document.writeln('bIsRightVersion = True');
+document.writeln('End If');
+document.writeln('End If');
+document.writeln('</SCR' + 'IPT\>'); 
+}
+
+function detectPluginWDS7006318782127() 
+{ 
+	if (!bIsRightVersion) 
+	{
+		if (navigator.plugins != null && navigator.plugins.length > 0)
+		{
+			if (navigator.plugins["Shockwave Flash 2.0"] || navigator.plugins["Shockwave Flash"])
+			{
+				var swVer2 = navigator.plugins["Shockwave Flash 2.0"] ? " 2.0" : "";
+				var flashDescription = navigator.plugins["Shockwave Flash" + swVer2].description;
+				var descArray = flashDescription.split(" ");
+				var tempArrayMajor = descArray[2].split(".");	
+				var versionMajor = tempArrayMajor[0];
+				bIsRightVersion = (versionMajor >= nRequiredVersion);
+			}
+		}
+		else if (navigator.userAgent.toLowerCase().indexOf("webtv/2.6") != -1)
+		{
+			bIsRightVersion = (4 >= nRequiredVersion);
+		}
+		else if (navigator.userAgent.toLowerCase().indexOf("webtv/2.5") != -1)
+		{
+			bIsRightVersion = (3 >= nRequiredVersion);
+		}
+		else if (navigator.userAgent.toLowerCase().indexOf("webtv") != -1) 
+		{
+			bIsRightVersion = (2 >= nRequiredVersion);
+		}
+	}
+}
+
+detectPluginWDS7006318782127();
+var _WDS7006318782127_Instance =
+{
+  click : "http://ad.doubleclick.net/click%3Bh%3Dv8/3d75/3/0/%2a/g%3B266254990%3B0-0%3B4%3B47077323%3B4986-300/600%3B51985928/51946686/1%3Bu%3D%3B%7Eokv%3D%3Bpg%3Dindex2%3Blogged_in%3D0%3Btile%3D4%3Bsz%3D300x250%2C300x600%3Bu%3D%3B%7Esscs%3D%3f",
+  clickThruUrl: "http://clk.atdmt.com/go/429767135/direct;vt.1;wi.300;hi.600;ai.299181241;ct.$num$/01/",
+  imgs : []
+};
+if (!window.armapi_a1_a1)
+{
+var armapi_a1_a1 =
+{
+initialize : function(unique_id){},
+click : function(unique_id, num, suffix)
+{
+this.clickTrack(unique_id);
+this.clickThru(unique_id, num, suffix);
+},
+clickTrack : function(unique_id, num)
+{
+var instance = window[unique_id + "_Instance"];
+if (instance.click != "")
+{
+var img = new Image();
+img.src = instance.click + "http://t.atdmt.com";
+instance.imgs.push(img); 
+}
+},
+clickThru : function(unique_id, num, suffix) {
+  var instance = window[unique_id + "_Instance"];
+  var url = instance.clickThruUrl.replace("$num$", num) + suffix;
+  window.open(url, "_blank");  
+}
+};
+}
+
+var armapi_ArmClickType = isIE ? "ext" : "";
+
+var _strContentWDS7006318782127 = '';
+if(bIsRightVersion) 
+{ 
+var strFQDN = "HTTP://spe.atdmt.com/ds/NMMRTSMGUWDS/"; 
+var index = strFQDN.indexOf("/ds/");
+strFQDN = strFQDN.substring(0, index);
+_strContentWDS7006318782127 = '' + '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="HTTP://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab" id="idSWFWDS7006318782127" width="300" height="600">'
++ '<param name="movie" value="HTTP://spe.atdmt.com/ds/NMMRTSMGUWDS/121022_win8dev/Win8Dev_allrecipe_GS_300x600.swf?ver=1&clickTag1=!~!click!~!http://clk.atdmt.com/go/429767135/direct;vt.1;wi.300;hi.600;ai.299181241;ct.1/01&clickTag=!~!click!~!http://clk.atdmt.com/go/429767135/direct;vt.1;wi.300;hi.600;ai.299181241;ct.1/01" />'
++ '<param name="base" value="HTTP://spe.atdmt.com/ds/NMMRTSMGUWDS/121022_win8dev/" />'
++ '<param name="FlashVars"  value="ArmClickType='+ armapi_ArmClickType + '&unique_id=_WDS7006318782127&ArmApi=armapi_a1_a1&ArmClickUrl=http://clk.atdmt.com/go/429767135/direct;vt.1;wi.300;hi.600;ai.299181241;ct.$num$/01/&ArmClickToken=$num$" />'
++ '<param name="quality" value="high" />'
++ '<param name="salign" value="lt" />'
++ '<param name="loop" value="true" />'
++ '<param name="wmode" value="opaque" />'
++ '<param name="allowScriptAccess" value="always" />'
++ '<embed  allowScriptAccess="always" quality="high" salign="LT" loop="true" type="application/x-shockwave-flash" pluginspace="HTTP://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash" base="HTTP://spe.atdmt.com/ds/NMMRTSMGUWDS/121022_win8dev/" wmode="opaque" src="HTTP://spe.atdmt.com/ds/NMMRTSMGUWDS/121022_win8dev/Win8Dev_allrecipe_GS_300x600.swf?ver=1&clickTag1=!~!click!~!http://clk.atdmt.com/go/429767135/direct;vt.1;wi.300;hi.600;ai.299181241;ct.1/01&clickTag=!~!click!~!http://clk.atdmt.com/go/429767135/direct;vt.1;wi.300;hi.600;ai.299181241;ct.1/01" width="300" height="600" FlashVars="unique_id=_WDS7006318782127&ArmApi=armapi_a1_a1&ArmClickUrl=http://clk.atdmt.com/go/429767135/direct;vt.1;wi.300;hi.600;ai.299181241;ct.$num$/01/&ArmClickToken=$num$" />'
++ '</object>'
++ '';
+
+if ( "%OOB%" == "1" )
+  _strContentWDS7006318782127 = _strContentWDS7006318782127.replace(/!~!click!~!/g,'');
+else
+  _strContentWDS7006318782127 = _strContentWDS7006318782127.replace(/!~!click!~!/g,'http://ad.doubleclick.net/click%3Bh%3Dv8/3d75/3/0/%2a/g%3B266254990%3B0-0%3B4%3B47077323%3B4986-300/600%3B51985928/51946686/1%3Bu%3D%3B%7Eokv%3D%3Bpg%3Dindex2%3Blogged_in%3D0%3Btile%3D4%3Bsz%3D300x250%2C300x600%3Bu%3D%3B%7Esscs%3D%3f');
+  
+} 
+else 
+{
+_strContentWDS7006318782127 = '<a target="_blank" href="http://clk.atdmt.com/go/429767135/direct;vt.1;wi.300;hi.600;ai.299181241;ct.1/01/" onclick="if(\'http://ad.doubleclick.net/click%3Bh%3Dv8/3d75/3/0/%2a/g%3B266254990%3B0-0%3B4%3B47077323%3B4986-300/600%3B51985928/51946686/1%3Bu%3D%3B%7Eokv%3D%3Bpg%3Dindex2%3Blogged_in%3D0%3Btile%3D4%3Bsz%3D300x250%2C300x600%3Bu%3D%3B%7Esscs%3D%3f\')(new Image).src=\'http://ad.doubleclick.net/click%3Bh%3Dv8/3d75/3/0/%2a/g%3B266254990%3B0-0%3B4%3B47077323%3B4986-300/600%3B51985928/51946686/1%3Bu%3D%3B%7Eokv%3D%3Bpg%3Dindex2%3Blogged_in%3D0%3Btile%3D4%3Bsz%3D300x250%2C300x600%3Bu%3D%3B%7Esscs%3D%3fhttp://t.atdmt.com\'"><img border="0" src="HTTP://spe.atdmt.com/ds/NMMRTSMGUWDS/121022_win8dev/Win8Dev_allrecipe_GS_300x600_v2.jpg?ver=1" width="300" height="600" /></a>';
+}
+document.write(_strContentWDS7006318782127);
+
+if("0" == "1"){document.write('<scr' + 'ipt type="text/javascript" src="HTTP://spe.atdmt.com/ds/Ad.autoLoad.js?plugin=AdChoices"></scr' + 'ipt>');}
+
+document.write('<script src="http://ace.adoftheyear.com/p13297/tagger_v04.php?project=p13297&tag=1a&channel=[sid=429767135|cid=299181241|]"></script>');
