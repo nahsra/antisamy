@@ -276,6 +276,19 @@ public class Policy {
     protected static Element getTopLevelElement(InputSource source) throws PolicyException {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+            /**
+             * Disable external entities, etc.
+             */
+            String FEATURE = null;
+            FEATURE = "http://xml.org/sax/features/external-general-entities";
+            dbf.setFeature(FEATURE, false);
+            FEATURE = "http://xml.org/sax/features/external-parameter-entities";
+            dbf.setFeature(FEATURE, false);
+            FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
+            dbf.setFeature(FEATURE, true);
+            FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+            dbf.setFeature(FEATURE, false);
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document dom = db.parse(source);
             return dom.getDocumentElement();
@@ -353,6 +366,19 @@ public class Policy {
             }
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+            /**
+             * Disable external entities, etc.
+             */
+            String FEATURE = null;
+            FEATURE = "http://xml.org/sax/features/external-general-entities";
+            dbf.setFeature(FEATURE, false);
+            FEATURE = "http://xml.org/sax/features/external-parameter-entities";
+            dbf.setFeature(FEATURE, false);
+            FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
+            dbf.setFeature(FEATURE, true);
+            FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+            dbf.setFeature(FEATURE, false);
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document dom;
 
