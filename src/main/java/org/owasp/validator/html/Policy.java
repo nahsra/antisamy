@@ -80,6 +80,10 @@ public class Policy {
     public static final String PRESERVE_SPACE = "preserveSpace";
     public static final String PRESERVE_COMMENTS = "preserveComments";
     public static final String ENTITY_ENCODE_INTL_CHARS = "entityEncodeIntlChars";
+    public static final String EXTERNAL_GENERAL_ENTITIES = "http://xml.org/sax/features/external-general-entities";
+    public static final String EXTERNAL_PARAM_ENTITIES = "http://xml.org/sax/features/external-parameter-entities";
+    public static final String DISALLOW_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
+    public static final String LOAD_EXTERNAL_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
 
     public static final String ACTION_VALIDATE = "validate";
     public static final String ACTION_FILTER = "filter";
@@ -280,15 +284,10 @@ public class Policy {
             /**
              * Disable external entities, etc.
              */
-            String FEATURE = null;
-            FEATURE = "http://xml.org/sax/features/external-general-entities";
-            dbf.setFeature(FEATURE, false);
-            FEATURE = "http://xml.org/sax/features/external-parameter-entities";
-            dbf.setFeature(FEATURE, false);
-            FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
-            dbf.setFeature(FEATURE, true);
-            FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-            dbf.setFeature(FEATURE, false);
+            dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+            dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
+            dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
+            dbf.setFeature(LOAD_EXTERNAL_DTD, false);
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document dom = db.parse(source);
             return dom.getDocumentElement();
@@ -370,15 +369,10 @@ public class Policy {
             /**
              * Disable external entities, etc.
              */
-            String FEATURE = null;
-            FEATURE = "http://xml.org/sax/features/external-general-entities";
-            dbf.setFeature(FEATURE, false);
-            FEATURE = "http://xml.org/sax/features/external-parameter-entities";
-            dbf.setFeature(FEATURE, false);
-            FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
-            dbf.setFeature(FEATURE, true);
-            FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-            dbf.setFeature(FEATURE, false);
+            dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+            dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
+            dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
+            dbf.setFeature(LOAD_EXTERNAL_DTD, false);
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document dom;
 
