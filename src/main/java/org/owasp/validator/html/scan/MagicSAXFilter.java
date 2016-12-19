@@ -271,11 +271,6 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 
 			boolean isStyle = "style".endsWith(element.localpart);
 
-			if (isStyle) {
-				this.operations.push(Ops.CSS);
-				cssContent = new StringBuffer();
-				cssAttributes = attributes;
-			} else {
 				// validate all attributes, we need to do this now to find out
 				// how to deal with the element
 				boolean removeTag = false;
@@ -352,6 +347,10 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 
 				if (removeTag) {
 					this.operations.push(Ops.REMOVE);
+				} else if (isStyle) {
+					this.operations.push(Ops.CSS);
+					cssContent = new StringBuffer();
+					cssAttributes = validattributes;
 				} else if (filterTag) {
 					this.operations.push(Ops.FILTER);
 				} else {
@@ -368,7 +367,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 
 					this.operations.push(Ops.KEEP);
 				}
-			}
+			
 		} else if (tag.isAction( "truncate")) {
 			this.operations.push(Ops.TRUNCATE);
 		} else {
