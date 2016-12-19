@@ -1237,8 +1237,8 @@ public class AntiSamyTest {
     @Test
     public void testIssue2() throws ScanException, PolicyException {
     	String test = "<style onload=alert(1)>h1 {color:red;}</style>";
-    	assertTrue(!as.scan(test, policy, AntiSamy.DOM).getCleanHTML().contains("alert"));
-    	assertTrue(!as.scan(test, policy, AntiSamy.SAX).getCleanHTML().contains("alert"));
+    	assertFalse(as.scan(test, policy, AntiSamy.DOM).getCleanHTML().contains("alert"));
+    	assertFalse(as.scan(test, policy, AntiSamy.SAX).getCleanHTML().contains("alert"));
     }
 
 }
