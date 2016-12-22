@@ -4,7 +4,43 @@
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
     <version>1.5.5-SNAPSHOT</version>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+ 
     <name>OWASP AntiSamy</name>
+    <description>A library for performing fast, configurable cleansing of HTML coming from untrusted sources.</description>
+    <url>https://github.com/nahsra/antisamy</url>
+
+    <developers>
+      <developer>
+        <id>nahsra</id>
+        <name>Arshan Dabirsiaghi</name>
+        <email>arshan.dabirsiaghi@gmail.com</email>
+      </developer>
+    </developers>
+
+    <licenses>
+      <license>
+        <name>BSD 3</name>
+        <url>https://opensource.org/licenses/BSD-3-Clause</url>
+      </license>
+    </licenses>
+   
+     <scm>
+        <connection>scm:git:git@github.com:nahsra/antisamy.git</connection>
+        <url>scm:git:git@github.com:nahsra/antisamy.git</url>
+        <developerConnection>scm:git:git@github.com:nahsra/antisamy.git</developerConnection>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>xml-apis</groupId>
@@ -50,6 +86,39 @@
                     </archive>
                 </configuration>
             </plugin>
+               <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-gpg-plugin</artifactId>
+               <executions>
+                 <execution>
+                   <id>sign-artifacts</id>
+                   <phase>verify</phase>
+                   <goals>
+                     <goal>sign</goal>
+                   </goals>
+                 </execution>
+               </executions>
+             </plugin>
+            <plugin>
+               <artifactId>maven-javadoc-plugin</artifactId>
+               <executions>
+                 <execution>
+                   <id>attach-javadocs</id>
+                   <phase>package</phase>
+                   <goals><goal>jar</goal></goals>
+                 </execution>
+               </executions>
+             </plugin>
+            <plugin>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <phase>package</phase>
+                <goals><goal>jar-no-fork</goal></goals>
+              </execution>
+            </executions>
+        </plugin>
         </plugins>
     </build>
 </project>
