@@ -1209,6 +1209,23 @@ public class AntiSamyTest {
     }
 
     @Test
+    public void testDataTag159() throws ScanException, PolicyException {
+        /* issue #159 - allow dynamic HTML5 data-* attribute */
+        String good = "<p data-tag=\"abc123\">Hello World!</p>";
+        String bad = "<p dat-tag=\"abc123\">Hello World!</p>";
+        String goodExpected = "<p data-tag=\"abc123\">Hello World!</p>";
+        String badExpected = "<p>Hello World!</p>";
+        // test good attribute "data-"
+        CleanResults cr = as.scan(good, policy, AntiSamy.SAX);
+        String s = cr.getCleanHTML();
+        assertEquals(goodExpected, s);
+        // test bad attribute "dat-"
+        cr = as.scan(bad, policy, AntiSamy.SAX);
+        s = cr.getCleanHTML();
+        assertEquals(badExpected, s);
+    }
+
+    @Test
     public void testXSSInAntiSamy151() throws ScanException, PolicyException {
         String test = "<bogus>whatever</bogus><img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\" "
             + "onmouseover=\"alert('xss')\">";
