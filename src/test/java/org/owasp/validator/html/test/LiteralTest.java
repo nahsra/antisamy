@@ -1,7 +1,6 @@
 package org.owasp.validator.html.test;
 
 import java.net.URL;
-import java.util.Iterator;
 
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.CleanResults;
@@ -29,14 +28,7 @@ public class LiteralTest extends TestCase {
 		System.out.println("Loading policy from URL: " + url);
 		policy = Policy.getInstance(url);
 	}
-
-
-	private URL getResource(String res) {
-		URL url = this.getClass().getResource(res);
-		System.out.println("Policy URL: " + url);
-		return url;
-	}
-
+	
 	public void testSAXGoodResult() throws Exception {
 		System.out.println("Policy: " + policy);
 
