@@ -230,55 +230,5 @@ public class CssScanner {
 			List<String> errorMessages, int sizeLimit) throws ScanException {
 		// Implemented in ExternalCssScanner.java
 	}
-
-    /**
-     * Test method to demonstrate CSS scanning.
-     * 
-     * @deprecated
-     * @param args
-     *                unused
-     * @throws Exception
-     *                 if any error occurs
-     */
-    public static void main(String[] args) throws Exception {
-	InternalPolicy policy = (InternalPolicy) Policy.getInstance("resources/antisamy-1.2.xml");
 	
-	CssScanner scanner;
-	
-	if(policy.isEmbedStyleSheets()) {
-		scanner = new ExternalCssScanner(policy, ResourceBundle.getBundle("AntiSamy", Locale.getDefault()));
-	}else{
-		scanner = new CssScanner(policy, ResourceBundle.getBundle("AntiSamy", Locale.getDefault()));
-	}
-
-	CleanResults results;
-
-	results = scanner
-		.scanStyleSheet(
-			"@import url(http://www.owasp.org/skins/monobook/main.css);"
-				+ "@import url(http://www.w3schools.com/stdtheme.css);"
-				+ "@import url(http://www.google.com/ig/f/t1wcX5O39cc/ig.css); ",
-			Integer.MAX_VALUE);
-
-	// Test case for live CSS docs. Just change URL to a live CSS on
-	// the internet. Note this is test code and does not handle IO
-	// errors
-	// StringBuffer sb = new StringBuffer();
-	// BufferedReader reader = new BufferedReader(new InputStreamReader(
-	// new URL("http://www.owasp.org/skins/monobook/main.css")
-	// .openStream()));
-	// String line = null;
-	// while ((line = reader.readLine()) != null) {
-	// sb.append(line);
-	// sb.append("\n");
-	// }
-	// results = scanner.scanStyleSheet(sb.toString(),
-	// Policy.DEFAULT_MAX_INPUT_SIZE);
-
-	System.out.println("Cleaned result:");
-	System.out.println(results.getCleanHTML());
-	System.out.println("--");
-	System.out.println("Error messages");
-	System.out.println(results.getErrorMessages());
-    }
 }

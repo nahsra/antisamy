@@ -36,10 +36,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpContentTooLargeException;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
@@ -71,7 +73,7 @@ public class ExternalCssScanner extends CssScanner {
 	 *                 if an error occurs during scanning
 	 */
 	protected void parseImportedStylesheets(LinkedList stylesheets, CssHandler handler,
-			ArrayList errorMessages, int sizeLimit) throws ScanException {
+			ArrayList<String> errorMessages, int sizeLimit) throws ScanException {
 			
 			int importedStylesheets = 0;
 			
@@ -79,29 +81,30 @@ public class ExternalCssScanner extends CssScanner {
 			// continue parsing the nested styles. Note this only happens
 			// if CSS importing was enabled in the policy file
 			if (!stylesheets.isEmpty()) {
-			    HttpClient httpClient = new HttpClient();
-			
-			    // Ensure that we have appropriate timeout values so we don't
+				// Ensure that we have appropriate timeout values so we don't
 			    // get DoSed waiting for returns
-			    HttpConnectionManagerParams params = httpClient
-				    .getHttpConnectionManager().getParams();
-			
 			    int timeout = DEFAULT_TIMEOUT;
-			
 			    try {
-				timeout = Integer.parseInt(policy
-					.getDirective(Policy.CONNECTION_TIMEOUT));
+			    	timeout = Integer.parseInt(policy.getDirective(Policy.CONNECTION_TIMEOUT));
 			    } catch (NumberFormatException nfe) {
 			    }
-			
-			    params.setConnectionTimeout(timeout);
-			    params.setSoTimeout(timeout);
-			    httpClient.getHttpConnectionManager().setParams(params);
+			    
+			    RequestConfig requestConfig = RequestConfig.custom()
+						  .setSocketTimeout(timeout)
+						  .setConnectTimeout(timeout)
+						  .setConnectionRequestTimeout(timeout)
+						  .build();
+			    
+			    HttpClient httpClient = HttpClientBuilder.create().
+			    		disableAutomaticRetries().
+			    		disableConnectionState().
+			    		disableCookieManagement().
+			    		setDefaultRequestConfig(requestConfig).
+			    		build();
 			
 			    int allowedImports = Policy.DEFAULT_MAX_STYLESHEET_IMPORTS;
 			    try {
-				allowedImports = Integer.parseInt(policy
-					.getDirective("maxStyleSheetImports"));
+					allowedImports = Integer.parseInt(policy.getDirective("maxStyleSheetImports"));
 			    } catch (NumberFormatException nfe) {
 			    }
 			
@@ -121,16 +124,15 @@ public class ExternalCssScanner extends CssScanner {
 				    continue;
 				}
 			
-				GetMethod stylesheetRequest = new GetMethod(stylesheetUri
-					.toString());
+				HttpGet stylesheetRequest = new HttpGet(stylesheetUri);
 			
 				byte[] stylesheet = null;
 				try {
 				    // pull down stylesheet, observing size limit
-				    httpClient.executeMethod(stylesheetRequest);
-				    stylesheet = stylesheetRequest.getResponseBody(sizeLimit);
-				} catch (HttpContentTooLargeException hctle) {
-				    errorMessages
+				    HttpResponse response = httpClient.execute(stylesheetRequest);
+				    stylesheet = EntityUtils.toByteArray(response.getEntity());
+				    if(stylesheet != null && stylesheet.length > sizeLimit) {
+				    	errorMessages
 					    .add(ErrorMessageUtil
 						    .getMessage(
 						    	messages,
@@ -141,6 +143,8 @@ public class ExternalCssScanner extends CssScanner {
 										    .toString()),
 								    String.valueOf(policy
 									    .getMaxInputSize()) }));
+				    	stylesheet = null;
+				    }
 				} catch (IOException ioe) {
 				    errorMessages.add(ErrorMessageUtil
 					    .getMessage(

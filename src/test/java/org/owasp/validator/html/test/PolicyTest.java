@@ -15,8 +15,6 @@ import java.io.ByteArrayInputStream;
  *
  * @author Jacob Coulter & Mark Oberhaus
  */
-
-@SuppressWarnings("deprecation")
 public class PolicyTest extends TestCase {
 
     private Policy policy;
