@@ -283,6 +283,10 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 					if (attribute == null) {
 						// no policy defined, perhaps it is a global attribute
 						attribute = policy.getGlobalAttributeByName(nameLower);
+						if (attribute == null && policy.isAllowDynamicAttributes()) {
+						    // not a global attribute, perhaps it is a dynamic attribute, if allowed
+						    attribute = policy.getDynamicAttributeByName(nameLower);
+						}
 					}
 					// boolean isAttributeValid = false;
 					if ("style".equalsIgnoreCase(name)) {

@@ -27,6 +27,8 @@ http://www.w3.org/TR/html401/struct/global.html
 		<directive name="connectionTimeout" value="5000"/>
 		<directive name="maxStyleSheetImports" value="3"/>
 		
+		<!-- Allows the use of dynamic attributes (i.e. HTML5 "data-") -->
+		<directive name="allowDynamicAttributes" value="true" />
 	</directives>
 	
 	<common-regexps>
@@ -183,7 +185,12 @@ http://www.w3.org/TR/html401/struct/global.html
 		 	</regexp-list>
 		 </attribute>
 
-		 
+		<attribute name="data-" description="Allows the HTML5 'data-' attribute to be added to elements">
+			<regexp-list>
+				<regexp name="anything"/>
+			</regexp-list>
+		</attribute>
+
  		<!-- the "style" attribute will be validated by an inline stylesheet scanner, so no need to define anything here - i hate having to special case this but no other choice -->
 		 <attribute name="style" description="The 'style' attribute provides the ability for users to change many attributes of the tag's contents using a strict syntax"/>
 		 
@@ -500,7 +507,12 @@ http://www.w3.org/TR/html401/struct/global.html
 		<!-- Not valid in base, br, frame, frameset, hr, iframe, param, and script elements.  -->
 		<attribute name="lang"/>
 	</global-tag-attributes>
-	
+
+	<!-- Declare "dynamic" tag attributes here. The directive "allowDynamicAttributes" must be set to true -->
+	<dynamic-tag-attributes>
+		<attribute name="data-"/> <!-- HTML5 "data-" tag -->
+	</dynamic-tag-attributes>
+
 	<tags-to-encode>
 		<tag>g</tag>
 		<tag>grin</tag>

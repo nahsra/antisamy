@@ -80,6 +80,8 @@ public class Policy {
     public static final String PRESERVE_SPACE = "preserveSpace";
     public static final String PRESERVE_COMMENTS = "preserveComments";
     public static final String ENTITY_ENCODE_INTL_CHARS = "entityEncodeIntlChars";
+    public static final String ALLOW_DYNAMIC_ATTRIBUTES = "allowDynamicAttributes";
+
     public static final String EXTERNAL_GENERAL_ENTITIES = "http://xml.org/sax/features/external-general-entities";
     public static final String EXTERNAL_PARAM_ENTITIES = "http://xml.org/sax/features/external-parameter-entities";
     public static final String DISALLOW_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
@@ -97,6 +99,7 @@ public class Policy {
     private final Map<String, Property> cssRules;
     protected final Map<String, String> directives;
     private final Map<String, Attribute> globalAttributes;
+    private final Map<String, Attribute> dynamicAttributes;
 
     private final TagMatcher allowedEmptyTagsMatcher;
     private final TagMatcher requiresClosingTagsMatcher;
@@ -115,6 +118,7 @@ public class Policy {
         Map<String, Property> cssRules = new HashMap<String, Property>();
         Map<String, String> directives = new HashMap<String, String>();
         Map<String, Attribute> globalAttributes = new HashMap<String, Attribute>();
+        Map<String, Attribute> dynamicAttributes = new HashMap<String, Attribute>();
 
         List<String> allowedEmptyTags = new ArrayList<String>();
         List<String> requireClosingTags = new ArrayList<String>();
@@ -211,6 +215,7 @@ public class Policy {
         this.cssRules = Collections.unmodifiableMap(parseContext.cssRules);
         this.directives = Collections.unmodifiableMap(parseContext.directives);
         this.globalAttributes = Collections.unmodifiableMap(parseContext.globalAttributes);
+        this.dynamicAttributes = Collections.unmodifiableMap(parseContext.dynamicAttributes);
     }
 
     protected Policy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules) {
@@ -221,6 +226,7 @@ public class Policy {
         this.cssRules = old.cssRules;
         this.directives = directives;
         this.globalAttributes = old.globalAttributes;
+        this.dynamicAttributes = old.dynamicAttributes;
     }
 
     protected static ParseContext getSimpleParseContext(Element topLevelElement) throws PolicyException {
@@ -313,6 +319,7 @@ public class Policy {
         parseDirectives(getFirstChild(topLevelElement, "directives"), parseContext.directives);
         parseCommonAttributes(getFirstChild(topLevelElement, "common-attributes"), parseContext.commonAttributes, parseContext.commonRegularExpressions);
         parseGlobalAttributes(getFirstChild(topLevelElement, "global-tag-attributes"), parseContext.globalAttributes, parseContext.commonAttributes);
+        parseDynamicAttributes(getFirstChild(topLevelElement, "dynamic-tag-attributes"), parseContext.dynamicAttributes, parseContext.commonAttributes);
         parseTagRules(getFirstChild(topLevelElement, "tag-rules"), parseContext.commonAttributes, parseContext.commonRegularExpressions, parseContext.tagRules);
         parseCSSRules(getFirstChild(topLevelElement, "css-rules"), parseContext.cssRules, parseContext.commonRegularExpressions);
 
@@ -489,6 +496,30 @@ public class Policy {
                 globalAttributes1.put(name.toLowerCase(), toAdd);
             } else {
                 throw new PolicyException("Global attribute '" + name + "' was not defined in <common-attributes>");
+            }
+        }
+    }
+
+    /**
+     * Go through <dynamic-tag-attributes> section of the policy file.
+     *
+     * @param root              Top level of <dynamic-tag-attributes>
+     * @param dynamicAttributes A HashMap of dynamic Attributes that need validation for every tag.
+     * @param commonAttributes  The common attributes
+     * @throws PolicyException
+     */
+    private static void parseDynamicAttributes(Element root, Map<String, Attribute> dynamicAttributes, Map<String, Attribute> commonAttributes) throws PolicyException {
+        for (Element ele : getByTagName(root, "attribute")) {
+
+            String name = getAttributeValue(ele, "name");
+
+            Attribute toAdd = commonAttributes.get(name.toLowerCase());
+
+            if (toAdd != null) {
+                String attrName = name.toLowerCase().substring(0, name.length() - 1);
+                dynamicAttributes.put(attrName, toAdd);
+            } else {
+                throw new PolicyException("Dynamic attribute '" + name + "' was not defined in <common-attributes>");
             }
         }
     }
@@ -732,6 +763,25 @@ public class Policy {
     public Attribute getGlobalAttributeByName(String name) {
         return globalAttributes.get(name.toLowerCase());
 
+    }
+
+    /**
+     * A method for returning one of the dynamic <global-attribute> entries by
+     * name.
+     *
+     * @param name The name of the dynamic global-attribute we want to look up.
+     * @return An Attribute associated with the global-attribute lookup name specified,
+     * or null if not found.
+     */
+    public Attribute getDynamicAttributeByName(String name) {
+        Attribute dynamicAttribute = null;
+        for (String d : dynamicAttributes.keySet()) {
+            if (name.startsWith(d)) {
+                dynamicAttribute = dynamicAttributes.get(d);
+                break;
+            }
+        }
+        return dynamicAttribute;
     }
 
     /**

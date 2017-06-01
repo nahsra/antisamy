@@ -27,13 +27,14 @@ public class PolicyTest extends TestCase {
     private static final String DIRECTIVES = "<directives>\n</directives>\n";
     private static final String COMMON_ATTRIBUTES = "<common-attributes>\n</common-attributes>\n";
     private static final String GLOBAL_TAG_ATTRIBUTES = "<global-tag-attributes>\n</global-tag-attributes>\n";
+    private static final String DYNAMIC_TAG_ATTRIBUTES = "<dynamic-tag-attributes>\n</dynamic-tag-attributes>\n";
     private static final String TAG_RULES = "<tag-rules>\n</tag-rules>";
     private static final String CSS_RULES = "<css-rules>\n</css-rules>\n";
     private static final String COMMON_REGEXPS = "<common-regexps>\n</common-regexps>";
     private static final String FOOTER = "</anti-samy-rules>";
 
     private String assembleFile(String allowedEmptyTagsSection) {
-        return HEADER + DIRECTIVES + COMMON_REGEXPS + COMMON_ATTRIBUTES + GLOBAL_TAG_ATTRIBUTES + TAG_RULES + CSS_RULES +
+        return HEADER + DIRECTIVES + COMMON_REGEXPS + COMMON_ATTRIBUTES + GLOBAL_TAG_ATTRIBUTES + DYNAMIC_TAG_ATTRIBUTES + TAG_RULES + CSS_RULES +
                allowedEmptyTagsSection + FOOTER;
     }
 

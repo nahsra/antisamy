@@ -28,6 +28,7 @@ public class InternalPolicy extends Policy {
     private final boolean preserveComments;
     private final boolean embedStyleSheets;
     private final boolean isEncodeUnknownTag;
+    private final boolean allowDynamicAttributes;
 
 
     protected InternalPolicy(URL baseUrl, ParseContext parseContext) throws PolicyException {
@@ -47,6 +48,7 @@ public class InternalPolicy extends Policy {
         this.preserveComments = isTrue(Policy.PRESERVE_COMMENTS);
         this.styleTag = getTagByLowercaseName("style");
         this.embedStyleSheets = isTrue(Policy.EMBED_STYLESHEETS);
+        this.allowDynamicAttributes = isTrue(Policy.ALLOW_DYNAMIC_ATTRIBUTES);
     }
 
     protected InternalPolicy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules) {
@@ -66,6 +68,7 @@ public class InternalPolicy extends Policy {
         this.preserveComments = isTrue(Policy.PRESERVE_COMMENTS);
         this.styleTag = getTagByLowercaseName("style");
         this.embedStyleSheets = isTrue(Policy.EMBED_STYLESHEETS);
+        this.allowDynamicAttributes = isTrue(Policy.ALLOW_DYNAMIC_ATTRIBUTES);
     }
 
     public Tag getEmbedTag() {
@@ -131,6 +134,10 @@ public class InternalPolicy extends Policy {
 
     public boolean isEncodeUnknownTag() {
         return isEncodeUnknownTag;
+    }
+
+    public boolean isAllowDynamicAttributes() {
+        return allowDynamicAttributes;
     }
 
     /**
