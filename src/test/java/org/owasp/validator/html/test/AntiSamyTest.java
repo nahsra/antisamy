@@ -956,26 +956,26 @@ public class AntiSamyTest {
     public void issue101InternationalCharacterSupport() throws ScanException, PolicyException {
         Policy revised = policy.cloneWithDirective(Policy.ENTITY_ENCODE_INTL_CHARS, "false");
 
-        String html = "<b>letter 'a' with umlaut: ä";
+        String html = "<b>letter 'a' with umlaut: \u00e4";
         String crDom = as.scan(html, revised, AntiSamy.DOM).getCleanHTML();
         String crSax = as.scan(html, revised, AntiSamy.SAX).getCleanHTML();
-        assertTrue(crDom.contains("ä"));
-        assertTrue(crSax.contains("ä"));
+        assertTrue(crDom.contains("\u00e4"));
+        assertTrue(crSax.contains("\u00e4"));
 
         Policy revised2 = policy.cloneWithDirective(Policy.USE_XHTML, "false").cloneWithDirective(Policy.ENTITY_ENCODE_INTL_CHARS, "true");
         crDom = as.scan(html, revised2, AntiSamy.DOM).getCleanHTML();
         crSax = as.scan(html, revised2, AntiSamy.SAX).getCleanHTML();
-        assertTrue(!crDom.contains("ä"));
+        assertTrue(!crDom.contains("\u00e4"));
         assertTrue(crDom.contains("&auml;"));
-        assertTrue(!crSax.contains("ä"));
+        assertTrue(!crSax.contains("\u00e4"));
         assertTrue(crSax.contains("&auml;"));
 
         Policy revised3 = policy.cloneWithDirective(Policy.USE_XHTML, "true").cloneWithDirective(Policy.ENTITY_ENCODE_INTL_CHARS, "true");
         crDom = as.scan(html, revised3, AntiSamy.DOM).getCleanHTML();
         crSax = as.scan(html, revised3, AntiSamy.SAX).getCleanHTML();
-        assertTrue(!crDom.contains("ä"));
+        assertTrue(!crDom.contains("\u00e4"));
         assertTrue(crDom.contains("&auml;"));
-        assertTrue(!crSax.contains("ä"));
+        assertTrue(!crSax.contains("\u00e4"));
         assertTrue(crSax.contains("&auml;"));
     }
 
