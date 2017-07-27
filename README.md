@@ -14,7 +14,6 @@ First, add the dependency from Maven:
 <dependency>
    <groupId>org.owasp.antisamy</groupId>
    <projectId>antisamy</projectId>
-   <version>1.5.5</version>
 </dependency>
 ```
 
