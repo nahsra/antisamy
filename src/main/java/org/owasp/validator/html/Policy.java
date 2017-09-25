@@ -638,12 +638,7 @@ public class Policy {
         }
         return allowedRegExp;
     }
-
-    public static void main(String[] args) {
-		Pattern p = Pattern.compile("[\\p{L}\\p{N}\\\\.\\#@\\$%\\+&amp;;\\-_~,\\?=/!]+");
-	}
-
-
+    
     private static void parseTagRules(Element root, Map<String, Attribute> commonAttributes1, Map<String, AntiSamyPattern> commonRegularExpressions1, Map<String, Tag> tagRules1) throws PolicyException {
 
         if (root == null) return;
