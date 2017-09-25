@@ -29,7 +29,7 @@
 
 		<!--  force non-empty with a '+' at the end instead of '*'
 		-->
-		<regexp name="onsiteURL" value="([\p{L}\p{N}\p{Zs}/\.\?=&amp;\-~])+" />
+		<regexp name="onsiteURL" value="^(?![\p{L}\p{N}\\\.\#@\$%\+&amp;;\-_~,\?=/!]*(&amp;colon))[\p{L}\p{N}\\\.\#@\$%\+&amp;;\-_~,\?=/!]*"/>
 
 		<!--  ([\w\\/\.\?=&amp;;\#-~]+|\#(\w)+)
 		-->
