@@ -1174,6 +1174,25 @@ public class AntiSamyTest {
     }
 
     @Test
+    public void testOnsiteRegex() throws ScanException, PolicyException {
+    	assertIsGoodOnsiteURL("foo");
+    	assertIsGoodOnsiteURL("/foo/bar");
+    	assertIsGoodOnsiteURL("../../di.cgi?foo&amp;3D~");
+    	assertIsGoodOnsiteURL("/foo/bar/1/sdf;jsessiond=1f1f12312_123123");
+    }
+    
+    void assertIsGoodOnsiteURL(String url) throws ScanException, PolicyException {
+    	String html = as.scan("<a href=\"" + url + "\">X</a>", policy, AntiSamy.DOM).getCleanHTML();
+    	assertTrue(html.contains("href=\""));
+	}
+    
+	@Test
+    public void issue10() throws ScanException, PolicyException {
+    	assertFalse(as.scan("<a href=\"javascript&colon;alert&lpar;1&rpar;\">X</a>", policy, AntiSamy.DOM).getCleanHTML().contains("javascript"));
+        assertFalse(as.scan("<a href=\"javascript&colon;alert&lpar;1&rpar;\">X</a>", policy, AntiSamy.SAX).getCleanHTML().contains("javascript"));
+    }
+    
+    @Test
     public void issue147() throws ScanException, PolicyException {
         URL url = getClass().getResource("/antisamy-tinymce.xml");
 
