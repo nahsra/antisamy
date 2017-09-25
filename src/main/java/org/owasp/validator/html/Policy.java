@@ -91,9 +91,6 @@ public class Policy {
     public static final String ACTION_FILTER = "filter";
     public static final String ACTION_TRUNCATE = "truncate";
 
-    private static char REGEXP_BEGIN = '^';
-    private static char REGEXP_END = '$';
-
     private final Map<String, AntiSamyPattern> commonRegularExpressions;
     protected final Map<String, Tag> tagRules;
     private final Map<String, Property> cssRules;
@@ -588,7 +585,7 @@ public class Policy {
             if (regExpName != null && regExpName.length() > 0) {
                 allowedRegExp.add(commonRegularExpressions1.get(regExpName).getPattern());
             } else {
-                allowedRegExp.add(Pattern.compile(REGEXP_BEGIN + value + REGEXP_END));
+                allowedRegExp.add(Pattern.compile(value));
             }
         }
         return allowedRegExp;
@@ -617,7 +614,7 @@ public class Policy {
                 }
 
             } else if (value != null && value.length() > 0) {
-                allowedRegexps.add(Pattern.compile(REGEXP_BEGIN + value + REGEXP_END));
+                allowedRegexps.add(Pattern.compile(value));
             }
         }
         return allowedRegexps;
@@ -634,16 +631,14 @@ public class Policy {
             if (pattern != null) {
                 allowedRegExp.add(pattern.getPattern());
             } else if (value != null) {
-                allowedRegExp.add(Pattern.compile(REGEXP_BEGIN + value + REGEXP_END));
+                allowedRegExp.add(Pattern.compile(value));
             } else {
                 throw new PolicyException("Regular expression '" + regExpName + "' was referenced as a common regexp in definition of '" + name + "', but does not exist in <common-regexp>");
             }
         }
         return allowedRegExp;
     }
-
-
-
+    
     private static void parseTagRules(Element root, Map<String, Attribute> commonAttributes1, Map<String, AntiSamyPattern> commonRegularExpressions1, Map<String, Tag> tagRules1) throws PolicyException {
 
         if (root == null) return;
