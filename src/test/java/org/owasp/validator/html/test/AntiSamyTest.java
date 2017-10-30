@@ -1276,5 +1276,19 @@ public class AntiSamyTest {
     	assertFalse(as.scan(test, policy, AntiSamy.DOM).getCleanHTML().contains("alert"));
     	assertFalse(as.scan(test, policy, AntiSamy.SAX).getCleanHTML().contains("alert"));
     }
+    
+    /*
+     * Mailing list user sent this in. Didn't work, but good test to leave in.
+     */
+    @Test
+    public void testUnknownTags() throws ScanException, PolicyException {
+    	String test = "<%/onmouseover=prompt(1)>";
+    	CleanResults saxResults = as.scan(test, policy, AntiSamy.SAX);
+    	CleanResults domResults = as.scan(test, policy, AntiSamy.DOM);
+    	System.out.println("OnUnknown (SAX): " + saxResults.getCleanHTML());
+    	System.out.println("OnUnknown (DOM): " + domResults.getCleanHTML());
+    	assertFalse(saxResults.getCleanHTML().contains("<%/"));
+    	assertFalse(domResults.getCleanHTML().contains("<%/"));
+    }
 
 }
