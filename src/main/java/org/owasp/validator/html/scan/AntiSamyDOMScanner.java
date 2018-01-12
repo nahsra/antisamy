@@ -90,7 +90,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         super(policy);
     }
 
-    /** @noinspection UnusedDeclaration Todo Investigate */
+    /* @noinspection UnusedDeclaration Todo Investigate */
     public AntiSamyDOMScanner() throws PolicyException {
         super();
     }
@@ -313,7 +313,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         addError(ErrorMessageUtil.ERROR_TAG_ENCODED, new Object[]{HTMLEntityEncoder.htmlEntityEncode(tagName)});
         processChildren(eleChildNodes, currentStackDepth);
 
-        /*
+   /*
     * Transform the tag to text, HTML-encode it and promote the
     * children. The tag will be kept in the fragment as one or two text
     * Nodes located before and after the children; representing how the
@@ -350,7 +350,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
             }
         }
 
-        /*
+   /*
     * Check to see if it's a <style> tag. We have to special case this
     * tag so we can hand it off to the custom style sheet validating
     * parser.
@@ -360,7 +360,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
             if (processStyleTag(ele, parentNode)) return;
         }
 
-        /*
+   /*
     * Go through the attributes in the tainted tag and validate them
     * against the values we have for them.
     *
@@ -376,7 +376,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
         processChildren(eleChildNodes, currentStackDepth);
 
-        /*
+   /*
     * If we have been dealing with a <param> that has been converted to
     * an <embed>, convert it back
     */
@@ -390,8 +390,8 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
     private boolean processStyleTag(Element ele, Node parentNode) {
         /*
-* Invoke the css parser on this element.
-*/
+         * Invoke the css parser on this element.
+         */
         CssScanner styleScanner;
 
         if(policy.isEmbedStyleSheets()) {

@@ -31,8 +31,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URL;
 import java.util.Collections;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +45,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 import org.junit.Test;
 import org.owasp.validator.html.AntiSamy;
+import org.owasp.validator.html.AsyncResults;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
@@ -467,13 +473,15 @@ public class AntiSamyTest {
     @Test
     public void isssue31() throws ScanException, PolicyException {
 
-        String test = "<b><u><g>foo";
+        String test = "<b><u><g>foo</g></u></b>";
         Policy revised = policy.cloneWithDirective("onUnknownTag", "encode");
         CleanResults cr = as.scan(test, revised, AntiSamy.DOM);
         String s = cr.getCleanHTML();
         assertFalse(!s.contains("&lt;g&gt;"));
+        assertFalse(!s.contains("&lt;/g&gt;"));
         s = as.scan(test, revised, AntiSamy.SAX).getCleanHTML();
         assertFalse(!s.contains("&lt;g&gt;"));
+        assertFalse(!s.contains("&lt;/g&gt;"));
 
         Tag tag = policy.getTagByLowercaseName("b").mutateAction("encode");
         Policy policy1 = policy.mutateTag(tag);
@@ -482,11 +490,13 @@ public class AntiSamyTest {
         s = cr.getCleanHTML();
 
         assertFalse(!s.contains("&lt;b&gt;"));
+        assertFalse(!s.contains("&lt;/b&gt;"));
 
         cr = as.scan(test, policy1, AntiSamy.SAX);
         s = cr.getCleanHTML();
 
         assertFalse(!s.contains("&lt;b&gt;"));
+        assertFalse(!s.contains("&lt;/b&gt;"));
     }
 
     @Test
@@ -1272,9 +1282,9 @@ public class AntiSamyTest {
 
     @Test
     public void testIssue2() throws ScanException, PolicyException {
-    	String test = "<style onload=alert(1)>h1 {color:red;}</style>";
-    	assertFalse(as.scan(test, policy, AntiSamy.DOM).getCleanHTML().contains("alert"));
-    	assertFalse(as.scan(test, policy, AntiSamy.SAX).getCleanHTML().contains("alert"));
+        	String test = "<style onload=alert(1)>h1 {color:red;}</style>";
+        	assertFalse(as.scan(test, policy, AntiSamy.DOM).getCleanHTML().contains("alert"));
+        	assertFalse(as.scan(test, policy, AntiSamy.SAX).getCleanHTML().contains("alert"));
     }
     
     /*
@@ -1282,13 +1292,24 @@ public class AntiSamyTest {
      */
     @Test
     public void testUnknownTags() throws ScanException, PolicyException {
-    	String test = "<%/onmouseover=prompt(1)>";
-    	CleanResults saxResults = as.scan(test, policy, AntiSamy.SAX);
-    	CleanResults domResults = as.scan(test, policy, AntiSamy.DOM);
-    	System.out.println("OnUnknown (SAX): " + saxResults.getCleanHTML());
-    	System.out.println("OnUnknown (DOM): " + domResults.getCleanHTML());
-    	assertFalse(saxResults.getCleanHTML().contains("<%/"));
-    	assertFalse(domResults.getCleanHTML().contains("<%/"));
+        	String test = "<%/onmouseover=prompt(1)>";
+        	CleanResults saxResults = as.scan(test, policy, AntiSamy.SAX);
+        	CleanResults domResults = as.scan(test, policy, AntiSamy.DOM);
+        	System.out.println("OnUnknown (SAX): " + saxResults.getCleanHTML());
+        	System.out.println("OnUnknown (DOM): " + domResults.getCleanHTML());
+        	assertFalse(saxResults.getCleanHTML().contains("<%/"));
+        	assertFalse(domResults.getCleanHTML().contains("<%/"));
+    }
+    
+    @Test
+    public void testAsyncScan() throws ScanException, PolicyException, InterruptedException, ExecutionException {
+        Reader reader = new StringReader("<bogus>whatever</bogus><img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\" "
+                + "onmouseover=\"alert('xss')\">");
+        Writer writer = new StringWriter();
+        AsyncResults results_sax = as.scanAsync(reader, writer, policy);
+        results_sax.waitForCompletion();
+        String cleanHtml = writer.toString().trim();
+        assertEquals("whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\" />", cleanHtml);
     }
 
 }

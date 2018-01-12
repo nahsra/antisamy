@@ -44,7 +44,7 @@ public abstract class AbstractAntiSamyScanner {
 
 	public abstract CleanResults scan(String html) throws ScanException;
 
-	/** @noinspection UnusedDeclaration TODO: Investigate */
+	/* @noinspection UnusedDeclaration TODO: Investigate */
     public abstract CleanResults getResults();
 
 	public AbstractAntiSamyScanner(Policy policy) {
@@ -85,7 +85,7 @@ public abstract class AbstractAntiSamyScanner {
         return format;
 	}
 	
-	/** @noinspection deprecation*/
+	/* @noinspection deprecation*/
     protected org.apache.xml.serialize.HTMLSerializer getHTMLSerializer(Writer w, OutputFormat format) {
 
         if(policy.isUseXhtml()) {

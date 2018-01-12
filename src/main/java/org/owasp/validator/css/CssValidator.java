@@ -117,9 +117,6 @@ public class CssValidator {
 	 *            the name of the selector
 	 * @param selector
 	 *            the object representation of the selector
-	 * @param results
-	 *            the <code>CleanResults</code> object to add any error
-	 *            messages to
 	 * @return true if this selector name is valid; false otherwise
 	 */
 	public boolean isValidSelector(String selectorName, Selector selector)
@@ -196,9 +193,6 @@ public class CssValidator {
 	 *            the name of the selector that contains this condition
 	 * @param condition
 	 *            the object representation of this condition
-	 * @param results
-	 *            the <code>CleanResults</code> object to add any error
-	 *            messages to
 	 * @return true if this condition is valid; false otherwise
 	 */
 	public boolean isValidCondition(String selectorName, Condition condition)

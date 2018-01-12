@@ -53,7 +53,7 @@ import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
 
 /**
  * Policy.java
- * <p/>
+ * <p></p>
  * This file holds the model for our policy engine.
  *
  * @author Arshan Dabirsiaghi
@@ -191,8 +191,8 @@ public class Policy {
 
     /**
      * This retrieves a Policy based on the URL object passed in.
-     * <p/>
-     * NOTE: This is the only factory method that will work with <include> tags
+     * <p></p>
+     * NOTE: This is the only factory method that will work with &lt;include&gt; tags
      * in AntiSamy policy files.
      *
      * @param url A URL object which contains the XML policy information.
@@ -749,7 +749,7 @@ public class Policy {
 
 
     /**
-     * A simple method for returning on of the <global-attribute> entries by
+     * A simple method for returning on of the &lt;global-attribute&gt; entries by
      * name.
      *
      * @param name The name of the global-attribute we want to look up.
@@ -761,7 +761,7 @@ public class Policy {
     }
 
     /**
-     * A method for returning one of the dynamic <global-attribute> entries by
+     * A method for returning one of the dynamic &lt;global-attribute&gt; entries by
      * name.
      *
      * @param name The name of the dynamic global-attribute we want to look up.
@@ -808,7 +808,7 @@ public class Policy {
 
 
     /**
-     * Resolves public & system ids to files stored within the JAR.
+     * Resolves public and system ids to files stored within the JAR.
      */
     public static InputSource resolveEntity(final String systemId, URL baseUrl) throws IOException, SAXException {
         InputSource source;

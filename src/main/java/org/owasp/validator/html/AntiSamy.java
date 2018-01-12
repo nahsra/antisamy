@@ -28,6 +28,8 @@ import org.owasp.validator.html.scan.AntiSamyDOMScanner;
 import org.owasp.validator.html.scan.AntiSamySAXScanner;
 
 import java.io.File;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * 
@@ -100,6 +102,10 @@ public class AntiSamy {
 		} else {
 			return new AntiSamySAXScanner(policy).scan(taintedHTML);
 		}
+	}
+	
+	public AsyncResults scanAsync(Reader reader, Writer writer, Policy policy) throws ScanException {
+	    return (new AntiSamySAXScanner(policy)).scan(reader, writer);
 	}
 
 	/**
