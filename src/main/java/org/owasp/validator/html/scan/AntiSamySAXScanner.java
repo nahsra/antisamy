@@ -31,33 +31,26 @@ import java.io.Writer;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 
 import org.apache.xerces.xni.parser.XMLDocumentFilter;
 import org.cyberneko.html.parsers.SAXParser;
-import org.owasp.validator.html.AsyncResults;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.util.ErrorMessageUtil;
+import org.w3c.dom.DocumentFragment;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
 public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
-
-    private static final ExecutorService executorService = Executors.newCachedThreadPool();
     
     private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
 
@@ -107,36 +100,30 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
            throw new ScanException(errorMessages.get(0));
        }
        
-        StringWriter out = new StringWriter();
+        final StringWriter out = new StringWriter();
         StringReader reader = new StringReader(html);
 
-        AsyncResults results = scan(reader, out);
-        try
-        {
-            CachedItem cachedItem = (CachedItem) results.getFuture().get();
-            final String cleanHtml = trim(html, out.getBuffer().toString());
-            Callable<String> cleanCallable = new Callable<String>() {
-                public String call() throws Exception {
-                    return cleanHtml;
-                }
-            };
-
-            errorMessages.clear();
-            errorMessages.addAll(cachedItem.magicSAXFilter.getErrorMessages());
-            cachedItems.add(cachedItem);
-            return new CleanResults(results.getStartOfScan(), cleanCallable, null, errorMessages);
-        }
-        catch (InterruptedException e)
-        {
-            throw new ScanException(e);
-        }
-        catch (ExecutionException e)
-        {
-            throw new ScanException(e);
-        }
+        CleanResults results = scan(reader, out);
+        final String tainted = html;
+        Callable<String> cleanCallable = new Callable<String>() {
+            public String call() throws Exception {
+                return trim(tainted, out.toString());
+            }
+        };
+        return new CleanResults(results.getStartOfScan(), cleanCallable, (DocumentFragment)null, results.getErrorMessages());
 	}
 
-	public AsyncResults scan(Reader reader, Writer out) throws ScanException {
+	/**
+	 * Using a SAX parser, can pass Streams for input and output.
+	 * Use case is as Servlet filter where request or response is large
+	 * and caller does not need the entire string in memory.
+	 * @param reader A Reader which can feed the SAXParser a little input at a time
+	 * @param writer A Writer that can take a little output at a time
+	 * @return CleanResults where the cleanHtml is null. If a caller wants the html as a string,
+	 *         it must capture the contents of the writer (i.e. use a StringWriter)
+	 * @throws ScanException
+	 */
+	public CleanResults scan(Reader reader, Writer writer) throws ScanException {
 		try {
 			
             CachedItem candidateCachedItem = cachedItems.poll();
@@ -165,15 +152,13 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
             //noinspection deprecation
             final org.apache.xml.serialize.OutputFormat format = getOutputFormat();
             //noinspection deprecation
-            final org.apache.xml.serialize.HTMLSerializer serializer = getHTMLSerializer(out, format);
-            Future<CachedItem> future = executorService.submit(new Callable<CachedItem>() {
-                public CachedItem call() throws TransformerException {
-                    transformer.transform(source, new SAXResult(serializer));
-                    return cachedItem;
-                }
-            });
+            final org.apache.xml.serialize.HTMLSerializer serializer = getHTMLSerializer(writer, format);
+            
+            transformer.transform(source, new SAXResult(serializer));
+            errorMessages.clear();
+            errorMessages.addAll(cachedItem.magicSAXFilter.getErrorMessages());
 
-			return new AsyncResults(startOfScan, future);
+			return new CleanResults(startOfScan, (String)null, (DocumentFragment)null, errorMessages);
 
 		} catch (Exception e) {
 			throw new ScanException(e);

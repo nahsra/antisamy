@@ -104,7 +104,19 @@ public class AntiSamy {
 		}
 	}
 	
-	public AsyncResults scanAsync(Reader reader, Writer writer, Policy policy) throws ScanException {
+	/**
+	 * Use this method if caller has Streams rather than Strings for I/O
+	 * Useful for servlets where the response is very large and we don't validate, 
+	 * simply encode as bytes are consumed from the stream.
+	 * @param reader Reader that produces the input, possibly a little at a time
+	 * @param writer Writer that receives the cleaned output, possibly a little at a time
+	 * @param policy Policy that directs the scan
+	 * @return CleanResults where the cleanHtml is null. If caller wants the clean html, it
+	 *         must capture the writer's contents. When using Streams, caller generally
+	 *         doesn't want to create a single string containing clean html.
+	 * @throws ScanException
+	 */
+	public CleanResults scan(Reader reader, Writer writer, Policy policy) throws ScanException {
 	    return (new AntiSamySAXScanner(policy)).scan(reader, writer);
 	}
 

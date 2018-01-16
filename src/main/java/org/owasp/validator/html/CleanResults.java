@@ -46,6 +46,7 @@ public class CleanResults {
 
 	private List<String> errorMessages = new ArrayList<String>();
 	private Callable<String> cleanHTML;
+	private long startOfScan;
 	private long elapsedScan;
 
 	private DocumentFragment cleanXMLDocumentFragment;
@@ -59,6 +60,7 @@ public class CleanResults {
 
 	public CleanResults(long startOfScan, final String cleanHTML,
 			DocumentFragment XMLDocumentFragment, List<String> errorMessages) {
+	    this.startOfScan = startOfScan;
 		this.elapsedScan = System.currentTimeMillis() - startOfScan;
 		this.cleanXMLDocumentFragment = XMLDocumentFragment;
 		this.cleanHTML = new Callable<String>() {
@@ -120,5 +122,13 @@ public class CleanResults {
 	public int getNumberOfErrors() {
 		return errorMessages.size();
 	}
+
+	/**
+	 * @return time that scan started in ms
+	 */
+    public long getStartOfScan()
+    {
+        return startOfScan;
+    }
 
 }

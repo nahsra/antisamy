@@ -45,7 +45,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 import org.junit.Test;
 import org.owasp.validator.html.AntiSamy;
-import org.owasp.validator.html.AsyncResults;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
@@ -1263,7 +1262,6 @@ public class AntiSamyTest {
 
         CleanResults results_dom = as.scan(test, policy, AntiSamy.DOM);
 
-
         assertEquals( results_sax.getCleanHTML(), results_dom.getCleanHTML());
         assertEquals("whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\" />", results_dom.getCleanHTML());
     }
@@ -1302,12 +1300,11 @@ public class AntiSamyTest {
     }
     
     @Test
-    public void testAsyncScan() throws ScanException, PolicyException, InterruptedException, ExecutionException {
+    public void testStreamScan() throws ScanException, PolicyException, InterruptedException, ExecutionException {
         Reader reader = new StringReader("<bogus>whatever</bogus><img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\" "
                 + "onmouseover=\"alert('xss')\">");
         Writer writer = new StringWriter();
-        AsyncResults results_sax = as.scanAsync(reader, writer, policy);
-        results_sax.waitForCompletion();
+        as.scan(reader, writer, policy);
         String cleanHtml = writer.toString().trim();
         assertEquals("whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\" />", cleanHtml);
     }
