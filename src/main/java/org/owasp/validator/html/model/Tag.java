@@ -77,9 +77,10 @@ public class Tag {
     /**
      * Returns a regular expression for validating individual tags. Not used by the AntiSamy scanner, but you might find some use for this.
      *
-     * @return A regular expression for the tag, i.e., "^&lt;b&gt;$", or "&lt;hr(\s)*(width='((\w){2,3}(\%)*)'&gt;"
+     * @return A regular expression for the tag, i.e., 
+     * <code>"^&lt;b&gt;$"</code> 
+     * or <code>"&lt;hr(\s)*(width='((\w){2,3}(\%)*)'&gt;"</code>
      */
-
     public String getRegularExpression() {
 
         /*

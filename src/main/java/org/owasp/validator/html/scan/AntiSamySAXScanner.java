@@ -24,9 +24,12 @@
 
 package org.owasp.validator.html.scan;
 
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Queue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.xml.transform.OutputKeys;
@@ -42,12 +45,13 @@ import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.util.ErrorMessageUtil;
+import org.w3c.dom.DocumentFragment;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
 public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
-
+    
     private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
 
     private static final TransformerFactory sTransformerFactory = TransformerFactory.newInstance();
@@ -81,35 +85,62 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
 	}
 
 	public CleanResults scan(String html) throws ScanException {
+	    return scan(html, this.policy);
+	}
+	
+	public CleanResults scan(String html, Policy policy) throws ScanException {
+       if (html == null) {
+            throw new ScanException(new NullPointerException("Null input"));
+        }
 
-		if (html == null) {
-			throw new ScanException(new NullPointerException("Null input"));
-		}
+       int maxInputSize = this.policy.getMaxInputSize();
 
-		int maxInputSize = policy.getMaxInputSize();
+       if (html.length() > maxInputSize) {
+           addError(ErrorMessageUtil.ERROR_INPUT_SIZE, new Object[] {html.length(), maxInputSize});
+           throw new ScanException(errorMessages.get(0));
+       }
+       
+        final StringWriter out = new StringWriter();
+        StringReader reader = new StringReader(html);
 
-		if (html.length() > maxInputSize) {
-			addError(ErrorMessageUtil.ERROR_INPUT_SIZE, new Object[] {html.length(), maxInputSize});
-			throw new ScanException(errorMessages.get(0));
-		}
-		
+        CleanResults results = scan(reader, out);
+        final String tainted = html;
+        Callable<String> cleanCallable = new Callable<String>() {
+            public String call() throws Exception {
+                return trim(tainted, out.toString());
+            }
+        };
+        return new CleanResults(results.getStartOfScan(), cleanCallable, (DocumentFragment)null, results.getErrorMessages());
+	}
+
+	/**
+	 * Using a SAX parser, can pass Streams for input and output.
+	 * Use case is as Servlet filter where request or response is large
+	 * and caller does not need the entire string in memory.
+	 * @param reader A Reader which can feed the SAXParser a little input at a time
+	 * @param writer A Writer that can take a little output at a time
+	 * @return CleanResults where the cleanHtml is null. If a caller wants the html as a string,
+	 *         it must capture the contents of the writer (i.e. use a StringWriter)
+	 * @throws ScanException
+	 */
+	public CleanResults scan(Reader reader, Writer writer) throws ScanException {
 		try {
 			
-			StringWriter out = new StringWriter();
-
-            CachedItem cachedItem = cachedItems.poll();
-            if (cachedItem == null){
-                cachedItem = new CachedItem(getNewTransformer(), getParser(), new MagicSAXFilter(messages));
+            CachedItem candidateCachedItem = cachedItems.poll();
+            if (candidateCachedItem == null){
+                candidateCachedItem = new CachedItem(getNewTransformer(), getParser(), new MagicSAXFilter(messages));
             }
+            
+            final CachedItem cachedItem = candidateCachedItem;
 
             SAXParser parser = cachedItem.saxParser;
             cachedItem.magicSAXFilter.reset(policy);
 
             long startOfScan = System.currentTimeMillis();
 
-            SAXSource source = new SAXSource(parser, new InputSource(new StringReader(html)));
+            final SAXSource source = new SAXSource(parser, new InputSource(reader));
 			
-            Transformer transformer = cachedItem.transformer;
+            final Transformer transformer = cachedItem.transformer;
             boolean formatOutput = policy.isFormatOutput();
             boolean useXhtml = policy.isUseXhtml();
             boolean omitXml = policy.isOmitXmlDeclaration();
@@ -119,17 +150,15 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
             transformer.setOutputProperty(OutputKeys.METHOD, useXhtml ? "xml" : "html");
 
             //noinspection deprecation
-            org.apache.xml.serialize.OutputFormat format = getOutputFormat();
+            final org.apache.xml.serialize.OutputFormat format = getOutputFormat();
             //noinspection deprecation
-            org.apache.xml.serialize.HTMLSerializer serializer = getHTMLSerializer(out, format);
-			transformer.transform(source, new SAXResult(serializer));			
-
-			String cleanHtml = trim(html, out.getBuffer().toString());
-
-			errorMessages.clear();
+            final org.apache.xml.serialize.HTMLSerializer serializer = getHTMLSerializer(writer, format);
+            
+            transformer.transform(source, new SAXResult(serializer));
+            errorMessages.clear();
             errorMessages.addAll(cachedItem.magicSAXFilter.getErrorMessages());
-            cachedItems.add( cachedItem);
-			return new CleanResults(startOfScan, cleanHtml, null, errorMessages);
+
+			return new CleanResults(startOfScan, (String)null, (DocumentFragment)null, errorMessages);
 
 		} catch (Exception e) {
 			throw new ScanException(e);

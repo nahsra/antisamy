@@ -31,8 +31,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URL;
 import java.util.Collections;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1257,7 +1262,6 @@ public class AntiSamyTest {
 
         CleanResults results_dom = as.scan(test, policy, AntiSamy.DOM);
 
-
         assertEquals( results_sax.getCleanHTML(), results_dom.getCleanHTML());
         assertEquals("whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\" />", results_dom.getCleanHTML());
     }
@@ -1276,9 +1280,9 @@ public class AntiSamyTest {
 
     @Test
     public void testIssue2() throws ScanException, PolicyException {
-    	String test = "<style onload=alert(1)>h1 {color:red;}</style>";
-    	assertFalse(as.scan(test, policy, AntiSamy.DOM).getCleanHTML().contains("alert"));
-    	assertFalse(as.scan(test, policy, AntiSamy.SAX).getCleanHTML().contains("alert"));
+        	String test = "<style onload=alert(1)>h1 {color:red;}</style>";
+        	assertFalse(as.scan(test, policy, AntiSamy.DOM).getCleanHTML().contains("alert"));
+        	assertFalse(as.scan(test, policy, AntiSamy.SAX).getCleanHTML().contains("alert"));
     }
     
     /*
@@ -1286,13 +1290,23 @@ public class AntiSamyTest {
      */
     @Test
     public void testUnknownTags() throws ScanException, PolicyException {
-    	String test = "<%/onmouseover=prompt(1)>";
-    	CleanResults saxResults = as.scan(test, policy, AntiSamy.SAX);
-    	CleanResults domResults = as.scan(test, policy, AntiSamy.DOM);
-    	System.out.println("OnUnknown (SAX): " + saxResults.getCleanHTML());
-    	System.out.println("OnUnknown (DOM): " + domResults.getCleanHTML());
-    	assertFalse(saxResults.getCleanHTML().contains("<%/"));
-    	assertFalse(domResults.getCleanHTML().contains("<%/"));
+        	String test = "<%/onmouseover=prompt(1)>";
+        	CleanResults saxResults = as.scan(test, policy, AntiSamy.SAX);
+        	CleanResults domResults = as.scan(test, policy, AntiSamy.DOM);
+        	System.out.println("OnUnknown (SAX): " + saxResults.getCleanHTML());
+        	System.out.println("OnUnknown (DOM): " + domResults.getCleanHTML());
+        	assertFalse(saxResults.getCleanHTML().contains("<%/"));
+        	assertFalse(domResults.getCleanHTML().contains("<%/"));
+    }
+    
+    @Test
+    public void testStreamScan() throws ScanException, PolicyException, InterruptedException, ExecutionException {
+        Reader reader = new StringReader("<bogus>whatever</bogus><img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\" "
+                + "onmouseover=\"alert('xss')\">");
+        Writer writer = new StringWriter();
+        as.scan(reader, writer, policy);
+        String cleanHtml = writer.toString().trim();
+        assertEquals("whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\" />", cleanHtml);
     }
 
 }

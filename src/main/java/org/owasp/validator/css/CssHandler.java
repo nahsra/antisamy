@@ -165,7 +165,6 @@ public class CssHandler implements DocumentHandler {
 	}
 
 	/**
-	 * Returns the error messages generated during parsing.
 	 * @return the error messages generated during parsing
 	 */
 	public Collection getErrorMessages() {
