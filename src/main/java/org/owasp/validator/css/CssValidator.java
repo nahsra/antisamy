@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -50,7 +50,7 @@ import org.w3c.css.sac.SiblingSelector;
 import org.w3c.css.sac.SimpleSelector;
 
 /**
- * Encapsulates all the neceesary operations for validating individual eleements
+ * Encapsulates all the necessary operations for validating individual elements
  * of a stylesheet (namely: selectors, conditions and properties).
  * 
  * @author Jason Li
@@ -118,6 +118,8 @@ public class CssValidator {
 	 * @param selector
 	 *            the object representation of the selector
 	 * @return true if this selector name is valid; false otherwise
+	 * @throws ScanException When there is a problem encountered
+	 *         while scanning this selector
 	 */
 	public boolean isValidSelector(String selectorName, Selector selector)
 			throws ScanException {
@@ -169,9 +171,6 @@ public class CssValidator {
 	 * 
 	 * @param selector
 	 *            the object representation of the selector
-	 * @param results
-	 *            the <code>CleanResults</code> object to add any error
-	 *            messages to
 	 * @return true if this selector name is valid; false otherwise
 	 */
 	private boolean validateSimpleSelector(SimpleSelector selector) {
@@ -194,6 +193,8 @@ public class CssValidator {
 	 * @param condition
 	 *            the object representation of this condition
 	 * @return true if this condition is valid; false otherwise
+	 * @throws ScanException When there is a problem encountered
+	 *         while scanning this condition
 	 */
 	public boolean isValidCondition(String selectorName, Condition condition)
 			throws ScanException {
@@ -254,9 +255,6 @@ public class CssValidator {
 	 *            the positive pattern of valid conditions
 	 * @param exclusionPattern
 	 *            the negative pattern of excluded conditions
-	 * @param results
-	 *            the <code>CleanResults</code> object to add any error
-	 *            messages to
 	 * @return true if this selector name is valid; false otherwise
 	 */
 	private boolean validateCondition(AttributeCondition condition,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -78,13 +78,12 @@ public class CssHandler implements DocumentHandler {
 	private final InternalPolicy policy;
 
 	/**
-	 * The encaspulated results including the error messages
+	 * The error messages
 	 */
-//	private final CleanResults results;
 	private final Collection<String> errorMessages;
 	
 	/**
-	 * The error message bundled to pull from.
+	 * The error message bundle to pull from.
 	 */
 	private ResourceBundle messages;
 	
@@ -119,6 +118,10 @@ public class CssHandler implements DocumentHandler {
 	 *            the policy to use
 	 * @param embeddedStyleSheets
 	 *            the queue of stylesheets imported
+	 * @param errorMessages
+	 *            the List of error messages to use if there are errors
+	 * @param messages
+	 *            the error message bundle to pull from
 	 */
 	public CssHandler(Policy policy, LinkedList embeddedStyleSheets,
 		List<String> errorMessages, ResourceBundle messages) {
@@ -133,8 +136,12 @@ public class CssHandler implements DocumentHandler {
 	 *            the policy to use
 	 * @param embeddedStyleSheets
 	 *            the queue of stylesheets imported
+	 * @param errorMessages
+	 *            the List of error messages to use if there are errors
 	 * @param tagName
 	 *            the associated tag name with this inline style
+	 * @param messages
+	 *            the error message bundle to pull from
 	 */
 	public CssHandler(Policy policy, LinkedList embeddedStyleSheets,
 			List<String> errorMessages, String tagName, ResourceBundle messages) {
@@ -150,7 +157,7 @@ public class CssHandler implements DocumentHandler {
 	/**
 	 * Returns the cleaned stylesheet.
 	 * 
-	 * @return the cleaned styesheet
+	 * @return the cleaned stylesheet.
 	 */
 	public String getCleanStylesheet() {
 		// Always ensure results contain most recent generation of stylesheet

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -58,6 +58,8 @@ public class XMLUtil {
 	 * XML element.
 	 * @param ele The document element from which to pull the integer value.
 	 * @param tagName The name of the node.
+	 * @param defaultValue The default int to return if the specified XML element cannot be found
+	 *           or parsed properly.
 	 * @return The integer value of the given node in the element passed in.
 	 */
 	

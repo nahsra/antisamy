@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -58,9 +58,6 @@ public class URIUtils {
 	 */
 	private static final String PARENT_DIR_OP = "..";
 
-	/**
-	 *
-	 **/
 	public static String resolveAsString(String href, String documentBase) {
 
 		try {
@@ -146,7 +143,9 @@ public class URIUtils {
 	 * I needed this method because the JDK doesn't do this
 	 * automatically when creating URLs.
 	 *
-	 * @param absoluteURL the absolute URI to normalize
+	 * @param absoluteURL the absolute URL to normalize
+	 * @return The normalized URL
+	 * @throws MalformedURLException if the supplied URL is malformed.
 	 */
 	public static String normalize(String absoluteURL)
 			throws MalformedURLException {

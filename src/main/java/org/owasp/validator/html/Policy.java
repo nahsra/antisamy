@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2013, Arshan Dabirsiaghi, Jason Li, Kristian Rosenvold
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li, Kristian Rosenvold
  *
  * All rights reserved.
  *
@@ -52,9 +52,7 @@ import org.xml.sax.SAXException;
 import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
 
 /**
- * Policy.java
- * <p></p>
- * This file holds the model for our policy engine.
+ * Policy.java - This file holds the model for our policy engine.
  *
  * @author Arshan Dabirsiaghi
  */
@@ -102,7 +100,11 @@ public class Policy {
     private final TagMatcher requiresClosingTagsMatcher;
 
     /**
-     * The path to the base policy file, used to resolve relative paths when reading included files
+     * Get the Tag specified by the provided tag name.
+     * 
+     * @param tagName
+     *            The name of the Tag to return.
+     * @return The requested Tag, or null if it doesn't exist.
      */
     public Tag getTagByLowercaseName(String tagName) {
         return tagRules.get(tagName);
@@ -191,7 +193,7 @@ public class Policy {
 
     /**
      * This retrieves a Policy based on the URL object passed in.
-     * <p></p>
+     * <br><br>
      * NOTE: This is the only factory method that will work with &lt;include&gt; tags
      * in AntiSamy policy files.
      *
@@ -270,6 +272,7 @@ public class Policy {
 
             return getTopLevelElement( source);
         } catch (SAXException e) {
+        	// This can't actually happen. See JavaDoc for resolveEntity(String, URL)
             throw new PolicyException(e);
         } catch (IOException e) {
             throw new PolicyException(e);
@@ -800,6 +803,7 @@ public class Policy {
     /**
      * Return a directive value based on a lookup name.
      *
+     * @param name The name of the directive we want to look up.
      * @return A String object containing the directive associated with the lookup name, or null if none is found.
      */
     public String getDirective(String name) {
@@ -808,7 +812,14 @@ public class Policy {
 
 
     /**
-     * Resolves public and system ids to files stored within the JAR.
+     * Resolves public and system IDs to files stored within the JAR.
+     * 
+     * @param systemId The name of the entity we want to look up.
+     * @param baseUrl The base location of the entity.
+     * @return A String object containing the directive associated with the lookup name, or null if none is found.
+     * @throws IOException if the specified URL can't be opened.
+     * @throws SAXException This exception can't actually be thrown, but left in the method signature for
+     *                API compatibility reasons.
      */
     public static InputSource resolveEntity(final String systemId, URL baseUrl) throws IOException, SAXException {
         InputSource source;

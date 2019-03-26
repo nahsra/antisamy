@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -25,7 +25,6 @@
 package org.owasp.validator.html;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -118,6 +117,8 @@ public class CleanResults {
 
 	/**
 	 * Return the number of errors encountered during filtering.
+	 * 
+	 * @return The number of errors encountered during filtering.
 	 */
 	public int getNumberOfErrors() {
 		return errorMessages.size();
