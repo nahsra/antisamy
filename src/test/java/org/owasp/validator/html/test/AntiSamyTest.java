@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -470,7 +470,7 @@ public class AntiSamyTest {
     }
 
     @Test
-    public void isssue31() throws ScanException, PolicyException {
+    public void issue31() throws ScanException, PolicyException {
 
         String test = "<b><u><g>foo</g></u></b>";
         Policy revised = policy.cloneWithDirective("onUnknownTag", "encode");
@@ -720,7 +720,7 @@ public class AntiSamyTest {
     }
 
     @Test
-    public void isssue56() throws ScanException, PolicyException {
+    public void issue56() throws ScanException, PolicyException {
         /* issue #56 - unnecessary spaces */
 
         String s = "<SPAN style='font-weight: bold;'>Hello World!</SPAN>";
@@ -1280,9 +1280,9 @@ public class AntiSamyTest {
 
     @Test
     public void testIssue2() throws ScanException, PolicyException {
-        	String test = "<style onload=alert(1)>h1 {color:red;}</style>";
-        	assertFalse(as.scan(test, policy, AntiSamy.DOM).getCleanHTML().contains("alert"));
-        	assertFalse(as.scan(test, policy, AntiSamy.SAX).getCleanHTML().contains("alert"));
+        String test = "<style onload=alert(1)>h1 {color:red;}</style>";
+        assertFalse(as.scan(test, policy, AntiSamy.DOM).getCleanHTML().contains("alert"));
+        assertFalse(as.scan(test, policy, AntiSamy.SAX).getCleanHTML().contains("alert"));
     }
     
     /*
@@ -1290,13 +1290,13 @@ public class AntiSamyTest {
      */
     @Test
     public void testUnknownTags() throws ScanException, PolicyException {
-        	String test = "<%/onmouseover=prompt(1)>";
-        	CleanResults saxResults = as.scan(test, policy, AntiSamy.SAX);
-        	CleanResults domResults = as.scan(test, policy, AntiSamy.DOM);
-        	System.out.println("OnUnknown (SAX): " + saxResults.getCleanHTML());
-        	System.out.println("OnUnknown (DOM): " + domResults.getCleanHTML());
-        	assertFalse(saxResults.getCleanHTML().contains("<%/"));
-        	assertFalse(domResults.getCleanHTML().contains("<%/"));
+        String test = "<%/onmouseover=prompt(1)>";
+        CleanResults saxResults = as.scan(test, policy, AntiSamy.SAX);
+        CleanResults domResults = as.scan(test, policy, AntiSamy.DOM);
+        System.out.println("OnUnknown (SAX): " + saxResults.getCleanHTML());
+        System.out.println("OnUnknown (DOM): " + domResults.getCleanHTML());
+        assertFalse(saxResults.getCleanHTML().contains("<%/"));
+        assertFalse(domResults.getCleanHTML().contains("<%/"));
     }
     
     @Test

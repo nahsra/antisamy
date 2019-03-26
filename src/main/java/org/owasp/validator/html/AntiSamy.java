@@ -39,7 +39,6 @@ import java.io.Writer;
  * accessibility of the policy file.
  * 
  * @author Arshan Dabirsiaghi
- * 
  */
 
 public class AntiSamy {
@@ -60,14 +59,12 @@ public class AntiSamy {
 	 * The meat and potatoes. The <code>scan()</code> family of methods are the
 	 * only methods the outside world should be calling to invoke AntiSamy.
 	 * 
-	 * @param taintedHTML
-	 *            Untrusted HTML which may contain malicious code.
+	 * @param taintedHTML Untrusted HTML which may contain malicious code.
 	 * @return A <code>CleanResults</code> object which contains information
 	 *         about the scan (including the results).
 	 * @throws ScanException When there is a problem encountered
 	 *         while scanning the HTML.
-	 * @throws PolicyException When there is a problem reading the
-	 *         policy file.
+	 * @throws PolicyException When there is a problem reading the policy file.
 	 */
 	public CleanResults scan(String taintedHTML) throws ScanException, PolicyException {
 
@@ -81,16 +78,13 @@ public class AntiSamy {
 	/**
 	 * This method sets <code>scan()</code> to use the specified scan type.
 	 * 
-	 * @param taintedHTML
-	 *            Untrusted HTML which may contain malicious code.
-	 * @param scanType
-	 *            The type of scan (DOM or SAX).
+	 * @param taintedHTML Untrusted HTML which may contain malicious code.
+	 * @param scanType The type of scan (DOM or SAX).
 	 * @return A <code>CleanResults</code> object which contains information
 	 *         about the scan (including the results).
 	 * @throws ScanException When there is a problem encountered
 	 *         while scanning the HTML.
-	 * @throws PolicyException When there is a problem reading the
-	 *         policy file.
+	 * @throws PolicyException When there is a problem reading the policy file.
 	 */
 	public CleanResults scan(String taintedHTML, int scanType) throws ScanException, PolicyException {
 
@@ -103,16 +97,13 @@ public class AntiSamy {
 	/**
 	 * This method wraps <code>scan()</code> using the Policy object passed in.
 	 * 
-	 * @param taintedHTML
-	 *            Untrusted HTML which may contain malicious code.
-	 * @param policy
-	 *            The custom policy to enforce.
+	 * @param taintedHTML Untrusted HTML which may contain malicious code.
+	 * @param policy The custom policy to enforce.
 	 * @return A <code>CleanResults</code> object which contains information
 	 *         about the scan (including the results).
 	 * @throws ScanException When there is a problem encountered
 	 *         while scanning the HTML.
-	 * @throws PolicyException When there is a problem reading the
-	 *         policy file.
+	 * @throws PolicyException When there is a problem reading the policy file.
 	 */
 	public CleanResults scan(String taintedHTML, Policy policy) throws ScanException, PolicyException {
 		return new AntiSamyDOMScanner(policy).scan(taintedHTML);
@@ -121,18 +112,14 @@ public class AntiSamy {
 	/**
 	 * This method wraps <code>scan()</code> using the Policy object passed in and the specified scan type.
 	 * 
-	 * @param taintedHTML
-	 *            Untrusted HTML which may contain malicious code.
-	 * @param policy
-	 *            The custom policy to enforce.
-	 * @param scanType
-	 *            The type of scan (DOM or SAX).
+	 * @param taintedHTML Untrusted HTML which may contain malicious code.
+	 * @param policy The custom policy to enforce.
+	 * @param scanType The type of scan (DOM or SAX).
 	 * @return A <code>CleanResults</code> object which contains information
 	 *         about the scan (including the results).
 	 * @throws ScanException When there is a problem encountered
 	 *         while scanning the HTML.
-	 * @throws PolicyException When there is a problem reading the
-	 *         policy file.
+	 * @throws PolicyException When there is a problem reading the policy file.
 	 */
 	public CleanResults scan(String taintedHTML, Policy policy, int scanType) throws ScanException, PolicyException {
 
@@ -150,10 +137,11 @@ public class AntiSamy {
 	 * @param reader Reader that produces the input, possibly a little at a time
 	 * @param writer Writer that receives the cleaned output, possibly a little at a time
 	 * @param policy Policy that directs the scan
-	 * @return CleanResults where the cleanHtml is null. If caller wants the clean html, it
+	 * @return CleanResults where the cleanHtml is null. If caller wants the clean HTML, it
 	 *         must capture the writer's contents. When using Streams, caller generally
-	 *         doesn't want to create a single string containing clean html.
-	 * @throws ScanException
+	 *         doesn't want to create a single string containing clean HTML.
+	 * @throws ScanException When there is a problem encountered
+	 *         while scanning the HTML.
 	 */
 	public CleanResults scan(Reader reader, Writer writer, Policy policy) throws ScanException {
 	    return (new AntiSamySAXScanner(policy)).scan(reader, writer);
@@ -162,16 +150,13 @@ public class AntiSamy {
 	/**
 	 * This method wraps <code>scan()</code> using the Policy in the specified file.
 	 * 
-	 * @param taintedHTML
-	 *            Untrusted HTML which may contain malicious code.
-	 * @param filename
-	 *            The file name of the custom policy to enforce.
+	 * @param taintedHTML Untrusted HTML which may contain malicious code.
+	 * @param filename The file name of the custom policy to enforce.
 	 * @return A <code>CleanResults</code> object which contains information
 	 *         about the scan (including the results).
 	 * @throws ScanException When there is a problem encountered
 	 *         while scanning the HTML.
-	 * @throws PolicyException When there is a problem reading the
-	 *         policy file.
+	 * @throws PolicyException When there is a problem reading the policy file.
 	 */
 	public CleanResults scan(String taintedHTML, String filename) throws ScanException, PolicyException {
 
@@ -183,16 +168,13 @@ public class AntiSamy {
 	/**
 	 * This method wraps <code>scan()</code> using the policy File object passed in.
 	 * 
-	 * @param taintedHTML
-	 *            Untrusted HTML which may contain malicious code.
-	 * @param policyFile
-	 *            The File object of the custom policy to enforce.
+	 * @param taintedHTML Untrusted HTML which may contain malicious code.
+	 * @param policyFile The File object of the custom policy to enforce.
 	 * @return A <code>CleanResults</code> object which contains information
 	 *         about the scan (including the results).
 	 * @throws ScanException When there is a problem encountered
 	 *         while scanning the HTML.
-	 * @throws PolicyException When there is a problem reading the
-	 *         policy file.
+	 * @throws PolicyException When there is a problem reading the policy file.
 	 */
 	public CleanResults scan(String taintedHTML, File policyFile) throws ScanException, PolicyException {
 

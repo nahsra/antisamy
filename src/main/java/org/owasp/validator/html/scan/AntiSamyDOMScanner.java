@@ -467,7 +467,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     }
 
     private void actionTruncate(Element ele, String tagName, NodeList eleChildNodes) {
-        /*
+   /*
     * Remove all attributes. This is for tags like i, b, u, etc. Purely
     * formatting without any need for attributes. It also removes any
     * children.
@@ -514,7 +514,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
             Attribute attr = tag.getAttributeByName(name.toLowerCase());
 
-            /**
+            /*
              * If we there isn't an attribute by that name in our policy
              * check to see if it's a globally defined attribute. Validate
              * against that if so.
@@ -642,7 +642,8 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
                     }
 
-                } else { /*
+                } else {
+                    /*
                      * the attribute they specified isn't in our policy
                      * - remove it (whitelisting!)
                      */
@@ -712,7 +713,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         String tagName = node.getNodeName();
 
         if (!isAllowedEmptyTag(tagName)) {
-            /*
+           /*
             * Wasn't in the list of allowed elements, so we'll nuke it.
             */
             addError(ErrorMessageUtil.ERROR_TAG_EMPTY, new Object[]{HTMLEntityEncoder.htmlEntityEncode(node.getNodeName())});
@@ -742,11 +743,9 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
 
     /**
-     * Used to promote the children of a parent to accomplish the "filterTag"
-     * action.
+     * Used to promote the children of a parent to accomplish the "filterTag" action.
      *
-     * @param ele
-     *            The Element we want to filter.
+     * @param ele The Element we want to filter.
      */
     private void promoteChildren(Element ele) {
         promoteChildren(ele, ele.getChildNodes());
@@ -767,7 +766,6 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     }
 
     /**
-     *
      * This method was borrowed from Mark McLaren, to whom I owe much beer.
      *
      * This method ensures that the output has only valid XML unicode characters
@@ -776,9 +774,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
      * standard</a>. This method will return an empty String if the input is
      * null or empty.
      *
-     *
-     * @param in
-     *            The String whose non-valid characters we want to remove.
+     * @param in The String whose non-valid characters we want to remove.
      * @param invalidXmlCharsMatcher  The reusable regex matcher
      * @return The in String, stripped of non-valid characters.
      */
@@ -791,16 +787,14 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         return invalidXmlCharsMatcher.matches() ? invalidXmlCharsMatcher.replaceAll("") : in;
     }
 
-    // private void debug(String s) { System.out.println(s); }
     /**
      * Transform the element to text, HTML-encode it and promote the children.
      * The element will be kept in the fragment as one or two text Nodes located
      * before and after the children; representing how the tag used to wrap
      * them. If the element didn't have any children then only one text Node is
-     * created representing an empty element. *
+     * created representing an empty element.
      *
-     * @param ele
-     *            Element to be encoded
+     * @param ele Element to be encoded
      */
     private void encodeAndPromoteChildren(Element ele) {
         Node parent = ele.getParentNode();
@@ -817,8 +811,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     /**
      * Returns a text version of the passed element
      *
-     * @param ele
-     *            Element to be converted
+     * @param ele Element to be converted
      * @return String representation of the element
      */
     private String toString(Element ele) {

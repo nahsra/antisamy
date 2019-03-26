@@ -76,19 +76,20 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
 
         }
     }
+
     public AntiSamySAXScanner(Policy policy) {
-		super(policy);
-	}
+        super(policy);
+    }
 
-	public CleanResults getResults() {
-		return null;
-	}
+    public CleanResults getResults() {
+        return null;
+    }
 
-	public CleanResults scan(String html) throws ScanException {
-	    return scan(html, this.policy);
-	}
-	
-	public CleanResults scan(String html, Policy policy) throws ScanException {
+    public CleanResults scan(String html) throws ScanException {
+        return scan(html, this.policy);
+    }
+
+    public CleanResults scan(String html, Policy policy) throws ScanException {
        if (html == null) {
             throw new ScanException(new NullPointerException("Null input"));
         }
@@ -111,21 +112,22 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
             }
         };
         return new CleanResults(results.getStartOfScan(), cleanCallable, (DocumentFragment)null, results.getErrorMessages());
-	}
+    }
 
-	/**
-	 * Using a SAX parser, can pass Streams for input and output.
-	 * Use case is as Servlet filter where request or response is large
-	 * and caller does not need the entire string in memory.
-	 * @param reader A Reader which can feed the SAXParser a little input at a time
-	 * @param writer A Writer that can take a little output at a time
-	 * @return CleanResults where the cleanHtml is null. If a caller wants the html as a string,
-	 *         it must capture the contents of the writer (i.e. use a StringWriter)
-	 * @throws ScanException
-	 */
-	public CleanResults scan(Reader reader, Writer writer) throws ScanException {
-		try {
-			
+    /**
+     * Using a SAX parser, can pass Streams for input and output.
+     * Use case is a Servlet filter where request or response is large
+     * and caller does not need the entire string in memory.
+     * @param reader A Reader which can feed the SAXParser a little input at a time
+     * @param writer A Writer that can take a little output at a time
+     * @return CleanResults where the cleanHtml is null. If a caller wants the HTML as a string,
+     *         it must capture the contents of the writer (i.e., use a StringWriter).
+     * @throws ScanException When there is a problem encountered
+     *         while scanning the HTML.
+     */
+    public CleanResults scan(Reader reader, Writer writer) throws ScanException {
+        try {
+
             CachedItem candidateCachedItem = cachedItems.poll();
             if (candidateCachedItem == null){
                 candidateCachedItem = new CachedItem(getNewTransformer(), getParser(), new MagicSAXFilter(messages));
@@ -139,7 +141,7 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
             long startOfScan = System.currentTimeMillis();
 
             final SAXSource source = new SAXSource(parser, new InputSource(reader));
-			
+
             final Transformer transformer = cachedItem.transformer;
             boolean formatOutput = policy.isFormatOutput();
             boolean useXhtml = policy.isUseXhtml();
@@ -163,12 +165,11 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
 		} catch (Exception e) {
 			throw new ScanException(e);
 		}
-
-	}
+    }
 
      /**
       * Return a new Transformer instance. This is wrapped in a synchronized method because there is
-      * no guarantee that the TransformerFactory is thread-safe
+      * no guarantee that the TransformerFactory is thread-safe.
       *
       * @return a new Transformer instance.
       */
@@ -188,7 +189,6 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
             parser.setFeature("http://cyberneko.org/html/features/scanner/cdata-sections", true);
             parser.setFeature("http://apache.org/xml/features/scanner/notify-char-refs", true);
             parser.setFeature("http://apache.org/xml/features/scanner/notify-builtin-refs", true);
-
 
             parser.setProperty("http://cyberneko.org/html/properties/names/elems", "lower");
             return parser;

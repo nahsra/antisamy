@@ -59,7 +59,7 @@ public class CleanResults {
 
 	public CleanResults(long startOfScan, final String cleanHTML,
 			DocumentFragment XMLDocumentFragment, List<String> errorMessages) {
-	    this.startOfScan = startOfScan;
+		this.startOfScan = startOfScan;
 		this.elapsedScan = System.currentTimeMillis() - startOfScan;
 		this.cleanXMLDocumentFragment = XMLDocumentFragment;
 		this.cleanHTML = new Callable<String>() {
@@ -125,11 +125,13 @@ public class CleanResults {
 	}
 
 	/**
+	 * Get the time the scan started.
+	 * 
 	 * @return time that scan started in ms
 	 */
-    public long getStartOfScan()
-    {
-        return startOfScan;
-    }
+	public long getStartOfScan()
+	{
+		return startOfScan;
+	}
 
 }
