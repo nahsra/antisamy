@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
 	<xsd:element name="anti-samy-rules">
-	
 		<xsd:complexType>
-	
-		<xsd:sequence>
-			<xsd:element name="directives" type="Directives" maxOccurs="1" minOccurs="1"/>
-			<xsd:element name="common-regexps" type="CommonRegexps" maxOccurs="1" minOccurs="1"/>
-			<xsd:element name="common-attributes" type="AttributeList" maxOccurs="1" minOccurs="1"/>
-			<xsd:element name="global-tag-attributes" type="AttributeList" maxOccurs="1" minOccurs="1"/>
-			<xsd:element name="tags-to-encode" type="TagsToEncodeList" minOccurs="0" maxOccurs="1"/>
-			<xsd:element name="tag-rules" type="TagRules" minOccurs="1" maxOccurs="1"/>
-			<xsd:element name="css-rules" type="CSSRules" minOccurs="1" maxOccurs="1"/>
-            <xsd:element name="allowed-empty-tags" type="AllowedEmptyTags" minOccurs="0" maxOccurs="1"/>
-
-		</xsd:sequence>
-
+			<xsd:sequence>
+				<xsd:element name="directives" type="Directives" maxOccurs="1" minOccurs="1"/>
+				<xsd:element name="common-regexps" type="CommonRegexps" maxOccurs="1" minOccurs="1"/>
+				<xsd:element name="common-attributes" type="AttributeList" maxOccurs="1" minOccurs="1"/>
+				<xsd:element name="global-tag-attributes" type="AttributeList" maxOccurs="1" minOccurs="1"/>
+				<xsd:element name="dynamic-tag-attributes" type="AttributeList" maxOccurs="1" minOccurs="1"/>
+				<xsd:element name="tags-to-encode" type="TagsToEncodeList" minOccurs="0" maxOccurs="1"/>
+				<xsd:element name="tag-rules" type="TagRules" minOccurs="1" maxOccurs="1"/>
+				<xsd:element name="css-rules" type="CSSRules" minOccurs="1" maxOccurs="1"/>
+	        	<xsd:element name="allowed-empty-tags" type="AllowedEmptyTags" minOccurs="0" maxOccurs="1"/>
+			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
+	
 	<xsd:complexType name="Directives">
 		<xsd:sequence maxOccurs="unbounded">
 			<xsd:element name="directive" type="Directive" minOccurs="0"/>
@@ -27,10 +24,8 @@
 	</xsd:complexType>
 	
 	<xsd:complexType name="Directive">
-	
 		<xsd:attribute name="name" use="required"/>
 		<xsd:attribute name="value" use="required"/>
-	
 	</xsd:complexType>
 	
 	<xsd:complexType name="CommonRegexps">
@@ -61,10 +56,8 @@
 		<xsd:sequence maxOccurs="unbounded">
 			<xsd:element name="attribute" type="Attribute" minOccurs="0" />
 		</xsd:sequence>
-		
 		<xsd:attribute name="name" use="required"/>
 		<xsd:attribute name="action" use="required"/>
-		
 	</xsd:complexType>
 
     <xsd:complexType name="AllowedEmptyTags">
@@ -82,14 +75,13 @@
 		<xsd:attribute name="description"/>
 		<xsd:attribute name="onInvalid"/>
 	</xsd:complexType>
-	
 
 	<xsd:complexType name="RegexpList">
 		<xsd:sequence maxOccurs="unbounded">
 			<xsd:element name="regexp" type="RegExp" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:complexType>
-	
+
 	<xsd:complexType name="RegExp">
 		<xsd:attribute name="name" type="xsd:string"/>
 		<xsd:attribute name="value" type="xsd:string"/>
@@ -123,7 +115,6 @@
 		<xsd:attribute name="description" type="xsd:string"/>
 	</xsd:complexType>
 
-	
 	<xsd:complexType name="ShorthandList">
 		<xsd:sequence maxOccurs="unbounded">
 			<xsd:element name="shorthand" type="Shorthand" minOccurs="0"/>
@@ -133,7 +124,7 @@
 	<xsd:complexType name="Shorthand">
 		<xsd:attribute name="name" type="xsd:string" use="required"/>
 	</xsd:complexType>	
-	
+
 	<xsd:complexType name="CategoryList">
 		<xsd:sequence maxOccurs="unbounded">
 			<xsd:element name="category" type="Category" minOccurs="0"/>
@@ -143,7 +134,6 @@
 	<xsd:complexType name="Category">
 		<xsd:attribute name="value" type="xsd:string" use="required"/>
 	</xsd:complexType>
-	
 
 	<xsd:complexType name="Entity">
 		<xsd:attribute name="name" type="xsd:string" use="required"/>	
