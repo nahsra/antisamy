@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -30,7 +30,10 @@ package org.owasp.validator.css;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,7 +41,6 @@ import org.apache.batik.css.parser.ParseException;
 import org.apache.batik.css.parser.Parser;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.InternalPolicy;
-import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.w3c.css.sac.InputSource;
 
@@ -80,6 +82,8 @@ public class CssScanner {
      * 
      * @param policy
      *                the policy to follow when scanning
+     * @param messages
+     *                the error message bundle to pull from
      */
     public CssScanner(InternalPolicy policy, ResourceBundle messages) {
     	this.policy = policy;

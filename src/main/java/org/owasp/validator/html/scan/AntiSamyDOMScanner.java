@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  *
  * All rights reserved.
  *
@@ -90,7 +90,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         super(policy);
     }
 
-    /** @noinspection UnusedDeclaration Todo Investigate */
+    /* UnusedDeclaration TODO Investigate */
     public AntiSamyDOMScanner() throws PolicyException {
         super();
     }
@@ -98,14 +98,14 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     /**
      * This is where the magic lives.
      *
-     *
      * @param html
      *            A String whose contents we want to scan.
      * @return A <code>CleanResults</code> object with an
      *         <code>XMLDocumentFragment</code> object and its String
      *         representation, as well as some scan statistics.
-     * @throws ScanException
-     */
+     * @throws ScanException When there is a problem encountered
+	 *         while scanning the HTML.
+	 */
     public CleanResults scan(String html) throws ScanException {
 
         if (html == null) {

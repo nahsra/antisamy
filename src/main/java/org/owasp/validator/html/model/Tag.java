@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -29,7 +29,7 @@ import java.util.*;
 /**
  * A model for HTML "tags" and the rules dictating their validation/filtration. Also contains information
  * about their allowed attributes.
- * <p/>
+ * <br><br>
  * There is also some experimental (unused) code in here for generating a valid regular expression according to a policy
  * file on a per-tag basis.
  *
@@ -38,8 +38,8 @@ import java.util.*;
 public class Tag {
 
     /*
-      * These are the fields pulled from the policy XML.
-      */
+     * These are the fields pulled from the policy XML.
+     */
     private final Map<String, Attribute> allowedAttributes;
     private final String name;
     private final String action;
@@ -77,7 +77,7 @@ public class Tag {
     /**
      * Returns a regular expression for validating individual tags. Not used by the AntiSamy scanner, but you might find some use for this.
      *
-     * @return A regular expression for the tag, i.e., "^<b>$", or "<hr(\s)*(width='((\w){2,3}(\%)*)'>"
+     * @return A regular expression for the tag, i.e., "^&lt;b&gt;$", or "&lt;hr(\s)*(width='((\w){2,3}(\%)*)'&gt;"
      */
 
     public String getRegularExpression() {
