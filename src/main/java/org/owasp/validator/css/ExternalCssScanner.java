@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -59,20 +59,13 @@ public class ExternalCssScanner extends CssScanner {
 	 * Parses through a <code>LinkedList</code> of imported stylesheet
 	 * URIs, this method parses through those stylesheets and validates them
 	 * 
-	 * @param stylesheets
-	 *                the <code>LinkedList</code> of stylesheet URIs to
-	 *                parse
-	 * @param handler
-	 *                the <code>CssHandler</code> to use for parsing
-	 * @param errorMessages
-	 *                the list of error messages to append to
-	 * @param sizeLimit
-	 *                the limit on the total size in bites of any imported
-	 *                stylesheets
-	 * @throws ScanException
-	 *                 if an error occurs during scanning
+	 * @param stylesheets the <code>LinkedList</code> of stylesheet URIs to parse
+	 * @param handler the <code>CssHandler</code> to use for parsing
+	 * @param errorMessages the list of error messages to append to
+	 * @param sizeLimit the limit on the total size in bites of any imported stylesheets
+	 * @throws ScanException if an error occurs during scanning
 	 */
-	protected void parseImportedStylesheets(LinkedList stylesheets, CssHandler handler,
+	protected void parseImportedStylesheets(LinkedList<?> stylesheets, CssHandler handler,
 			ArrayList<String> errorMessages, int sizeLimit) throws ScanException {
 			
 			int importedStylesheets = 0;
@@ -172,8 +165,7 @@ public class ExternalCssScanner extends CssScanner {
 				    }
 			
 				}
-			    }
 			}
-			}
-
+		}
+	}
 }

@@ -13,7 +13,8 @@ First, add the dependency from Maven:
 ```xml
 <dependency>
    <groupId>org.owasp.antisamy</groupId>
-   <projectId>antisamy</projectId>
+   <artifactId>antisamy</artifactId>
+   <version>LATEST_VERSION</version>
 </dependency>
 ```
 

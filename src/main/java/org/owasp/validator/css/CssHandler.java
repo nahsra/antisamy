@@ -90,7 +90,7 @@ public class CssHandler implements DocumentHandler {
 	/**
 	 * A queue of imported stylesheets; used to track imported stylesheets
 	 */
-	private final LinkedList importedStyleSheets;
+	private final LinkedList<URI> importedStyleSheets;
 
 	/**
 	 * The tag currently being examined (if any); used for inline stylesheet
@@ -123,7 +123,7 @@ public class CssHandler implements DocumentHandler {
 	 * @param messages
 	 *            the error message bundle to pull from
 	 */
-	public CssHandler(Policy policy, LinkedList embeddedStyleSheets,
+	public CssHandler(Policy policy, LinkedList<URI> embeddedStyleSheets,
 		List<String> errorMessages, ResourceBundle messages) {
 		this(policy, embeddedStyleSheets, errorMessages, null, messages);
 	}
@@ -143,7 +143,7 @@ public class CssHandler implements DocumentHandler {
 	 * @param messages
 	 *            the error message bundle to pull from
 	 */
-	public CssHandler(Policy policy, LinkedList embeddedStyleSheets,
+	public CssHandler(Policy policy, LinkedList<URI> embeddedStyleSheets,
 			List<String> errorMessages, String tagName, ResourceBundle messages) {
 		this.policy = (InternalPolicy) policy;
 		this.errorMessages = errorMessages;
@@ -168,8 +168,8 @@ public class CssHandler implements DocumentHandler {
 	 * Returns the error messages generated during parsing.
 	 * @return the error messages generated during parsing
 	 */
-	public Collection getErrorMessages() {
-	    return new ArrayList(errorMessages);
+	public Collection<String> getErrorMessages() {
+	    return new ArrayList<String>(errorMessages);
 	}
 	
 	/*

@@ -285,7 +285,7 @@ public class CssValidator {
 		value = value.toLowerCase();
 
 		// check if the value matches any of the allowed literal values
-		Iterator allowedValues = property.getAllowedValues().iterator();
+		Iterator<?> allowedValues = property.getAllowedValues().iterator();
 		while (allowedValues.hasNext() && !isValid) {
 			String allowedValue = (String) allowedValues.next();
 
@@ -295,7 +295,7 @@ public class CssValidator {
 		}
 
 		// check if the value matches any of the allowed regular expressions
-		Iterator allowedRegexps = property.getAllowedRegExp().iterator();
+		Iterator<?> allowedRegexps = property.getAllowedRegExp().iterator();
 		while (allowedRegexps.hasNext() && !isValid) {
 			Pattern pattern = (Pattern) allowedRegexps.next();
 
@@ -305,7 +305,7 @@ public class CssValidator {
 		}
 
 		// check if the value matches any of the allowed shorthands
-		Iterator shorthandRefs = property.getShorthandRefs().iterator();
+		Iterator<?> shorthandRefs = property.getShorthandRefs().iterator();
 		while (shorthandRefs.hasNext() && !isValid) {
 			String shorthandRef = (String) shorthandRefs.next();
 			Property shorthand = policy.getPropertyByName(shorthandRef);

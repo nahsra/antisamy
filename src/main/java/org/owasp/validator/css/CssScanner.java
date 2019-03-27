@@ -30,6 +30,7 @@ package org.owasp.validator.css;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -106,60 +107,56 @@ public class CssScanner {
      * @throws ScanException
      *                 if an error occurs during scanning
      */
-    public CleanResults scanStyleSheet(String taintedCss, int sizeLimit)
-	    throws ScanException {
+    public CleanResults scanStyleSheet(String taintedCss, int sizeLimit) throws ScanException {
 
         long startOfScan = System.currentTimeMillis();
         List<String> errorMessages = new ArrayList<String>();
 
-	/* Check to see if the text starts with (\s)*<![CDATA[
-	 * and end with ]]>(\s)*.
-	 */
+        /* Check to see if the text starts with (\s)*<![CDATA[
+         * and end with ]]>(\s)*.
+         */
 
-    Matcher m = p.matcher(taintedCss);
-	
-	boolean isCdata = m.matches();
-	
-	if ( isCdata ) {
-		taintedCss = m.group(1);
-	}
-	
-	// Create a queue of all style sheets that need to be validated to
-	// account for any sheets that may be imported by the current CSS
-	LinkedList stylesheets = new LinkedList();
+        Matcher m = p.matcher(taintedCss);
+        boolean isCdata = m.matches();
 
-	CssHandler handler = new CssHandler(policy, stylesheets, errorMessages, messages);
+        if ( isCdata ) {
+            taintedCss = m.group(1);
+        }
 
-	// parse the stylesheet
-	parser.setDocumentHandler(handler);
+        // Create a queue of all style sheets that need to be validated to
+        // account for any sheets that may be imported by the current CSS
+        LinkedList<URI> stylesheets = new LinkedList<URI>();
 
-	try {
-	    // parse the style declaration
-	    // note this does not count against the size limit because it
-	    // should already have been counted by the caller since it was
-	    // embedded in the HTML
-	    parser
-		    .parseStyleSheet(new InputSource(new StringReader(
-			    taintedCss)));
-	} catch (IOException ioe) {
-	    throw new ScanException(ioe);
-	    
-	/*
-	 * ParseExceptions, from batik, is unfortunately a RuntimeException.
-	 */
-	} catch (ParseException pe) {
-		throw new ScanException(pe);
-	}
+        CssHandler handler = new CssHandler(policy, stylesheets, errorMessages, messages);
 
-	parseImportedStylesheets(stylesheets, handler, errorMessages, sizeLimit);
+        // parse the stylesheet
+        parser.setDocumentHandler(handler);
 
-	String cleaned = handler.getCleanStylesheet();
-	
-	if ( isCdata && !policy.isUseXhtml()) {
-		cleaned = "<![CDATA[[" + cleaned + "]]>";
-	}
-	
-	return new CleanResults(startOfScan, cleaned, null, errorMessages);
+        try {
+	      // parse the style declaration
+	      // note this does not count against the size limit because it
+	      // should already have been counted by the caller since it was
+	      // embedded in the HTML
+	        parser.parseStyleSheet(new InputSource(new StringReader(taintedCss)));
+	    } catch (IOException ioe) {
+	        throw new ScanException(ioe);
+
+            /*
+             * ParseExceptions, from batik, is unfortunately a RuntimeException.
+             */
+        } catch (ParseException pe) {
+            throw new ScanException(pe);
+        }
+
+        parseImportedStylesheets(stylesheets, handler, errorMessages, sizeLimit);
+
+        String cleaned = handler.getCleanStylesheet();
+
+        if ( isCdata && !policy.isUseXhtml()) {
+            cleaned = "<![CDATA[[" + cleaned + "]]>";
+        }
+
+        return new CleanResults(startOfScan, cleaned, null, errorMessages);
     }
 
     /**
@@ -185,32 +182,31 @@ public class CssScanner {
     public CleanResults scanInlineStyle(String taintedCss, String tagName,
 	    int sizeLimit) throws ScanException {
 
-	long startOfScan = System.currentTimeMillis();
+        long startOfScan = System.currentTimeMillis();
 
-	List<String> errorMessages = new ArrayList<String>();
+        List<String> errorMessages = new ArrayList<String>();
 
-	// Create a queue of all style sheets that need to be validated to
-	// account for any sheets that may be imported by the current CSS
-	LinkedList stylesheets = new LinkedList();
+        // Create a queue of all style sheets that need to be validated to
+        // account for any sheets that may be imported by the current CSS
+        LinkedList<URI> stylesheets = new LinkedList<URI>();
 
-	CssHandler handler = new CssHandler(policy, stylesheets, errorMessages,
-		tagName, messages);
+        CssHandler handler = new CssHandler(policy, stylesheets, errorMessages, tagName, messages);
 
-	parser.setDocumentHandler(handler);
+        parser.setDocumentHandler(handler);
 
-	try {
-	    // parse the inline style declaration
-	    // note this does not count against the size limit because it
-	    // should already have been counted by the caller since it was
-	    // embedded in the HTML
-	    parser.parseStyleDeclaration(taintedCss);
-	} catch (IOException ioe) {
-	    throw new ScanException(ioe);
-	}
+        try {
+            // parse the inline style declaration
+            // note this does not count against the size limit because it
+            // should already have been counted by the caller since it was
+            // embedded in the HTML
+            parser.parseStyleDeclaration(taintedCss);
+        } catch (IOException ioe) {
+            throw new ScanException(ioe);
+        }
 
-	parseImportedStylesheets(stylesheets, handler, errorMessages, sizeLimit);
+        parseImportedStylesheets(stylesheets, handler, errorMessages, sizeLimit);
 
-	return new CleanResults(startOfScan, handler.getCleanStylesheet(), null, errorMessages);
+        return new CleanResults(startOfScan, handler.getCleanStylesheet(), null, errorMessages);
     }
     
     /**
@@ -230,7 +226,7 @@ public class CssScanner {
 	 * @throws ScanException
 	 *                 if an error occurs during scanning
 	 */
-	protected void parseImportedStylesheets(LinkedList stylesheets, CssHandler handler,
+	protected void parseImportedStylesheets(LinkedList<URI> stylesheets, CssHandler handler,
 			List<String> errorMessages, int sizeLimit) throws ScanException {
 		// Implemented in ExternalCssScanner.java
 	}
