@@ -1284,7 +1284,6 @@ public class AntiSamyTest {
         // However, the test above can't replicate this misbehavior.
     }
     
-
     @Test
     public void testGithubIssue24() throws ScanException, PolicyException {
     	
@@ -1297,7 +1296,20 @@ public class AntiSamyTest {
         assertThat(as.scan(test24, revisedPolicy, AntiSamy.SAX).getCleanHTML(), containsString(email));
         assertThat(as.scan(test24, revisedPolicy, AntiSamy.DOM).getCleanHTML(), containsString(email));
     }
-
+    
+    @Test
+    public void testGithubIssue26() throws ScanException, PolicyException {
+        // Potential bypass (False positive)
+    	String test26 = "&#x22;&#x3E;&#x3C;&#x69;&#x6D;&#x67;&#x20;&#x73;&#x72;&#x63;&#x3D;&#x61;&#x20;&#x6F;&#x6E;&#x65;&#x72;&#x72;&#x6F;&#x72;&#x3D;&#x61;&#x6C;&#x65;&#x72;&#x74;&#x28;&#x31;&#x29;&#x3E;";
+    	// Issue claims you end up with this:
+    	//   ><img src=a onerror=alert(1)>
+    	
+        assertThat(as.scan(test26, policy, AntiSamy.SAX).getCleanHTML(), not(containsString("<img src=a onerror=alert(1)>")));
+        assertThat(as.scan(test26, policy, AntiSamy.DOM).getCleanHTML(), not(containsString("<img src=a onerror=alert(1)>")));
+        
+        // But you actually end up with this: &quot;&gt;&lt;img src=a onerror=alert(1)&gt; -- Which is as expected
+    }
+    
     @Test
     public void testGithubIssue27() throws ScanException, PolicyException {
     	// This test doesn't cause an ArrayIndexOutOfBoundsException, as reported in this issue even though it
@@ -1307,4 +1319,76 @@ public class AntiSamyTest {
         assertThat(as.scan(test27, policy, AntiSamy.SAX).getCleanHTML(), containsString("test"));
     }
 
+static final String test33 = "<html>\n"
+    	  + "<head>\n"
+    	  + "  <title>Test</title>\n"
+    	  + "</head>\n"
+    	  + "<body>\n"
+    	  + "  <h1>Tricky Encoding</h1>\n"
+    	  + "  <h2>NOT Sanitized by AntiSamy</h2>\n"
+    	  + "  <ol>\n"
+    	  + "    <li><a href=\"javascript&#00058x=alert,x%281%29\">X&#00058;x</a></li>\n"
+    	  + "    <li><a href=\"javascript&#00058y=alert,y%281%29\">X&#00058;y</a></li>\n"
+
+    	  + "    <li><a href=\"javascript&#58x=alert,x%281%29\">X&#58;x</a></li>\n"
+    	  + "    <li><a href=\"javascript&#58y=alert,y%281%29\">X&#58;y</a></li>\n"
+
+    	  + "    <li><a href=\"javascript&#x0003Ax=alert,x%281%29\">X&#x0003A;x</a></li>\n"
+    	  + "    <li><a href=\"javascript&#x0003Ay=alert,y%281%29\">X&#x0003A;y</a></li>\n"
+
+    	  + "    <li><a href=\"javascript&#x3Ax=alert,x%281%29\">X&#x3A;x</a></li>\n"
+    	  + "    <li><a href=\"javascript&#x3Ay=alert,y%281%29\">X&#x3A;y</a></li>\n"
+    	  + "  </ol>\n"
+    	  + "  <h1>Tricky Encoding with Ampersand Encoding</h1>\n"
+    	  + "  <p>AntiSamy turns harmless payload into XSS by just decoding the encoded ampersands in the href attribute</a>\n"
+    	  + "  <ol>\n"
+    	  + "    <li><a href=\"javascript&amp;#x3Ax=alert,x%281%29\">X&amp;#x3A;x</a></li>\n"
+    	  + "    <li><a href=\"javascript&AMP;#x3Ax=alert,x%281%29\">X&AMP;#x3A;x</a></li>\n"
+
+    	  + "    <li><a href=\"javascript&#38;#x3Ax=alert,x%281%29\">X&#38;#x3A;x</a></li>\n"
+    	  + "    <li><a href=\"javascript&#00038;#x3Ax=alert,x%281%29\">X&#00038;#x3A;x</a></li>\n"
+
+    	  + "    <li><a href=\"javascript&#x26;#x3Ax=alert,x%281%29\">X&#x26;#x3A;x</a></li>\n"
+    	  + "    <li><a href=\"javascript&#x00026;#x3Ax=alert,x%281%29\">X&#x00026;#x3A;x</a></li>\n"
+    	  + "  </ol>\n"
+    	  + "  <p><a href=\"javascript&#x3Ax=alert,x%281%29\">Original without ampersand encoding</a></p>\n"
+    	  + "</body>\n"
+    	  + "</html>";
+    			
+    @Test
+    public void testGithubIssue33a() throws ScanException, PolicyException {
+        	
+        // Potential bypass
+
+    	// Issue claims you end up with this:
+    	//   javascript:x=alert and other similar problems (javascript&#00058x=alert,x%281%29) but can't replicate that.
+    	//System.out.println(as.scan(test33, policy, AntiSamy.SAX).getCleanHTML());
+    	
+        assertThat(as.scan(test33, policy, AntiSamy.SAX).getCleanHTML(), not(containsString("javascript&#00058x=alert,x%281%29")));
+        assertThat(as.scan(test33, policy, AntiSamy.DOM).getCleanHTML(), not(containsString("javascript&#00058x=alert,x%281%29")));
+    }
+    
+    
+    @Test
+    public void testGithubIssue34a() throws ScanException, PolicyException {
+
+    	// bypass stripNonValidXMLCharacters
+    	// Issue indicates: "<div>Hello\\uD83D\\uDC95</div>" should be sanitized to: "<div>Hello</div>"
+    	
+        String test34a = "<div>Hello\uD83D\uDC95</div>";
+        assertEquals("<div>Hello</div>", as.scan(test34a, policy, AntiSamy.SAX).getCleanHTML());
+        assertEquals("<div>Hello</div>", as.scan(test34a, policy, AntiSamy.DOM).getCleanHTML());
+    }
+
+    @Test
+    public void testGithubIssue34b() throws ScanException, PolicyException {
+
+    	// bypass stripNonValidXMLCharacters
+    	// Issue indicates: "<div>Hello\\uD83D\\uDC95</div>" should be sanitized to: "<div>Hello</div>"
+    	
+        String test34b = "\uD888";
+        assertEquals("", as.scan(test34b, policy, AntiSamy.DOM).getCleanHTML());
+        assertEquals("", as.scan(test34b, policy, AntiSamy.SAX).getCleanHTML());
+    }
+    
 }

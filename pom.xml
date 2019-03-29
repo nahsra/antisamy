@@ -55,56 +55,74 @@
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-css</artifactId>
             <version>1.11</version>
+            <exclusions>
+                <!-- exclude this as batik-css 1.11 uses commons-logging 1.0.4 and we want to eliminate the convergence mismatch -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <dependency>
+         <dependency>
             <groupId>net.sourceforge.nekohtml</groupId>
             <artifactId>nekohtml</artifactId>
             <version>1.9.22</version>
+            <exclusions>
+                <!-- exclude this as nekohtml 1.9.22 uses xercesImpl 2.11.0 and we want to eliminate the convergence mismatch -->
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <type>jar</type>
-            <scope>test</scope>
-            <version>4.12</version>
-        </dependency>
-        <dependency>
-		    <groupId>commons-codec</groupId>
-		    <artifactId>commons-codec</artifactId>
-		    <version>1.12</version>
-		    <scope>test</scope>
-		</dependency>
-		<dependency>
-		    <groupId>commons-io</groupId>
-		    <artifactId>commons-io</artifactId>
-		    <version>2.6</version>
-		    <scope>test</scope>
-		</dependency>
 		<dependency>
 		    <groupId>org.apache.httpcomponents</groupId>
 		    <artifactId>httpclient</artifactId>
 		    <version>4.5.7</version>
+            <exclusions>
+                <!-- exclude this as httpclient 4.5.7 uses commons-codec 1.11 and we want to eliminate the convergence mismatch -->
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
 		<dependency>
 		    <groupId>xerces</groupId>
 		    <artifactId>xercesImpl</artifactId>
 		    <version>2.12.0</version>
 		</dependency>
-		<dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>7.6.21.v20160908</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <version>7.6.21.v20160908</version>
+		    <groupId>commons-codec</groupId>
+		    <artifactId>commons-codec</artifactId>
+		    <version>1.12</version>
+		</dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
+		
     </dependencies>
     <build>
+    	<pluginManagement>
+    	    <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-dependency-plugin</artifactId>
+                  <version>3.1.1</version>
+               </plugin>
+    	    </plugins>
+    	</pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -131,8 +149,14 @@
                         </manifest>
                     </archive>
                 </configuration>
-             </plugin>
+            </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-javadoc-plugin</artifactId>
                <version>3.0.1</version>
                <executions>
@@ -142,18 +166,61 @@
                    <goals><goal>jar</goal></goals>
                  </execution>
                </executions>
-             </plugin>
+            </plugin>
             <plugin>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>3.0.1</version>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <phase>package</phase>
-                <goals><goal>jar-no-fork</goal></goals>
-              </execution>
-            </executions>
-        </plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-source-plugin</artifactId>
+               <version>3.0.1</version>
+               <executions>
+                 <execution>
+                   <id>attach-sources</id>
+                   <phase>package</phase>
+                   <goals><goal>jar-no-fork</goal></goals>
+                 </execution>
+               </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.1</version>
+            </plugin>
         </plugins>
     </build>
+    <reporting>
+        <plugins>
+           <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>versions-maven-plugin</artifactId>
+               <version>2.5</version>
+               <reportSets>
+                 <reportSet>
+                   <reports>
+                     <report>dependency-updates-report</report>
+                     <report>plugin-updates-report</report>
+                   </reports>
+                 </reportSet>
+               </reportSets>
+           </plugin>
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-project-info-reports-plugin</artifactId>
+               <version>3.0.0</version>
+               <reportSets>
+                 <reportSet>
+                   <reports>
+                     <report>dependency-convergence</report>
+                   </reports>
+                 </reportSet>
+               </reportSets>
+               <configuration>
+                 <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+               </configuration>
+           </plugin>
+        </plugins>
+    </reporting>
 </project>
