@@ -78,9 +78,9 @@
 		<dependency>
 		    <groupId>org.apache.httpcomponents</groupId>
 		    <artifactId>httpclient</artifactId>
-		    <version>4.5.7</version>
+		    <version>4.5.8</version>
             <exclusions>
-                <!-- exclude this as httpclient 4.5.7 uses commons-codec 1.11 and we want to eliminate the convergence mismatch -->
+                <!-- exclude this as httpclient 4.5.8 uses commons-codec 1.11 and we want to eliminate the convergence mismatch -->
                 <exclusion>
                     <groupId>commons-codec</groupId>
                     <artifactId>commons-codec</artifactId>
