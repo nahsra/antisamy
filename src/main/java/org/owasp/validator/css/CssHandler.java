@@ -58,7 +58,6 @@ import org.w3c.css.sac.SelectorList;
  * 
  * @see javax.swing.text.html.StyleSheet
  * @author Jason Li
- * 
  */
 public class CssHandler implements DocumentHandler {
 
@@ -209,7 +208,6 @@ public class CssHandler implements DocumentHandler {
 					HTMLEntityEncoder.htmlEntityEncode(atRule)
 				}));		    
 		}
-		
 	}
 
 	/*
@@ -235,7 +233,7 @@ public class CssHandler implements DocumentHandler {
 			    errorMessages.add(ErrorMessageUtil.getMessage(
 						messages,
 					ErrorMessageUtil.ERROR_CSS_IMPORT_URL_INVALID,
-					new Object[] { HTMLEntityEncoder.htmlEntityEncode(uri) }));
+					new Object[] {}));
 			    return;			
 			} 
 			

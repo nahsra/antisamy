@@ -54,7 +54,6 @@ import org.w3c.css.sac.SimpleSelector;
  * of a stylesheet (namely: selectors, conditions and properties).
  * 
  * @author Jason Li
- * 
  */
 public class CssValidator {
 
@@ -138,21 +137,21 @@ public class CssValidator {
 			DescendantSelector descSelector = (DescendantSelector) selector;
 			return isValidSelector(selectorName, descSelector
 					.getSimpleSelector())
-					& isValidSelector(selectorName, descSelector
+					&& isValidSelector(selectorName, descSelector
 							.getAncestorSelector());
 		case Selector.SAC_CONDITIONAL_SELECTOR:
 			// this is a compound selector - decompose into simple selectors
 			ConditionalSelector condSelector = (ConditionalSelector) selector;
 			return isValidSelector(selectorName, condSelector
 					.getSimpleSelector())
-					& isValidCondition(selectorName, condSelector
+					&& isValidCondition(selectorName, condSelector
 							.getCondition());
 		case Selector.SAC_DIRECT_ADJACENT_SELECTOR:
 			// this is a compound selector - decompose into simple selectors
 			SiblingSelector sibSelector = (SiblingSelector) selector;
 			return isValidSelector(selectorName, sibSelector
 					.getSiblingSelector())
-					& isValidSelector(selectorName, sibSelector.getSelector());
+					&& isValidSelector(selectorName, sibSelector.getSelector());
 		case Selector.SAC_NEGATIVE_SELECTOR:
 			// this is a compound selector with one simple selector
 			return validateSimpleSelector((NegativeSelector) selector);
@@ -181,7 +180,7 @@ public class CssValidator {
 
         String selectorLowerCase = selector.toString().toLowerCase();
         return policy.getCommonRegularExpressions("cssElementSelector").matches(selectorLowerCase)
-				& !policy.getCommonRegularExpressions("cssElementExclusion").matches(selectorLowerCase);
+				&& !policy.getCommonRegularExpressions("cssElementExclusion").matches(selectorLowerCase);
 	}
 
 	/**
@@ -205,7 +204,7 @@ public class CssValidator {
 			CombinatorCondition comboCondition = (CombinatorCondition) condition;
 			return isValidCondition(selectorName, comboCondition
 					.getFirstCondition())
-					& isValidCondition(selectorName, comboCondition
+					&& isValidCondition(selectorName, comboCondition
 							.getSecondCondition());
 		case Condition.SAC_CLASS_CONDITION:
 			// this is a basic class condition; compare condition against
@@ -264,7 +263,7 @@ public class CssValidator {
 		// NOTE: intentionally using non-short-circuited AND operator to
 		// generate all relevant error messages
         String otherLower = condition.toString().toLowerCase();
-        return pattern.matches(otherLower) & !exclusionPattern.matches(otherLower);
+        return pattern.matches(otherLower) && !exclusionPattern.matches(otherLower);
 	}
 
 	/**

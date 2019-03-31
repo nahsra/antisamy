@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -25,6 +25,7 @@
 package org.owasp.validator.html.test;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.PolicyException;
 import org.owasp.validator.html.ScanException;
@@ -52,7 +53,7 @@ public class AntiSamyPerformanceTest {
     @Before
     public void setUp() throws Exception {
 
-        /*
+          /*
            * Load the policy. You may have to change the path to find the Policy
            * file for your environment.
            */
@@ -63,7 +64,7 @@ public class AntiSamyPerformanceTest {
     }
 
 
-    @org.junit.Test
+    @Test
     public void compareSpeedsLargeFiles() throws IOException, ScanException, PolicyException {
 
         URL[] urls = {

@@ -25,19 +25,19 @@ public class LiteralTest extends TestCase {
 		 */
 		//get Policy instance from a URL.
 		URL url = getClass().getResource("/antisamy.xml");
-		System.out.println("Loading policy from URL: " + url);
+		//System.out.println("Loading policy from URL: " + url);
 		policy = Policy.getInstance(url);
 	}
 	
 	public void testSAXGoodResult() throws Exception {
-		System.out.println("Policy: " + policy);
+		//System.out.println("Policy: " + policy);
 
 		// good
 		String html = "<div align=\"right\">html</div>";
 
 		CleanResults cleanResults = new AntiSamy(policy).scan(html, AntiSamy.SAX);
-		System.out.println("SAX cleanResults: " + cleanResults.getCleanHTML());
-		System.out.println("SAX cleanResults error messages: " + cleanResults.getErrorMessages().size());
+		//System.out.println("SAX cleanResults: " + cleanResults.getCleanHTML());
+		//System.out.println("SAX cleanResults error messages: " + cleanResults.getErrorMessages().size());
 
         for (String msg : cleanResults.getErrorMessages()) {
             System.out.println("error msg: " + msg);
@@ -47,29 +47,29 @@ public class LiteralTest extends TestCase {
 	}
 
     public void testSAXBadResult() throws Exception {
-        System.out.println("Policy: " + policy);
+        //System.out.println("Policy: " + policy);
 
         // AntiSamy should complain about the attribute value "foo" ... but it is not
         String badHtml = "<div align=\"foo\">badhtml</div>";
 
         CleanResults cleanResults2 = new AntiSamy(policy).scan(badHtml, AntiSamy.SAX);
 
-        System.out.println("SAX cleanResults2: " + cleanResults2.getCleanHTML());
-        System.out.println("SAX cleanResults2 error messages: " + cleanResults2.getErrorMessages().size());
+        //System.out.println("SAX cleanResults2: " + cleanResults2.getCleanHTML());
+        //System.out.println("SAX cleanResults2 error messages: " + cleanResults2.getErrorMessages().size());
         for (String msg : cleanResults2.getErrorMessages()) {
-            System.out.println("error msg: " + msg);
+        //    System.out.println("error msg: " + msg);
         }
         assertTrue(cleanResults2.getErrorMessages().size() > 0);
     }
 
     public void testDOMGoodResult() throws Exception {
-		System.out.println("Policy: " + policy);
+		//System.out.println("Policy: " + policy);
 
 		// good
 		String html = "<div align=\"right\">html</div>";
 
 		CleanResults cleanResults = new AntiSamy(policy).scan(html, AntiSamy.DOM);
-		System.out.println("DOM cleanResults error messages: " + cleanResults.getErrorMessages().size());
+		//System.out.println("DOM cleanResults error messages: " + cleanResults.getErrorMessages().size());
         for (String msg : cleanResults.getErrorMessages()) {
             System.out.println("error msg: " + msg);
         }
@@ -78,16 +78,16 @@ public class LiteralTest extends TestCase {
 	}
 
     public void testDOMBadResult() throws Exception {
-        System.out.println("Policy: " + policy);
+        //System.out.println("Policy: " + policy);
 
         // AntiSamy should complain about the attribute value "foo" ... but it is not
         String badHtml = "<div align=\"foo\">badhtml</div>";
 
         CleanResults cleanResults2 = new AntiSamy(policy).scan(badHtml, AntiSamy.DOM);
 
-        System.out.println("DOM cleanResults2 error messages: " + cleanResults2.getErrorMessages().size());
+        //System.out.println("DOM cleanResults2 error messages: " + cleanResults2.getErrorMessages().size());
         for (String msg : cleanResults2.getErrorMessages()) {
-            System.out.println("error msg: " + msg);
+        //    System.out.println("error msg: " + msg);
         }
         assertTrue(cleanResults2.getErrorMessages().size() > 0);
     }
