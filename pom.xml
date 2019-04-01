@@ -3,7 +3,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.5.8-SNAPSHOT</version>
+    <version>1.5.8</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -39,7 +39,8 @@
         <connection>scm:git:git@github.com:nahsra/antisamy.git</connection>
         <url>scm:git:git@github.com:nahsra/antisamy.git</url>
         <developerConnection>scm:git:git@github.com:nahsra/antisamy.git</developerConnection>
-    </scm>
+      <tag>antisamy-1.5.8</tag>
+  </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
