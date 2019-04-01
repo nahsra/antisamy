@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -33,27 +33,27 @@ import org.owasp.validator.html.util.ErrorMessageUtil;
 
 public abstract class AbstractAntiSamyScanner {
 
-	protected final InternalPolicy policy;
-	protected final List<String> errorMessages = new ArrayList<String>();
+    protected final InternalPolicy policy;
+    protected final List<String> errorMessages = new ArrayList<String>();
 
-	protected static final ResourceBundle messages = getResourceBundle();
-	protected final Locale locale = Locale.getDefault();
+    protected static final ResourceBundle messages = getResourceBundle();
+    protected final Locale locale = Locale.getDefault();
 
-	protected boolean isNofollowAnchors = false;
-	protected boolean isValidateParamAsEmbed = false;
+    protected boolean isNofollowAnchors = false;
+    protected boolean isValidateParamAsEmbed = false;
 
-	public abstract CleanResults scan(String html) throws ScanException;
+    public abstract CleanResults scan(String html) throws ScanException;
 
-	/** @noinspection UnusedDeclaration TODO: Investigate */
+    /* UnusedDeclaration TODO: Investigate */
     public abstract CleanResults getResults();
 
-	public AbstractAntiSamyScanner(Policy policy) {
-		this.policy = (InternalPolicy) policy;
-	}
+    public AbstractAntiSamyScanner(Policy policy) {
+        this.policy = (InternalPolicy) policy;
+    }
 
-	public AbstractAntiSamyScanner() throws PolicyException {
-		policy = (InternalPolicy) Policy.getInstance();
-	}
+    public AbstractAntiSamyScanner() throws PolicyException {
+        policy = (InternalPolicy) Policy.getInstance();
+    }
 
     private static ResourceBundle getResourceBundle() {
         try {
@@ -64,11 +64,11 @@ public abstract class AbstractAntiSamyScanner {
     }
 
     protected void addError(String errorKey, Object[] objs) {
-		errorMessages.add(ErrorMessageUtil.getMessage(messages, errorKey, objs));
-	}
-	
-	
-	protected OutputFormat getOutputFormat() {
+        errorMessages.add(ErrorMessageUtil.getMessage(messages, errorKey, objs));
+    }
+    
+    
+    protected OutputFormat getOutputFormat() {
 
         OutputFormat format = new OutputFormat();
         format.setOmitXMLDeclaration(policy.isOmitXmlDeclaration());
@@ -83,29 +83,28 @@ public abstract class AbstractAntiSamyScanner {
         }
         
         return format;
-	}
-	
-	/** @noinspection deprecation*/
+    }
+  
     protected org.apache.xml.serialize.HTMLSerializer getHTMLSerializer(Writer w, OutputFormat format) {
 
-        if(policy.isUseXhtml()) {
-        	return new ASXHTMLSerializer(w, format, policy);
+    if(policy.isUseXhtml()) {
+            return new ASXHTMLSerializer(w, format, policy);
         }
         
         return new ASHTMLSerializer(w, format, policy);
-	}
+    }
 
-	protected String trim(String original, String cleaned) {
+    protected String trim(String original, String cleaned) {
         if (cleaned.endsWith("\n")) {
             if (!original.endsWith("\n")) {
                 if (cleaned.endsWith("\r\n")) {
-                	cleaned = cleaned.substring(0, cleaned.length() - 2);
+                    cleaned = cleaned.substring(0, cleaned.length() - 2);
                 } else if (cleaned.endsWith("\n")) {
-                	cleaned = cleaned.substring(0, cleaned.length() - 1);
+                    cleaned = cleaned.substring(0, cleaned.length() - 1);
                 }
             }
         }
         
         return cleaned;
-	}
+    }
 }

@@ -3,7 +3,6 @@ package org.owasp.validator.html.scan;
 import org.apache.xml.serialize.ElementState;
 import org.apache.xml.serialize.OutputFormat;
 import org.owasp.validator.html.InternalPolicy;
-import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.TagMatcher;
 
 import java.io.IOException;

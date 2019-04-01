@@ -56,7 +56,7 @@ import org.owasp.validator.html.util.HTMLEntityEncoder;
 public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 
     private static enum Ops {
-        CSS, FILTER, REMOVE, TRUNCATE, KEEP
+        CSS, FILTER, REMOVE, TRUNCATE, KEEP, ENCODE
     }
 	private final Stack<Ops> operations = new Stack<Ops>();
 	private List<String> errorMessages = new ArrayList<String>();
@@ -142,6 +142,10 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     private Ops peekTop(){
          return operations.empty() ? null : operations.peek();
     }
+    
+    private XMLStringBuffer makeEndTag(String tagName) {
+        return new XMLStringBuffer("</" + tagName + ">");
+    }
 
 	public void endElement(QName element, Augmentations augs) throws XNIException {
         Ops topOp = peekTop();
@@ -151,6 +155,10 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 		} else if (Ops.FILTER == topOp) {
 			// content is removed, but child nodes not
 			operations.pop();
+		} else if (Ops.ENCODE == topOp) {
+            // if encoding this element, insert closing tag: super.characters will encode the string buffer
+		    operations.pop();
+		    super.characters(makeEndTag(element.rawname), augs);
 		} else if (Ops.CSS == topOp) {
 			operations.pop();
 			// now scan the CSS.
@@ -257,7 +265,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 		} else if ((tag == null && policy.isEncodeUnknownTag()) || (tag != null && tag.isAction( "encode" ))) {
 			String name = "<" + element.localpart + ">";
 			super.characters( new XMLString( name.toCharArray(), 0, name.length() ), augs );
-			this.operations.push(Ops.FILTER);
+			this.operations.push(Ops.ENCODE);
 		} else if (tag == null) {
 			addError( ErrorMessageUtil.ERROR_TAG_NOT_IN_POLICY,
                       new Object[]{ HTMLEntityEncoder.htmlEntityEncode( element.localpart ) } );

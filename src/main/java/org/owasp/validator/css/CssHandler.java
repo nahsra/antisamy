@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -58,7 +58,6 @@ import org.w3c.css.sac.SelectorList;
  * 
  * @see javax.swing.text.html.StyleSheet
  * @author Jason Li
- * 
  */
 public class CssHandler implements DocumentHandler {
 
@@ -78,20 +77,19 @@ public class CssHandler implements DocumentHandler {
 	private final InternalPolicy policy;
 
 	/**
-	 * The encaspulated results including the error messages
+	 * The error messages
 	 */
-//	private final CleanResults results;
 	private final Collection<String> errorMessages;
 	
 	/**
-	 * The error message bundled to pull from.
+	 * The error message bundle to pull from.
 	 */
 	private ResourceBundle messages;
 	
 	/**
 	 * A queue of imported stylesheets; used to track imported stylesheets
 	 */
-	private final LinkedList importedStyleSheets;
+	private final LinkedList<URI> importedStyleSheets;
 
 	/**
 	 * The tag currently being examined (if any); used for inline stylesheet
@@ -119,8 +117,12 @@ public class CssHandler implements DocumentHandler {
 	 *            the policy to use
 	 * @param embeddedStyleSheets
 	 *            the queue of stylesheets imported
+	 * @param errorMessages
+	 *            the List of error messages to use if there are errors
+	 * @param messages
+	 *            the error message bundle to pull from
 	 */
-	public CssHandler(Policy policy, LinkedList embeddedStyleSheets,
+	public CssHandler(Policy policy, LinkedList<URI> embeddedStyleSheets,
 		List<String> errorMessages, ResourceBundle messages) {
 		this(policy, embeddedStyleSheets, errorMessages, null, messages);
 	}
@@ -133,10 +135,14 @@ public class CssHandler implements DocumentHandler {
 	 *            the policy to use
 	 * @param embeddedStyleSheets
 	 *            the queue of stylesheets imported
+	 * @param errorMessages
+	 *            the List of error messages to use if there are errors
 	 * @param tagName
 	 *            the associated tag name with this inline style
+	 * @param messages
+	 *            the error message bundle to pull from
 	 */
-	public CssHandler(Policy policy, LinkedList embeddedStyleSheets,
+	public CssHandler(Policy policy, LinkedList<URI> embeddedStyleSheets,
 			List<String> errorMessages, String tagName, ResourceBundle messages) {
 		this.policy = (InternalPolicy) policy;
 		this.errorMessages = errorMessages;
@@ -150,7 +156,7 @@ public class CssHandler implements DocumentHandler {
 	/**
 	 * Returns the cleaned stylesheet.
 	 * 
-	 * @return the cleaned styesheet
+	 * @return the cleaned stylesheet.
 	 */
 	public String getCleanStylesheet() {
 		// Always ensure results contain most recent generation of stylesheet
@@ -161,8 +167,8 @@ public class CssHandler implements DocumentHandler {
 	 * Returns the error messages generated during parsing.
 	 * @return the error messages generated during parsing
 	 */
-	public Collection getErrorMessages() {
-	    return new ArrayList(errorMessages);
+	public Collection<String> getErrorMessages() {
+	    return new ArrayList<String>(errorMessages);
 	}
 	
 	/*
@@ -202,7 +208,6 @@ public class CssHandler implements DocumentHandler {
 					HTMLEntityEncoder.htmlEntityEncode(atRule)
 				}));		    
 		}
-		
 	}
 
 	/*
@@ -228,7 +233,7 @@ public class CssHandler implements DocumentHandler {
 			    errorMessages.add(ErrorMessageUtil.getMessage(
 						messages,
 					ErrorMessageUtil.ERROR_CSS_IMPORT_URL_INVALID,
-					new Object[] { HTMLEntityEncoder.htmlEntityEncode(uri) }));
+					new Object[] {}));
 			    return;			
 			} 
 			

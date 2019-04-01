@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -28,7 +28,6 @@
  */
 package org.owasp.validator.html.model;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -38,7 +37,6 @@ import java.util.regex.Pattern;
  * or regular expressions) in order to be considered valid.
  * 
  * @author Jason Li
- * 
  */
 public class Property {
 	private final String name;
@@ -56,30 +54,32 @@ public class Property {
         this.shorthandRefs = Collections.unmodifiableList(shortHandRefs);
     }
 
-    /**
+	/**
 	 * Return a <code>List</code> of allowed regular expressions
-	 * @return A <code>List</code> of allowed regular expressions.
+	 * @return The List of allowed regular expressions.
 	 */
-	public List getAllowedRegExp() {
+	public List<Pattern> getAllowedRegExp() {
 		return allowedRegExp;
 	}
 
-    /**
-	 * @return A <code>List</code> of allowed literal values.
+	/**
+	 * Return a <code>List</code> of allowed literal values
+	 * @return The List of allowed literal values.
 	 */
-	public List getAllowedValues() {
+	public List<String> getAllowedValues() {
 		return allowedValues;
 	}
 
-    /**
-	 * @return A <code>List</code> of allowed shorthand references.
+	/**
+	 * Return a <code>List</code> of allowed shorthand references
+	 * @return The List of allowed shorthand references.
 	 */
-	public List getShorthandRefs() {
+	public List<String> getShorthandRefs() {
 		return shorthandRefs;
 	}
 
-    /**
-	 * 
+	/**
+	 * Get the name of the property.
 	 * @return The name of the property.
 	 */
 	public String getName() {

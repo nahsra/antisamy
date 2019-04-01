@@ -108,7 +108,7 @@ public class Attribute  {
             /*
             * Go through and add static values to the regular expression.
             */
-            Iterator allowedValues = this.allowedValues.iterator();
+            Iterator<String> allowedValues = this.allowedValues.iterator();
             while (allowedValues.hasNext()) {
                 String allowedValue = (String) allowedValues.next();
 
@@ -122,7 +122,7 @@ public class Attribute  {
             /*
             * Add the regular expressions for this attribute value to the mother regular expression.
             */
-            Iterator allowedRegExps = Arrays.asList((Pattern[]) this.allowedRegExps).iterator();
+            Iterator<Pattern> allowedRegExps = Arrays.asList((Pattern[]) this.allowedRegExps).iterator();
             while (allowedRegExps.hasNext()) {
                 Pattern allowedRegExp = (Pattern) allowedRegExps.next();
                 regExp.append(allowedRegExp.pattern());

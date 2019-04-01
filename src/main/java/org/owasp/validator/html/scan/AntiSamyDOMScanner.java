@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  *
  * All rights reserved.
  *
@@ -57,7 +57,6 @@ import java.util.regex.Pattern;
  * through a <code>AntiSamy.scan()</code> method.
  * 
  * @author Arshan Dabirsiaghi
- * 
  */
 public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
@@ -90,7 +89,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         super(policy);
     }
 
-    /** @noinspection UnusedDeclaration Todo Investigate */
+    /* UnusedDeclaration TODO Investigate */
     public AntiSamyDOMScanner() throws PolicyException {
         super();
     }
@@ -98,14 +97,14 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     /**
      * This is where the magic lives.
      *
-     *
      * @param html
      *            A String whose contents we want to scan.
      * @return A <code>CleanResults</code> object with an
      *         <code>XMLDocumentFragment</code> object and its String
      *         representation, as well as some scan statistics.
-     * @throws ScanException
-     */
+     * @throws ScanException When there is a problem encountered
+	 *         while scanning the HTML.
+	 */
     public CleanResults scan(String html) throws ScanException {
 
         if (html == null) {
@@ -313,7 +312,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         addError(ErrorMessageUtil.ERROR_TAG_ENCODED, new Object[]{HTMLEntityEncoder.htmlEntityEncode(tagName)});
         processChildren(eleChildNodes, currentStackDepth);
 
-        /*
+   /*
     * Transform the tag to text, HTML-encode it and promote the
     * children. The tag will be kept in the fragment as one or two text
     * Nodes located before and after the children; representing how the
@@ -350,7 +349,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
             }
         }
 
-        /*
+   /*
     * Check to see if it's a <style> tag. We have to special case this
     * tag so we can hand it off to the custom style sheet validating
     * parser.
@@ -360,7 +359,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
             if (processStyleTag(ele, parentNode)) return;
         }
 
-        /*
+   /*
     * Go through the attributes in the tainted tag and validate them
     * against the values we have for them.
     *
@@ -376,7 +375,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
         processChildren(eleChildNodes, currentStackDepth);
 
-        /*
+   /*
     * If we have been dealing with a <param> that has been converted to
     * an <embed>, convert it back
     */
@@ -390,8 +389,8 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
     private boolean processStyleTag(Element ele, Node parentNode) {
         /*
-* Invoke the css parser on this element.
-*/
+         * Invoke the css parser on this element.
+         */
         CssScanner styleScanner;
 
         if(policy.isEmbedStyleSheets()) {
@@ -468,7 +467,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     }
 
     private void actionTruncate(Element ele, String tagName, NodeList eleChildNodes) {
-        /*
+   /*
     * Remove all attributes. This is for tags like i, b, u, etc. Purely
     * formatting without any need for attributes. It also removes any
     * children.
@@ -515,7 +514,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
             Attribute attr = tag.getAttributeByName(name.toLowerCase());
 
-            /**
+            /*
              * If we there isn't an attribute by that name in our policy
              * check to see if it's a globally defined attribute. Validate
              * against that if so.
@@ -643,7 +642,8 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
                     }
 
-                } else { /*
+                } else {
+                    /*
                      * the attribute they specified isn't in our policy
                      * - remove it (whitelisting!)
                      */
@@ -713,7 +713,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         String tagName = node.getNodeName();
 
         if (!isAllowedEmptyTag(tagName)) {
-            /*
+           /*
             * Wasn't in the list of allowed elements, so we'll nuke it.
             */
             addError(ErrorMessageUtil.ERROR_TAG_EMPTY, new Object[]{HTMLEntityEncoder.htmlEntityEncode(node.getNodeName())});
@@ -743,11 +743,9 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
 
     /**
-     * Used to promote the children of a parent to accomplish the "filterTag"
-     * action.
+     * Used to promote the children of a parent to accomplish the "filterTag" action.
      *
-     * @param ele
-     *            The Element we want to filter.
+     * @param ele The Element we want to filter.
      */
     private void promoteChildren(Element ele) {
         promoteChildren(ele, ele.getChildNodes());
@@ -768,7 +766,6 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     }
 
     /**
-     *
      * This method was borrowed from Mark McLaren, to whom I owe much beer.
      *
      * This method ensures that the output has only valid XML unicode characters
@@ -777,9 +774,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
      * standard</a>. This method will return an empty String if the input is
      * null or empty.
      *
-     *
-     * @param in
-     *            The String whose non-valid characters we want to remove.
+     * @param in The String whose non-valid characters we want to remove.
      * @param invalidXmlCharsMatcher  The reusable regex matcher
      * @return The in String, stripped of non-valid characters.
      */
@@ -792,16 +787,14 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         return invalidXmlCharsMatcher.matches() ? invalidXmlCharsMatcher.replaceAll("") : in;
     }
 
-    // private void debug(String s) { System.out.println(s); }
     /**
      * Transform the element to text, HTML-encode it and promote the children.
      * The element will be kept in the fragment as one or two text Nodes located
      * before and after the children; representing how the tag used to wrap
      * them. If the element didn't have any children then only one text Node is
-     * created representing an empty element. *
+     * created representing an empty element.
      *
-     * @param ele
-     *            Element to be encoded
+     * @param ele Element to be encoded
      */
     private void encodeAndPromoteChildren(Element ele) {
         Node parent = ele.getParentNode();
@@ -818,8 +811,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     /**
      * Returns a text version of the passed element
      *
-     * @param ele
-     *            Element to be converted
+     * @param ele Element to be converted
      * @return String representation of the element
      */
     private String toString(Element ele) {

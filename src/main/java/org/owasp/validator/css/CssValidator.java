@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -50,11 +50,10 @@ import org.w3c.css.sac.SiblingSelector;
 import org.w3c.css.sac.SimpleSelector;
 
 /**
- * Encapsulates all the neceesary operations for validating individual eleements
+ * Encapsulates all the necessary operations for validating individual elements
  * of a stylesheet (namely: selectors, conditions and properties).
  * 
  * @author Jason Li
- * 
  */
 public class CssValidator {
 
@@ -117,10 +116,9 @@ public class CssValidator {
 	 *            the name of the selector
 	 * @param selector
 	 *            the object representation of the selector
-	 * @param results
-	 *            the <code>CleanResults</code> object to add any error
-	 *            messages to
 	 * @return true if this selector name is valid; false otherwise
+	 * @throws ScanException When there is a problem encountered
+	 *         while scanning this selector
 	 */
 	public boolean isValidSelector(String selectorName, Selector selector)
 			throws ScanException {
@@ -139,21 +137,21 @@ public class CssValidator {
 			DescendantSelector descSelector = (DescendantSelector) selector;
 			return isValidSelector(selectorName, descSelector
 					.getSimpleSelector())
-					& isValidSelector(selectorName, descSelector
+					&& isValidSelector(selectorName, descSelector
 							.getAncestorSelector());
 		case Selector.SAC_CONDITIONAL_SELECTOR:
 			// this is a compound selector - decompose into simple selectors
 			ConditionalSelector condSelector = (ConditionalSelector) selector;
 			return isValidSelector(selectorName, condSelector
 					.getSimpleSelector())
-					& isValidCondition(selectorName, condSelector
+					&& isValidCondition(selectorName, condSelector
 							.getCondition());
 		case Selector.SAC_DIRECT_ADJACENT_SELECTOR:
 			// this is a compound selector - decompose into simple selectors
 			SiblingSelector sibSelector = (SiblingSelector) selector;
 			return isValidSelector(selectorName, sibSelector
 					.getSiblingSelector())
-					& isValidSelector(selectorName, sibSelector.getSelector());
+					&& isValidSelector(selectorName, sibSelector.getSelector());
 		case Selector.SAC_NEGATIVE_SELECTOR:
 			// this is a compound selector with one simple selector
 			return validateSimpleSelector((NegativeSelector) selector);
@@ -172,9 +170,6 @@ public class CssValidator {
 	 * 
 	 * @param selector
 	 *            the object representation of the selector
-	 * @param results
-	 *            the <code>CleanResults</code> object to add any error
-	 *            messages to
 	 * @return true if this selector name is valid; false otherwise
 	 */
 	private boolean validateSimpleSelector(SimpleSelector selector) {
@@ -185,7 +180,7 @@ public class CssValidator {
 
         String selectorLowerCase = selector.toString().toLowerCase();
         return policy.getCommonRegularExpressions("cssElementSelector").matches(selectorLowerCase)
-				& !policy.getCommonRegularExpressions("cssElementExclusion").matches(selectorLowerCase);
+				&& !policy.getCommonRegularExpressions("cssElementExclusion").matches(selectorLowerCase);
 	}
 
 	/**
@@ -196,10 +191,9 @@ public class CssValidator {
 	 *            the name of the selector that contains this condition
 	 * @param condition
 	 *            the object representation of this condition
-	 * @param results
-	 *            the <code>CleanResults</code> object to add any error
-	 *            messages to
 	 * @return true if this condition is valid; false otherwise
+	 * @throws ScanException When there is a problem encountered
+	 *         while scanning this condition
 	 */
 	public boolean isValidCondition(String selectorName, Condition condition)
 			throws ScanException {
@@ -210,7 +204,7 @@ public class CssValidator {
 			CombinatorCondition comboCondition = (CombinatorCondition) condition;
 			return isValidCondition(selectorName, comboCondition
 					.getFirstCondition())
-					& isValidCondition(selectorName, comboCondition
+					&& isValidCondition(selectorName, comboCondition
 							.getSecondCondition());
 		case Condition.SAC_CLASS_CONDITION:
 			// this is a basic class condition; compare condition against
@@ -260,9 +254,6 @@ public class CssValidator {
 	 *            the positive pattern of valid conditions
 	 * @param exclusionPattern
 	 *            the negative pattern of excluded conditions
-	 * @param results
-	 *            the <code>CleanResults</code> object to add any error
-	 *            messages to
 	 * @return true if this selector name is valid; false otherwise
 	 */
 	private boolean validateCondition(AttributeCondition condition,
@@ -272,7 +263,7 @@ public class CssValidator {
 		// NOTE: intentionally using non-short-circuited AND operator to
 		// generate all relevant error messages
         String otherLower = condition.toString().toLowerCase();
-        return pattern.matches(otherLower) & !exclusionPattern.matches(otherLower);
+        return pattern.matches(otherLower) && !exclusionPattern.matches(otherLower);
 	}
 
 	/**
@@ -293,7 +284,7 @@ public class CssValidator {
 		value = value.toLowerCase();
 
 		// check if the value matches any of the allowed literal values
-		Iterator allowedValues = property.getAllowedValues().iterator();
+		Iterator<?> allowedValues = property.getAllowedValues().iterator();
 		while (allowedValues.hasNext() && !isValid) {
 			String allowedValue = (String) allowedValues.next();
 
@@ -303,7 +294,7 @@ public class CssValidator {
 		}
 
 		// check if the value matches any of the allowed regular expressions
-		Iterator allowedRegexps = property.getAllowedRegExp().iterator();
+		Iterator<?> allowedRegexps = property.getAllowedRegExp().iterator();
 		while (allowedRegexps.hasNext() && !isValid) {
 			Pattern pattern = (Pattern) allowedRegexps.next();
 
@@ -313,7 +304,7 @@ public class CssValidator {
 		}
 
 		// check if the value matches any of the allowed shorthands
-		Iterator shorthandRefs = property.getShorthandRefs().iterator();
+		Iterator<?> shorthandRefs = property.getShorthandRefs().iterator();
 		while (shorthandRefs.hasNext() && !isValid) {
 			String shorthandRef = (String) shorthandRefs.next();
 			Property shorthand = policy.getPropertyByName(shorthandRef);

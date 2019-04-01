@@ -4,7 +4,6 @@ import org.apache.xml.serialize.ElementState;
 import org.apache.xml.serialize.HTMLdtd;
 import org.apache.xml.serialize.OutputFormat;
 import org.owasp.validator.html.InternalPolicy;
-import org.owasp.validator.html.Policy;
 
 import java.io.IOException;
 import java.io.Writer;

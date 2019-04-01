@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -25,7 +25,6 @@
 package org.owasp.validator.html;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -46,6 +45,7 @@ public class CleanResults {
 
 	private List<String> errorMessages = new ArrayList<String>();
 	private Callable<String> cleanHTML;
+	private long startOfScan;
 	private long elapsedScan;
 
 	private DocumentFragment cleanXMLDocumentFragment;
@@ -59,6 +59,7 @@ public class CleanResults {
 
 	public CleanResults(long startOfScan, final String cleanHTML,
 			DocumentFragment XMLDocumentFragment, List<String> errorMessages) {
+		this.startOfScan = startOfScan;
 		this.elapsedScan = System.currentTimeMillis() - startOfScan;
 		this.cleanXMLDocumentFragment = XMLDocumentFragment;
 		this.cleanHTML = new Callable<String>() {
@@ -116,9 +117,21 @@ public class CleanResults {
 
 	/**
 	 * Return the number of errors encountered during filtering.
+	 * 
+	 * @return The number of errors encountered during filtering.
 	 */
 	public int getNumberOfErrors() {
 		return errorMessages.size();
+	}
+
+	/**
+	 * Get the time the scan started.
+	 * 
+	 * @return time that scan started in ms
+	 */
+	public long getStartOfScan()
+	{
+		return startOfScan;
 	}
 
 }
