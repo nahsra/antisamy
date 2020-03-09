@@ -3,7 +3,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.5.8</version>
+    <version>1.5.9</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -39,8 +39,7 @@
         <connection>scm:git:git@github.com:nahsra/antisamy.git</connection>
         <url>scm:git:git@github.com:nahsra/antisamy.git</url>
         <developerConnection>scm:git:git@github.com:nahsra/antisamy.git</developerConnection>
-      <tag>antisamy-1.5.8</tag>
-  </scm>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -55,9 +54,9 @@
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-css</artifactId>
-            <version>1.11</version>
+            <version>1.12</version>
             <exclusions>
-                <!-- exclude this as batik-css 1.11 uses commons-logging 1.0.4 and we want to eliminate the convergence mismatch -->
+                <!-- exclude this as batik-css 1.12 has a dependency that uses commons-logging 1.0.4 and we want to eliminate the convergence mismatch -->
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
@@ -79,9 +78,9 @@
 		<dependency>
 		    <groupId>org.apache.httpcomponents</groupId>
 		    <artifactId>httpclient</artifactId>
-		    <version>4.5.8</version>
+		    <version>4.5.12</version>
             <exclusions>
-                <!-- exclude this as httpclient 4.5.8 uses commons-codec 1.11 and we want to eliminate the convergence mismatch -->
+                <!-- exclude this as httpclient 4.5.12 uses commons-codec 1.11 and we want to eliminate the convergence mismatch -->
                 <exclusion>
                     <groupId>commons-codec</groupId>
                     <artifactId>commons-codec</artifactId>
@@ -96,14 +95,14 @@
         <dependency>
 		    <groupId>commons-codec</groupId>
 		    <artifactId>commons-codec</artifactId>
-		    <version>1.12</version>
+		    <version>1.14</version>
 		</dependency>
 
         <!-- Test dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13</version>
             <scope>test</scope>
         </dependency>
 
@@ -194,14 +193,14 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>3.1.11</version>
+                <version>3.1.12.2</version> <!-- spotbugs 4.0.0 has been released, but maven plugin for 4.x not yet released. -->
                 <dependencies>
-                  <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
+                  <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs. Not necessary at this time.  - - >
                   <dependency>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs</artifactId>
                     <version>3.1.12</version>
-                  </dependency>
+                  </dependency -->
                 </dependencies>
             </plugin>
         </plugins>

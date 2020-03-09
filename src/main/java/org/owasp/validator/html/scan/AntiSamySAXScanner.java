@@ -159,12 +159,12 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
             transformer.transform(source, new SAXResult(serializer));
             errorMessages.clear();
             errorMessages.addAll(cachedItem.magicSAXFilter.getErrorMessages());
+            cachedItems.add( cachedItem);
+            return new CleanResults(startOfScan, (String)null, (DocumentFragment)null, errorMessages);
 
-			return new CleanResults(startOfScan, (String)null, (DocumentFragment)null, errorMessages);
-
-		} catch (Exception e) {
-			throw new ScanException(e);
-		}
+        } catch (Exception e) {
+            throw new ScanException(e);
+        }
     }
 
      /**
