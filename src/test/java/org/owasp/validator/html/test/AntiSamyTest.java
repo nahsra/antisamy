@@ -1,13 +1,17 @@
 /*
- * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
- *                                                  1
- * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
- * Neither the name of OWASP nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this list
+ * of conditions and the following disclaimer.  Redistributions in binary form must
+ * reproduce the above copyright notice, this list of conditions and the following
+ * disclaimer in the documentation and/or other materials provided with the distribution.
+ * Neither the name of OWASP nor the names of its contributors may be used to endorse
+ * or promote products derived from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -1144,8 +1148,8 @@ public class AntiSamyTest {
         long total2 = System.currentTimeMillis() - start;
 
         assertNotNull(s);
-        System.out.println("replaceAllDirect " + total);
-        System.out.println("match then replace: " + total2);
+        //System.out.println("replaceAllDirect " + total);
+        //System.out.println("match then replace: " + total2);
     }
 
     @Test
@@ -1396,4 +1400,29 @@ static final String test33 = "<html>\n"
         assertEquals("", as.scan(test34b, policy, AntiSamy.SAX).getCleanHTML());
     }
 */
+
+    static final String test40 = "<html>\n"
+          + "<head>\n"
+          + "  <title>Test</title>\n"
+          + "</head>\n"
+          + "<body>\n"
+          + "  <h1>Tricky Encoding</h1>\n"
+          + "  <h2>NOT Sanitized by AntiSamy</h2>\n"
+          + "  <ol>\n"
+          + "    <li><h3>svg onload=alert follows:</h3><svg onload=alert(1)//</li>\n"
+          + "  </ol>\n"
+          + "</body>\n"
+          + "</html>";
+
+    @Test
+    public void testGithubIssue40() throws ScanException, PolicyException {
+
+        // Concern is that: <svg onload=alert(1)//  does not get cleansed.
+        // Based on these test results, it does get cleaned so this issue is a false positive, so we closed it.
+
+        assertThat(as.scan(test40, policy, AntiSamy.SAX).getCleanHTML(), not(containsString("<svg onload=alert(1)//")));
+        //System.out.println("SAX parser: " + as.scan(test40, policy, AntiSamy.SAX).getCleanHTML());
+        assertThat(as.scan(test40, policy, AntiSamy.DOM).getCleanHTML(), not(containsString("<svg onload=alert(1)//")));
+        //System.out.println("DOM parser: " + as.scan(test40, policy, AntiSamy.DOM).getCleanHTML());
+    }
 }
