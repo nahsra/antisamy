@@ -10,7 +10,7 @@ More details on AntiSamy are available at: https://www.owasp.org/index.php/Categ
 
 There is also a legacy developers guide at: https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/owaspantisamy/Developer%20Guide.pdf (not sure how long that will remain accessible).
 
-# Contributing to AntiSamy
+## Contributing to AntiSamy
 
 ### Find an Issue?
 If you have found a bug, then create an issue in the AntiSamy repo: https://github.com/nahsra/antisamy/issues
@@ -18,7 +18,7 @@ If you have found a bug, then create an issue in the AntiSamy repo: https://gith
 ### Find a Vulnerability?
 If you have found a vulnerability in AntiSamy, first search the issues list (see above) to see if it has already been reported. If it has not, then please contact Dave Wichers (dave.wichers at owasp.org) directly. Please do not report vulnerabilities via GitHub issues as we wish to keep our users secure while a patch is implemented and deployed. If you wish to be acknowledged for finding the vulnerability, then please follow this process.
 
-More detail is available in the file '[SECURITY.md](https://raw.githubusercontent.com/nahsra/antisamy/master/SECURITY.md)'.
+More detail is available in the file: [SECURITY.md](https://github.com/nahsra/antisamy/blob/master/SECURITY.md).
 
 
 ## How to Import
@@ -38,3 +38,4 @@ $ git clone https://github.com/nahsra/antisamy
 $ cd antisamy
 $ mvn package
 ```
+

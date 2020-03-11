@@ -26,9 +26,8 @@ can understand what needs to be done to fix it.
 
 ## Security Bulletins
 
-There are some ESAPI security bulletins published in the "documentation" directory on GitHub.
-For details see:
+These are the known CVEs reported for AntiSamy:
 
-* [Security Bulletin #1 - CVE-2016-10006: XSS Bypass in AntiSamy before v1.5.5 - https://www.cvedetails.com/cve/CVE-2016-10006
-* [Security Bulletin #2 - CVE-2017-14735: XSS via HTML5 Entities in AntiSamy before v1.5.7 - https://www.cvedetails.com/cve/CVE-2017-14735 
+* Security Bulletin #1 - CVE-2016-10006: XSS Bypass in AntiSamy before v1.5.5 - https://www.cvedetails.com/cve/CVE-2016-10006
+* Security Bulletin #2 - CVE-2017-14735: XSS via HTML5 Entities in AntiSamy before v1.5.7 - https://www.cvedetails.com/cve/CVE-2017-14735
 
