@@ -5,7 +5,7 @@
 If you believe that you have found a vulnerability in AntiSamy, first please search the
 GitHut issues list (for both open and closed issues) to see if it has already been reported.
 
-If it has not, then please contact Dave Wichers (dwichers at owasp.org) _directly_.
+If it has not, then please contact Dave Wichers (dave.wichers at owasp.org) _directly_.
 Please do **not** report any suspected vulnerabilities via GitHub issues
 as we wish to keep our users secure while a patch is implemented and deployed. 
 This is because if this is reported as a GitHub issue, it more or less is equivalent 
@@ -28,6 +28,6 @@ can understand what needs to be done to fix it.
 
 These are the known CVEs reported for AntiSamy:
 
-* Security Bulletin #1 - CVE-2016-10006: XSS Bypass in AntiSamy before v1.5.5 - https://www.cvedetails.com/cve/CVE-2016-10006
-* Security Bulletin #2 - CVE-2017-14735: XSS via HTML5 Entities in AntiSamy before v1.5.7 - https://www.cvedetails.com/cve/CVE-2017-14735
+* AntiSamy CVE #1 - CVE-2016-10006: XSS Bypass in AntiSamy before v1.5.5 - https://www.cvedetails.com/cve/CVE-2016-10006
+* AntiSamy CVE #2 - CVE-2017-14735: XSS via HTML5 Entities in AntiSamy before v1.5.7 - https://www.cvedetails.com/cve/CVE-2017-14735
 
