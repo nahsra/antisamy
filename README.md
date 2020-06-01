@@ -40,4 +40,4 @@ $ mvn package
 ```
 
 ## License
-Released under the [BSD-3-Clause])https://opensource.org/licenses/BSD-3-Clause) [LICENSE](https://github.com/nahsra/antisamy/blob/master/LICENSE). 
+Released under the [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) license as specified here: [LICENSE](https://github.com/nahsra/antisamy/blob/master/LICENSE). 
