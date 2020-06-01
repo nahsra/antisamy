@@ -6,7 +6,7 @@ Another way of saying that could be: It's an API that helps you make sure that c
 that get persisted on the server. The term "malicious code" in regards to web applications usually mean "JavaScript." Mostly, Cascading Stylesheets are only considered malicious 
 when they invoke JavaScript. However, there are many situations where "normal" HTML and CSS can be used in a malicious manner.
 
-More details on AntiSamy are available at: https://www.owasp.org/index.php/Category:OWASP_AntiSamy_Project. Particularly at: https://www.owasp.org/index.php/Category:OWASP_AntiSamy_Project#tab=How_do_I_get_started_3F.
+More details on AntiSamy are available at: https://owasp.org/www-project-antisamy/. Particularly at: https://owasp.org/www-project-antisamy/#div-how_do_i_get_started.
 
 There is also a legacy developers guide at: https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/owaspantisamy/Developer%20Guide.pdf (not sure how long that will remain accessible).
 
@@ -39,3 +39,5 @@ $ cd antisamy
 $ mvn package
 ```
 
+## License
+Released under the [BSD-3-Clause])https://opensource.org/licenses/BSD-3-Clause) [LICENSE](https://github.com/nahsra/antisamy/blob/master/LICENSE). 
