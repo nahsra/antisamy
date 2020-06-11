@@ -9,7 +9,7 @@ http://www.w3.org/TR/html401/struct/global.html
 	
 <anti-samy-rules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:noNamespaceSchemaLocation="antisamy.xsd">
-	
+	<!-- dummy commit to prove the github action works -->
 	<directives>
 		<directive name="omitXmlDeclaration" value="true"/>
 		<directive name="omitDoctypeDeclaration" value="true"/>
