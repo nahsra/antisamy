@@ -3,7 +3,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.5.9</version>
+    <version>1.5.10</version>
 
     <distributionManagement>
         <snapshotRepository>
