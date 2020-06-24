@@ -49,6 +49,7 @@
         <dependency>
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
+            <!-- Note that there is a 2.0.2 version of this, but it is actually much older than 1.4.01. -->
             <version>1.4.01</version>
         </dependency>
         <dependency>
@@ -114,7 +115,7 @@
                <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-dependency-plugin</artifactId>
-                  <version>3.1.1</version>
+                  <version>3.1.2</version>
                </plugin>
     	    </plugins>
     	</pluginManagement>
@@ -139,7 +140,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M2</version>
+                <version>3.0.0-M3</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.codehaus.mojo</groupId>
@@ -179,12 +180,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
-                <version>2.5.2</version>
+                <version>3.0.0-M1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -199,7 +200,7 @@
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-javadoc-plugin</artifactId>
-               <version>3.0.1</version>
+               <version>3.2.0</version>
                <executions>
                  <execution>
                    <id>attach-javadocs</id>
@@ -211,12 +212,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.7.1</version>
+                <version>3.9.0</version>
             </plugin>
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-source-plugin</artifactId>
-               <version>3.0.1</version>
+               <version>3.2.1</version>
                <executions>
                  <execution>
                    <id>attach-sources</id>
@@ -228,18 +229,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.1</version>
+                <version>3.0.0-M5</version>
             </plugin>
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>3.1.12.2</version> <!-- spotbugs 4.0.0 has been released, but maven plugin for 4.x not yet released. -->
+                <version>4.0.4</version>
                 <dependencies>
                   <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs. Not necessary at this time.  - - >
                   <dependency>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs</artifactId>
-                    <version>3.1.12</version>
+                    <version>4.0.4</version>
                   </dependency -->
                 </dependencies>
             </plugin>
@@ -250,7 +251,7 @@
            <plugin>
                <groupId>org.codehaus.mojo</groupId>
                <artifactId>versions-maven-plugin</artifactId>
-               <version>2.5</version>
+               <version>2.7</version>
                <reportSets>
                  <reportSet>
                    <reports>
@@ -263,7 +264,7 @@
            <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-project-info-reports-plugin</artifactId>
-               <version>3.0.0</version>
+               <version>3.1.0</version>
                <reportSets>
                  <reportSet>
                    <reports>
@@ -278,6 +279,15 @@
            <plugin>
                <groupId>com.github.spotbugs</groupId>
                <artifactId>spotbugs-maven-plugin</artifactId>
+               <configuration>
+                   <plugins>
+                       <plugin>
+                           <groupId>com.h3xstream.findsecbugs</groupId>
+                           <artifactId>findsecbugs-plugin</artifactId>
+                           <version>1.10.1</version>
+                       </plugin>
+                   </plugins>
+               </configuration>
            </plugin>
         </plugins>
     </reporting>
