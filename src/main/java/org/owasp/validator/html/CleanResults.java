@@ -96,7 +96,7 @@ public class CleanResults {
     }
 
 	/**
-	 * Return a list of error messages.
+	 * Return a list of error messages -- but an empty list returned does not mean there was no attack present, due to the serialization and deserialization process automatically cleaning up some attacks. See the README for more discussion.
 	 * 
 	 * @return An ArrayList object which contain the error messages after a
 	 *         scan.
