@@ -6,7 +6,7 @@ Another way of saying that could be: It's an API that helps you make sure that c
 
 ## How to Use
 
-### Import the dependency
+### 1. Import the dependency
 
 First, add the dependency from Maven:
 ```xml
@@ -17,7 +17,7 @@ First, add the dependency from Maven:
 </dependency>
 ```
 
-### Choosing a base policy file
+### 2. Choosing a base policy file
 Chances are that your site’s use case for AntiSamy is at least roughly comparable to one of the predefined policy files. They each represent a “typical” scenario for allowing users to provide HTML (and possibly CSS) formatting information. Let’s look into the different policy files:
 
 1) antisamy-slashdot.xml
@@ -38,10 +38,10 @@ MySpace was, at the time this project was born, arguably the most popular social
 
 I don’t know of a possible use case for this policy file. If you wanted to allow every single valid HTML and CSS element (but without JavaScript or blatant CSS-related phishing attacks), you can use this policy file. Not even MySpace was this crazy. However, it does serve as a good reference because it contains base rules for every element, so you can use it as a knowledge base when using tailoring the other policy files.
 
-### Tailoring the policy file
+### 3. Tailoring the policy file
 You may want to deploy AntiSamy in a default configuration, but it’s equally likely that a site may want to have strict, business-driven rules for what users can allow. The discussion that decides the tailoring should also consider attack surface - which grows in relative proportion to the policy file.
 
-### Calling the AntiSamy API
+### 4. Calling the AntiSamy API
 Using AntiSamy is easy. Here is an example of invoking AntiSamy with a policy file:
 
 ```
@@ -55,7 +55,7 @@ CleanResults cr = as.scan(dirtyInput, policy);
 MyUserDAO.storeUserProfile(cr.getCleanHTML()); // some custom function
 ```
 
-There are a few ways to create a Policy object. The `getInstance()` method can take any of the following:
+There are a few ways to create a `Policy` object. The `getInstance()` method can take any of the following:
 
  * a `String` filename
  * a `File` object
@@ -74,7 +74,7 @@ AntiSamy as = new AntiSamy();
 CleanResults cr = as.scan(dirtyInput, new File(policyFilePath));
 ```
 
-### - Analyzing CleanResults
+### 5. Analyzing CleanResults
 The `CleanResults` object provides a lot of useful stuff.
 
  * `getErrorMessages()` - a list of String error messages -- *if this returns 0 that does not mean there were no attacks!*
