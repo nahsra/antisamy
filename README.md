@@ -77,10 +77,14 @@ CleanResults cr = as.scan(dirtyInput, new File(policyFilePath));
 ### - Analyzing CleanResults
 The `CleanResults` object provides a lot of useful stuff.
 
-`getErrorMessages()` - a list of String error messages -- *if this returns 0 that does not mean there were no attacks!*
-`getCleanHTML()` - the clean, safe HTML output
-`getCleanXMLDocumentFragment()` - the clean, safe `XMLDocumentFragment` which is reflected in `getCleanHTML()`
-`getScanTime()` - returns the scan time in seconds
+ * `getErrorMessages()` - a list of String error messages -- *if this returns 0 that does not mean there were no attacks!*
+ * `getCleanHTML()` - the clean, safe HTML output
+ * `getCleanXMLDocumentFragment()` - the clean, safe `XMLDocumentFragment` which is reflected in `getCleanHTML()`
+ * `getScanTime()` - returns the scan time in seconds
+ 
+__Important Note__: There has been much confusion about `getErrorMessages()` method. The `getErrorMessages()` method does not subtly answer the question "is this safe input?" in the affirmative if it returns an empty list. You must always use the sanitized input and there is no way to be sure the input passed in had no attacks. 
+
+The serialization and deserialization process that is critical to the effectiveness of the sanitizer is purposefully lossy and will filter attacks a number of attack classes. Unfortunately, one of the tradeoffs in using this strategy is that we don't always know in retrospect that an attack was seen. Thus, the `getErrorMessages()` API is there to help users understand their well-intentioned input meet the requirements of the system, not help a developer detect if an attack was present. 
 
 ## Contributing to AntiSamy
 
