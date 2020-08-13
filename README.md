@@ -1,6 +1,6 @@
 # AntiSamy
 
-A library for performing fast, configurable cleansing of HTML coming from untrusted sources.
+A library for performing fast, configurable cleansing of HTML coming from untrusted sources. Supports Java 7+.
 
 Another way of saying that could be: It's an API that helps you make sure that clients don't supply malicious cargo code in the HTML they supply for their profile, comments, etc., that get persisted on the server. The term "malicious code" in regards to web applications usually mean "JavaScript." Mostly, Cascading Stylesheets are only considered malicious when they invoke JavaScript. However, there are many situations where "normal" HTML and CSS can be used in a malicious manner.
 
@@ -32,7 +32,7 @@ eBay is the most popular online auction site in the universe, as far as I can te
 
 3) antisamy-myspace.xml
 
-MySpace was, at the time this project was born, arguably the most popular social networking site. Users were allowed to submit pretty much all HTML and CSS they want -- as long as it doesn’t contain JavaScript. MySpace was using a word blacklist to validate users’ HTML, which is why they were subject to the infamous Samy worm. The Samy worm, which used fragmentation attacks combined with a word that should have been blacklisted (eval) - was the inspiration for the project.
+MySpace was, at the time this project was born, the most popular social networking site. Users were allowed to submit pretty much all the HTML and CSS they wanted -- as long as it didn’t contain JavaScript. MySpace was using a word blacklist to validate users’ HTML, which is why they were subject to the infamous Samy worm. The Samy worm, which used fragmentation attacks combined with a word that should have been blacklisted (eval) - was the inspiration for this project.
 
 4) antisamy-anythinggoes.xml
 
@@ -82,9 +82,9 @@ The `CleanResults` object provides a lot of useful stuff.
  * `getCleanXMLDocumentFragment()` - the clean, safe `XMLDocumentFragment` which is reflected in `getCleanHTML()`
  * `getScanTime()` - returns the scan time in seconds
  
-__Important Note__: There has been much confusion about `getErrorMessages()` method. The `getErrorMessages()` method does not subtly answer the question "is this safe input?" in the affirmative if it returns an empty list. You must always use the sanitized input and there is no way to be sure the input passed in had no attacks. 
+__Important Note__: There has been much confusion about the `getErrorMessages()` method. The `getErrorMessages()` method does not subtly answer the question "is this safe input?" in the affirmative if it returns an empty list. You must always use the sanitized input and there is no way to be sure the input passed in had no attacks.
 
-The serialization and deserialization process that is critical to the effectiveness of the sanitizer is purposefully lossy and will filter attacks a number of attack classes. Unfortunately, one of the tradeoffs in using this strategy is that we don't always know in retrospect that an attack was seen. Thus, the `getErrorMessages()` API is there to help users understand their well-intentioned input meet the requirements of the system, not help a developer detect if an attack was present. 
+The serialization and deserialization process that is critical to the effectiveness of the sanitizer is purposefully lossy and will filter out attacks via a number of attack vectors. Unfortunately, one of the tradeoffs of this strategy is that we don't always know in retrospect that an attack was seen. Thus, the `getErrorMessages()` API is there to help users understand their well-intentioned input meet the requirements of the system, not help a developer detect if an attack was present. 
 
 ## Contributing to AntiSamy
 
