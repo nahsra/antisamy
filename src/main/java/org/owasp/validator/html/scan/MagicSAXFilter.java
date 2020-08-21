@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -23,6 +23,8 @@
  */
 
 package org.owasp.validator.html.scan;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -53,13 +55,14 @@ import org.owasp.validator.html.util.HTMLEntityEncoder;
  * filter is SAX-based which means it is much more memory-efficient and also a
  * bit faster than the DOM-based implementation.
  */
+@SuppressFBWarnings(value = "REDOS", justification="Tested the Regex against saferegex and safe-regex and not vulnerable")
 public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 
     private static enum Ops {
         CSS, FILTER, REMOVE, TRUNCATE, KEEP, ENCODE
     }
 	private final Stack<Ops> operations = new Stack<Ops>();
-	private List<String> errorMessages = new ArrayList<String>();
+	private final List<String> errorMessages = new ArrayList<String>();
 	private StringBuffer cssContent = null;
 	private XMLAttributes cssAttributes = null;
 	private CssScanner cssScanner = null;
@@ -91,7 +94,6 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
         cssAttributes = null;
         cssScanner = null;
         inCdata = false;
-
     }
 
 	public void characters(XMLString text, Augmentations augs) throws XNIException {

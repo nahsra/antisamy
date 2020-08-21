@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -33,8 +33,8 @@ public class Constants {
 
     public static final String DEFAULT_ENCODING_ALGORITHM = "UTF-8";
     public static final Tag BASIC_PARAM_TAG_RULE;
-    public static List<String> defaultAllowedEmptyTags;
-    public static List<String> defaultRequiresClosingTags;
+    public static final List<String> defaultAllowedEmptyTags;
+    public static final List<String> defaultRequiresClosingTags;
     
     private static final String[] allowedEmptyTags = {
          "br", "hr", "a", "img", "link", "iframe", "script", "object", "applet",
@@ -55,11 +55,13 @@ public class Constants {
         attrs.put(paramValueAttr.getName().toLowerCase(), paramValueAttr);
         BASIC_PARAM_TAG_RULE = new Tag("param", attrs, Policy.ACTION_VALIDATE);
 
-        defaultAllowedEmptyTags = new ArrayList<String>();
-        defaultAllowedEmptyTags.addAll(Arrays.asList(allowedEmptyTags));
-        
-        defaultRequiresClosingTags = new ArrayList<String>();
-        defaultRequiresClosingTags.addAll(Arrays.asList(requiresClosingTags));
+        List<String> allowedEmptyTagsList = new ArrayList<String>();
+        allowedEmptyTagsList.addAll(Arrays.asList(allowedEmptyTags));
+        defaultAllowedEmptyTags = Collections.unmodifiableList(allowedEmptyTagsList);
+
+        List<String> requiresClosingTagsList = new ArrayList<String>();
+        requiresClosingTagsList.addAll(Arrays.asList(requiresClosingTags));
+        defaultRequiresClosingTags = Collections.unmodifiableList(requiresClosingTagsList);
     }
     
     public static final String DEFAULT_LOCALE_LANG = "en";

@@ -43,6 +43,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version.spotbugs>4.1.2</version.spotbugs>
     </properties>
 
     <dependencies>
@@ -99,6 +100,20 @@
             <version>1.14</version>
         </dependency>
 
+        <!-- SpotBugs dependencies -->
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>${version.spotbugs}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>net.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+            <version>1.0</version>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>junit</groupId>
@@ -110,15 +125,15 @@
     </dependencies>
 
     <build>
-    	<pluginManagement>
-    	    <plugins>
+        <pluginManagement>
+            <plugins>
                <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-dependency-plugin</artifactId>
                   <version>3.1.2</version>
                </plugin>
-    	    </plugins>
-    	</pluginManagement>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -156,6 +171,7 @@
                             <rules>
                                 <enforceBytecodeVersion>
                                     <maxJdkVersion>1.7</maxJdkVersion>
+                                    <ignoreOptionals>true</ignoreOptionals>
                                     <ignoredScopes>test</ignoredScopes>
                                     <message>Dependencies shouldn't require Java 8+.</message>
                                 </enforceBytecodeVersion>
@@ -212,7 +228,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.9.0</version>
+                <version>3.9.1</version>
             </plugin>
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
@@ -236,12 +252,13 @@
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>4.0.4</version>
                 <dependencies>
-                  <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs. Not necessary at this time.  - - >
+                  <!-- Overwrite dependency on SpotBugs if you want to specify the version of SpotBugs.
+                       SpotBugs itself is frequently several versions ahead of the spotbugs-maven-plugin -->
                   <dependency>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs</artifactId>
-                    <version>4.0.4</version>
-                  </dependency -->
+                    <version>${version.spotbugs}</version>
+                  </dependency>
                 </dependencies>
             </plugin>
         </plugins>
@@ -287,6 +304,8 @@
                            <version>1.10.1</version>
                        </plugin>
                    </plugins>
+                   <effort>Max</effort>
+                   <relaxed>false</relaxed>
                </configuration>
            </plugin>
         </plugins>

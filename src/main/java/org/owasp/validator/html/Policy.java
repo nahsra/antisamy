@@ -24,6 +24,8 @@
 
 package org.owasp.validator.html;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -259,7 +261,8 @@ public class Policy {
         return parseContext;
     }
 
-
+    @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
+          + "a vulnerability because it points to a local JAR file.")
     protected static Element getTopLevelElement(URL baseUrl) throws PolicyException {
         try {
             InputSource source = resolveEntity(baseUrl.toExternalForm(), baseUrl);
@@ -272,7 +275,7 @@ public class Policy {
 
             return getTopLevelElement( source);
         } catch (SAXException e) {
-        	// This can't actually happen. See JavaDoc for resolveEntity(String, URL)
+            // This can't actually happen. See JavaDoc for resolveEntity(String, URL)
             throw new PolicyException(e);
         } catch (IOException e) {
             throw new PolicyException(e);
@@ -306,8 +309,6 @@ public class Policy {
         }
     }
 
-
-
     private static void parsePolicy(Element topLevelElement, ParseContext parseContext)
             throws PolicyException {
 
@@ -327,10 +328,11 @@ public class Policy {
         parseRequiresClosingTags(getFirstChild(topLevelElement, "require-closing-tags"), parseContext.requireClosingTags);
     }
 
-
     /**
      * Returns the top level element of a loaded policy Document
      */
+    @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
+          + "a vulnerability because only local file URLs are allowed.")
     private static Element getPolicy(String href, URL baseUrl)
             throws PolicyException {
 
@@ -340,6 +342,12 @@ public class Policy {
             // Can't resolve public id, but might be able to resolve relative
             // system id, since we have a base URI.
             if (href != null && baseUrl != null) {
+
+                if (!"file".equals(baseUrl.getProtocol())) {
+                    throw new MalformedURLException(
+                        "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
+                }
+
                 URL url;
 
                 try {
@@ -389,7 +397,6 @@ public class Policy {
             if (source != null) {
                 dom = db.parse(source);
 
-
                 /**
                  * Get the policy information out of it!
                  */
@@ -419,7 +426,6 @@ public class Policy {
         return new InternalPolicy(this, Collections.unmodifiableMap(directives), tagRules);
     }
 
-
     /**
      * Go through <directives> section of the policy file.
      *
@@ -433,7 +439,6 @@ public class Policy {
             directives.put(name, value);
         }
     }
-
 
     /**
      * Go through <allowed-empty-tags> section of the policy file.
@@ -539,7 +544,6 @@ public class Policy {
             commonRegularExpressions1.put(name, new AntiSamyPattern(pattern));
         }
     }
-
 
     private static void parseCommonAttributes(Element root, Map<String, Attribute> commonAttributes1, Map<String, AntiSamyPattern> commonRegularExpressions1) {
         for (Element ele : getByTagName(root, "attribute")) {
@@ -743,13 +747,9 @@ public class Policy {
             }
             Property property = new Property(name,allowedRegexp3, allowedValue, shortHandRefs, description, onInvalidStr );
 
-
-
             cssRules1.put(name.toLowerCase(), property);
-
         }
     }
-
 
     /**
      * A simple method for returning on of the &lt;global-attribute&gt; entries by
@@ -773,11 +773,12 @@ public class Policy {
      */
     public Attribute getDynamicAttributeByName(String name) {
         Attribute dynamicAttribute = null;
-        for (String d : dynamicAttributes.keySet()) {
-            if (name.startsWith(d)) {
-                dynamicAttribute = dynamicAttributes.get(d);
-                break;
-            }
+        Set<Map.Entry<String, Attribute>> entries = dynamicAttributes.entrySet();
+        for (Map.Entry<String, Attribute> entry : entries) {
+          if (name.startsWith(entry.getKey())) {
+              dynamicAttribute = entry.getValue();
+              break;
+          }
         }
         return dynamicAttribute;
     }
@@ -810,7 +811,6 @@ public class Policy {
         return directives.get(name);
     }
 
-
     /**
      * Resolves public and system IDs to files stored within the JAR.
      * 
@@ -821,12 +821,21 @@ public class Policy {
      * @throws SAXException This exception can't actually be thrown, but left in the method signature for
      *                API compatibility reasons.
      */
+    @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
+          + "a vulnerability because only local file URLs are allowed.")
     public static InputSource resolveEntity(final String systemId, URL baseUrl) throws IOException, SAXException {
+
         InputSource source;
 
         // Can't resolve public id, but might be able to resolve relative
         // system id, since we have a base URI.
         if (systemId != null && baseUrl != null) {
+
+            if (!"file".equals(baseUrl.getProtocol())) {
+                throw new MalformedURLException(
+                    "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
+            }
+
             URL url;
 
             try {

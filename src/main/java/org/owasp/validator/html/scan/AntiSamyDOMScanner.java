@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
  *
  * All rights reserved.
  *
@@ -22,6 +22,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.owasp.validator.html.scan;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.apache.batik.css.parser.ParseException;
 import org.apache.xerces.dom.DocumentImpl;
@@ -50,7 +52,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 /**
  * This is where the magic lives. All the scanning/filtration logic resides
  * here, but it should not be called directly. All scanning should be done
@@ -58,6 +59,7 @@ import java.util.regex.Pattern;
  * 
  * @author Arshan Dabirsiaghi
  */
+@SuppressFBWarnings(value = "REDOS", justification="Tested the Regex against saferegex and safe-regex and not vulnerable")
 public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
     private Document document = new DocumentImpl();
@@ -66,8 +68,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     private static final int maxDepth = 250;
     private static final Pattern invalidXmlCharacters =
             Pattern.compile("[\\u0000-\\u001F\\uD800-\\uDFFF\\uFFFE-\\uFFFF&&[^\\u0009\\u000A\\u000D]]");
-    private static final Pattern conditionalDirectives =
-            Pattern.compile("<?!?\\[\\s*(?:end)?if[^]]*\\]>?");
+    private static final Pattern conditionalDirectives = Pattern.compile("<?!?\\[\\s*(?:end)?if[^]]*\\]>?");
 
     private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -23,6 +23,8 @@
  */
 
 package org.owasp.validator.html.util;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -58,6 +60,8 @@ public class URIUtils {
 	 */
 	private static final String PARENT_DIR_OP = "..";
 
+	@SuppressFBWarnings(value = "SECURITY",justification="The 2x Path Traversal warnings related to the use of"
+			+ " new File(href) are not vulnerabilities as no data is read or written.")
 	public static String resolveAsString(String href, String documentBase) {
 
 		try {
@@ -67,7 +71,6 @@ public class URIUtils {
 			return href;
 		} catch (MalformedURLException muex) {
 		}
-
 
 		//-- join document base + href
 		String absolute = null;
@@ -79,11 +82,9 @@ public class URIUtils {
 				absolute = documentBase + HREF_PATH_SEP + href;
 			}
 
-
 		} else {
 			absolute = href;
 		}
-
 
 		try {
 			//-- try to create a new URL and see if MalformedURLExcetion is
@@ -106,9 +107,7 @@ public class URIUtils {
 					return absolute;
 				}
 			}
-
 		}
-
 
 		// Try local files
 		String fileURL = absolute;
@@ -124,14 +123,14 @@ public class URIUtils {
 
 		//-- one last sanity check
 		try {
-			//-- try to create a new URL and see if MalformedURLExcetion is
+			//-- try to create a new URL and see if MalformedURLException is
 			//-- ever thrown
 			new URL(fileURL);
 			return fileURL;
 		} catch (MalformedURLException muex) {
 		}
 
-		//-- At this point we we're unsucessful at trying to resolve
+		//-- At this point we were unsuccessful at trying to resolve
 		//-- the href + documentbase, this could be due to a custom
 		//-- protocol or typo in the URI, just return documentBase +
 		//-- href
@@ -174,10 +173,8 @@ public class URIUtils {
 					throw new MalformedURLException("invalid absolute URL: " + absoluteURL);
 				}
 				tokens.pop();
-			} else {
-				if (!CURRENT_DIR_OP.equals(token)) {
-					tokens.push(token);
-				}
+			} else if (!CURRENT_DIR_OP.equals(token)) {
+				tokens.push(token);
 			}
 			last = token;
 		}
@@ -211,13 +208,12 @@ public class URIUtils {
 		for (int i = 0; i < chars.length; i++) {
 			char ch = chars[i];
 			switch (ch) {
-			case '\\':
-				sb.append(HREF_PATH_SEP);
-				break;
-			default:
-				sb.append(ch);
-				break;
-
+				case '\\':
+					sb.append(HREF_PATH_SEP);
+					break;
+				default:
+					sb.append(ch);
+					break;
 			}
 		}
 		return sb.toString();

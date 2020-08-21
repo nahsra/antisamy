@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -32,6 +32,7 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -55,6 +56,12 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
     private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
 
     private static final TransformerFactory sTransformerFactory = TransformerFactory.newInstance();
+
+    static {
+        // Disable external entities, etc.
+        sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+    }
 
     static class CachedItem {
         private final Transformer transformer;

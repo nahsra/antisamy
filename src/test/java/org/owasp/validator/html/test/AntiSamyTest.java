@@ -1131,13 +1131,13 @@ public class AntiSamyTest {
         String html = "<body> hey you <img/> out there on your own </body>";
 
         String s = null;
-        long start = System.currentTimeMillis();
+        //long start = System.currentTimeMillis();
         for (int j = 0; j < testReps; j++) {
             s = invalidXmlCharacters.matcher(html).replaceAll("");
         }
-        long total = System.currentTimeMillis() - start;
+        //long total = System.currentTimeMillis() - start;
 
-        start = System.currentTimeMillis();
+        //start = System.currentTimeMillis();
         Matcher matcher;
         for (int j = 0; j < testReps; j++) {
             matcher = invalidXmlCharacters.matcher(html);
@@ -1145,7 +1145,7 @@ public class AntiSamyTest {
                 s = matcher.replaceAll("");
             }
         }
-        long total2 = System.currentTimeMillis() - start;
+        //long total2 = System.currentTimeMillis() - start;
 
         assertNotNull(s);
         //System.out.println("replaceAllDirect " + total);
