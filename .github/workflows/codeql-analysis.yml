@@ -3,6 +3,8 @@
 #
 # You may wish to alter this file to override the set of languages analyzed,
 # or to provide custom queries or build logic.
+# This is a test edit to see if the CodeQL actually fires.
+
 name: "CodeQL"
 
 on:
