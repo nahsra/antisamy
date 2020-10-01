@@ -1,6 +1,8 @@
 # This workflow integrates Scan with GitHub's code scanning feature
 # Scan is a free open-source security tool for modern DevOps teams from ShiftLeft
 # Visit https://slscan.io/en/latest/integrations/code-scan for help
+
+# Force a new scan by SL
 name: SL Scan
 
 # This section configures the trigger for the workflow. Feel free to customize depending on your convention
