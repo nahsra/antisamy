@@ -549,8 +549,6 @@ http://www.w3.org/TR/html401/struct/global.html
 		<tag name="hr" action="validate"/>
 		<tag name="br" action="validate"/>
 
-		<tag name="col" action="validate"/>
-
 		<tag name="font" action="validate">
 			<attribute name="color">
 				<regexp-list>
@@ -2280,18 +2278,6 @@ http://www.w3.org/TR/html401/struct/global.html
 			<regexp-list>
 				<regexp name="cssIdentifier"/>
 				<regexp name="integer"/>
-			</regexp-list>
-		</property>
-		<property name="clip" default="auto" description="The 'clip' property applies to elements that have a 'overflow' property with a value other than 'visible'.">
-			<category-list>
-				<category value="visual"/>
-			</category-list>
-			<literal-list>
-				<literal value="auto"/>
-				<literal value="inherit"/>
-			</literal-list>
-			<regexp-list>
-				<regexp name="length"/>
 			</regexp-list>
 		</property>
 		<property name="cursor" default="auto" description="This property specifies the type of cursor to be displayed for the pointing device.">
