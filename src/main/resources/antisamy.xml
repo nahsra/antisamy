@@ -54,19 +54,19 @@ http://www.w3.org/TR/html401/struct/global.html
 		<regexp name="htmlTitle" value="[\p{L}\p{N}\s\-_',:\[\]!\./\\\(\)&amp;]*"/> <!-- force non-empty with a '+' at the end instead of '*' -->
 		<regexp name="htmlClass" value="[a-zA-Z0-9\s,\-_]+"/>
 
-		<regexp name="onsiteURL" value="^(?![\p{L}\p{N}\\\.\#@\$%\+&amp;;\-_~,\?=/!]*(&amp;colon))[\p{L}\p{N}\\\.\#@\$%\+&amp;;\-_~,\?=/!]*"/>
+		<regexp name="onsiteURL" value="^(?!//)(?![\p{L}\p{N}\\\.\#@\$%\+&amp;;\-_~,\?=/!]*(&amp;colon))[\p{L}\p{N}\\\.\#@\$%\+&amp;;\-_~,\?=/!]*"/>
 		<regexp name="anchoredURL" value="#(\w)+"/>
 		<regexp name="offsiteURL" value="(\s)*((ht|f)tp(s?)://|mailto:)[\p{L}\p{N}]+[\p{L}\p{N}\p{Zs}\.\#@\$%\+&amp;;:\-_~,\?=/!\(\)]*(\s)*"/>
-		
+
 		<regexp name="boolean" value="(true|false)"/>
 		<regexp name="singlePrintable" value="[a-zA-Z0-9]{1}"/> <!-- \w allows the '_' character -->
 
 		<!-- This is for elements (ex: elemName { ... }) -->
 		<regexp name="cssElementSelector" value="[a-zA-Z0-9\-_]+|\*"/>
-		
+
 		<!--  This is to list out any element names that are *not* valid -->
 		<regexp name="cssElementExclusion" value=""/>
-		
+
 		<!--  This if for classes (ex: .className { ... }) -->
 		<regexp name="cssClassSelector" value="\.[a-zA-Z0-9\-_]+"/>
 
