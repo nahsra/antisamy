@@ -52,10 +52,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 /**
  * This is where the magic lives. All the scanning/filtration logic resides
  * here, but it should not be called directly. All scanning should be done
- * through a <code>AntiSamy.scan()</code> method.
+ * through an <code>AntiSamy.scan()</code> method.
  * 
  * @author Arshan Dabirsiaghi
  */
@@ -98,18 +99,18 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     /**
      * This is where the magic lives.
      *
-     * @param html
-     *            A String whose contents we want to scan.
+     * @param html A String whose contents we want to scan.
      * @return A <code>CleanResults</code> object with an
      *         <code>XMLDocumentFragment</code> object and its String
      *         representation, as well as some scan statistics.
      * @throws ScanException When there is a problem encountered
 	 *         while scanning the HTML.
 	 */
+    @Override
     public CleanResults scan(String html) throws ScanException {
 
         if (html == null) {
-            throw new ScanException(new NullPointerException("Null input"));
+            throw new ScanException(new NullPointerException("Null html input"));
         }
 
         errorMessages.clear();
@@ -147,7 +148,6 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
              * W3C.
              */
 
-
             DOMFragmentParser parser = cachedItem.getDomFragmentParser();
 
             try {
@@ -163,7 +163,6 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
              * its string representation.
              */
 
-
             final String trimmedHtml = html;
 
             StringWriter out = new StringWriter();
@@ -175,10 +174,10 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
             org.apache.xml.serialize.HTMLSerializer serializer = getHTMLSerializer(out, format);
             serializer.serialize(dom);
 
-                    /*
-                    * Get the String out of the StringWriter and rip out the XML
-                    * declaration if the Policy says we should.
-                    */
+            /*
+             * Get the String out of the StringWriter and rip out the XML
+             * declaration if the Policy says we should.
+             */
             final String trimmed = trim( trimmedHtml, out.getBuffer().toString() );
 
             Callable<String> cleanHtml = new Callable<String>() {
@@ -187,7 +186,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                 }
             };
 
-            /**
+            /*
              * Return the DOM object as well as string HTML.
              */
             results = new CleanResults(startOfScan, cleanHtml, dom, errorMessages);
@@ -195,11 +194,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
             cachedItems.add( cachedItem);
             return results;
 
-
-        } catch (SAXException e) {
-            throw new ScanException(e);
-        }
-        catch ( IOException e ) {
+        } catch (SAXException | IOException e) {
             throw new ScanException(e);
         }
 
@@ -227,8 +222,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
      * according to the policy. This should be called implicitly through the
      * AntiSamy.scan() method.
      *
-     * @param node
-     *            The node to validate.
+     * @param node The node to validate.
      */
     private void recursiveValidateTag(final Node node, int currentStackDepth) throws ScanException {
 
@@ -335,7 +329,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     }
 
     private void actionValidate(int currentStackDepth, Element ele, Node parentNode, String tagName, String tagNameLowerCase, Tag tag, boolean masqueradingParam, Tag embedTag, NodeList eleChildNodes) throws ScanException {
-        /*
+   /*
     * If doing <param> as <embed>, now is the time to convert it.
     */
         String nameValue = null;
@@ -394,21 +388,18 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
          */
         CssScanner styleScanner;
 
-        if(policy.isEmbedStyleSheets()) {
+        if (policy.isEmbedStyleSheets()) {
             styleScanner = new ExternalCssScanner(policy, messages);
-        }else{
+        } else {
             styleScanner = new CssScanner(policy, messages);
         }
 
         try {
-
             Node firstChild = ele.getFirstChild();
             if (firstChild != null) {
 
                 String toScan = firstChild.getNodeValue();
-
                 CleanResults cr = styleScanner.scanStyleSheet(toScan, policy.getMaxInputSize());
-
                 errorMessages.addAll(cr.getErrorMessages());
 
                 /*
@@ -422,43 +413,19 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                 final String cleanHTML = cr.getCleanHTML();
 
                 if (cleanHTML == null || cleanHTML.equals("")) {
-
                     firstChild.setNodeValue("/* */");
-
                 } else {
-
                     firstChild.setNodeValue(cleanHTML);
-
                 }
-
             }
 
-        } catch (DOMException e) {
-
-            addError(ErrorMessageUtil.ERROR_CSS_TAG_MALFORMED, new Object[]{HTMLEntityEncoder.htmlEntityEncode(ele.getFirstChild().getNodeValue())});
-            parentNode.removeChild(ele);
-            return true;
-
-        } catch (ScanException e) {
-
-            addError(ErrorMessageUtil.ERROR_CSS_TAG_MALFORMED, new Object[]{HTMLEntityEncoder.htmlEntityEncode(ele.getFirstChild().getNodeValue())});
-            parentNode.removeChild(ele);
-            return true;
+        } catch (DOMException | ScanException | ParseException | NumberFormatException e) {
 
             /*
-             * This shouldn't be reachable anymore, but we'll leave it
-             * here because I'm hilariously dumb sometimes.
-             */
-        } catch (ParseException e) {
-
-            addError(ErrorMessageUtil.ERROR_CSS_TAG_MALFORMED, new Object[]{HTMLEntityEncoder.htmlEntityEncode(ele.getFirstChild().getNodeValue())});
-            parentNode.removeChild(ele);
-            return true;
-
-            /*
+             * ParseException shouldn't be possible anymore, but we'll leave it
+             * here because I (Arshan) am hilariously dumb sometimes.
              * Batik can throw NumberFormatExceptions (see bug #48).
              */
-        } catch (NumberFormatException e) {
 
             addError(ErrorMessageUtil.ERROR_CSS_TAG_MALFORMED, new Object[]{HTMLEntityEncoder.htmlEntityEncode(ele.getFirstChild().getNodeValue())});
             parentNode.removeChild(ele);
@@ -475,13 +442,10 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     */
 
         NamedNodeMap nnmap = ele.getAttributes();
-
         while (nnmap.getLength() > 0) {
-
-            addError(ErrorMessageUtil.ERROR_ATTRIBUTE_NOT_IN_POLICY, new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(nnmap.item(0).getNodeName())});
-
+            addError(ErrorMessageUtil.ERROR_ATTRIBUTE_NOT_IN_POLICY,
+                new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(nnmap.item(0).getNodeName())});
             ele.removeAttribute(nnmap.item(0).getNodeName());
-
         }
 
         int i = 0;
@@ -489,15 +453,12 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         int length = eleChildNodes.getLength();
 
         while (i < length) {
-
             Node nodeToRemove = eleChildNodes.item(j);
-
             if (nodeToRemove.getNodeType() != Node.TEXT_NODE) {
                 ele.removeChild(nodeToRemove);
             } else {
                 j++;
             }
-
             i++;
         }
     }
@@ -524,8 +485,6 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                 attr = policy.getGlobalAttributeByName(name);
             }
 
-            boolean isAttributeValid = false;
-
             /*
              * We have to special case the "style" attribute since it's
              * validated quite differently.
@@ -538,26 +497,15 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                 CssScanner styleScanner = new CssScanner(policy, messages);
 
                 try {
-
                     CleanResults cr = styleScanner.scanInlineStyle(value, tagName, policy.getMaxInputSize());
-
                     attribute.setNodeValue(cr.getCleanHTML());
-
                     List<String> cssScanErrorMessages = cr.getErrorMessages();
-
                     errorMessages.addAll(cssScanErrorMessages);
 
-                } catch (DOMException e) {
+                } catch (DOMException | ScanException e) {
 
-                    addError(ErrorMessageUtil.ERROR_CSS_ATTRIBUTE_MALFORMED, new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(ele.getNodeValue())});
-
-                    ele.removeAttribute(attribute.getNodeName());
-                    currentAttributeIndex--;
-
-                } catch (ScanException e) {
-
-                    addError(ErrorMessageUtil.ERROR_CSS_ATTRIBUTE_MALFORMED, new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(ele.getNodeValue())});
-
+                    addError(ErrorMessageUtil.ERROR_CSS_ATTRIBUTE_MALFORMED,
+                        new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(ele.getNodeValue())});
                     ele.removeAttribute(attribute.getNodeName());
                     currentAttributeIndex--;
                 }
@@ -566,18 +514,12 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
                 if (attr != null) {
 
-                    if (attr.containsAllowedValue( value.toLowerCase())) {
-                        isAttributeValid = true;
-                    }
-
-                    if (attr.matchesAllowedExpression(value)){
-                        isAttributeValid = true;
-                    }
-
-                    if (!isAttributeValid) {
+                    // See if attribute is invalid
+                    if (!(attr.containsAllowedValue( value.toLowerCase()) ||
+                         (attr.matchesAllowedExpression( value ))) ) {
 
                         /*
-                         * Document transgression and perform the
+                         * Attribute is NOT valid, so: Document transgression and perform the
                          * "onInvalid" action. The default action is to
                          * strip the attribute and leave the rest intact.
                          */
@@ -593,34 +535,30 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                             removeNode(ele);
 
                             addError(ErrorMessageUtil.ERROR_ATTRIBUTE_INVALID_REMOVED,
-                                    new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
+                              new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
                             return true;
 
                         } else if ("filterTag".equals(onInvalidAction)) {
 
                             /*
-                             * Remove the attribute and keep the rest of the
-                             * tag.
+                             * Remove the attribute and keep the rest of the tag.
                              */
 
                             processChildren(ele, currentStackDepth);
-
                             promoteChildren(ele);
-
-                            addError(ErrorMessageUtil.ERROR_ATTRIBUTE_CAUSE_FILTER, new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
+                            addError(ErrorMessageUtil.ERROR_ATTRIBUTE_CAUSE_FILTER,
+                              new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
 
                         } else if ("encodeTag".equals(onInvalidAction)) {
 
                             /*
-                             * Remove the attribute and keep the rest of the
-                             * tag.
+                             * Remove the attribute and keep the rest of the tag.
                              */
 
                             processChildren(ele, currentStackDepth);
-
                             encodeAndPromoteChildren(ele);
-
-                            addError(ErrorMessageUtil.ERROR_ATTRIBUTE_CAUSE_ENCODE, new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
+                            addError(ErrorMessageUtil.ERROR_ATTRIBUTE_CAUSE_ENCODE,
+                              new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
 
                         } else {
 
@@ -629,18 +567,15 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                              */
 
                             ele.removeAttribute(attribute.getNodeName());
-
                             currentAttributeIndex--;
-
-                            addError(ErrorMessageUtil.ERROR_ATTRIBUTE_INVALID, new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
+                            addError(ErrorMessageUtil.ERROR_ATTRIBUTE_INVALID,
+                              new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
 
                             if ("removeTag".equals(onInvalidAction) || "filterTag".equals(onInvalidAction)) {
                                 return true;
                                 // remove/filter the tag
                             }
-
                         }
-
                     }
 
                 } else {
@@ -649,13 +584,12 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                      * - remove it (whitelisting!)
                      */
 
-                    addError(ErrorMessageUtil.ERROR_ATTRIBUTE_NOT_IN_POLICY, new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
-
+                    addError(ErrorMessageUtil.ERROR_ATTRIBUTE_NOT_IN_POLICY,
+                      new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
                     ele.removeAttribute(attribute.getNodeName());
-
                     currentAttributeIndex--;
 
-                } // end if attribute is or is not found in policy file
+                } // end if attribute is found in policy file
 
             } // end while loop through attributes
 
@@ -672,7 +606,6 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         for (int i = 0; i < childNodes.getLength(); i++) {
 
             tmp = childNodes.item(i);
-
             recursiveValidateTag(tmp, currentStackDepth);
 
             /*
@@ -761,7 +694,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
             parent.insertBefore(node, ele);
         }
 
-        if (parent != null){
+        if (parent != null) {
             removeNode(ele);
         }
     }
@@ -839,6 +772,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         return eleAsString.toString();
     }
 
+    @Override
     public CleanResults getResults() {
         return results;
     }

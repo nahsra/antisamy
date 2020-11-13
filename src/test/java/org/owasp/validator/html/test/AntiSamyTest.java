@@ -31,12 +31,12 @@ package org.owasp.validator.html.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -101,7 +101,6 @@ public class AntiSamyTest {
     private AntiSamy as = new AntiSamy();
     private TestPolicy policy = null;
 
-
     @Before
     public void setUp() throws Exception {
 
@@ -115,15 +114,12 @@ public class AntiSamyTest {
         policy = TestPolicy.getInstance(url);
     }
 
-
     @Test
     public void SAX() {
         try {
             CleanResults cr = as.scan("<b>test</i></b>test thsidfshidf<script>sdfsdf", policy, AntiSamy.SAX);
             assertTrue(cr != null && cr.getCleanXMLDocumentFragment() == null && cr.getCleanHTML().length() > 0);
-        } catch (ScanException e) {
-            e.printStackTrace();
-        } catch (PolicyException e) {
+        } catch (ScanException | PolicyException e) {
             e.printStackTrace();
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -44,7 +44,6 @@ public abstract class AbstractAntiSamyScanner {
 
     public abstract CleanResults scan(String html) throws ScanException;
 
-    /* UnusedDeclaration TODO: Investigate */
     public abstract CleanResults getResults();
 
     public AbstractAntiSamyScanner(Policy policy) {

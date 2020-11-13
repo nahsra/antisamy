@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li, Kristian Rosenvold
+ * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li, Kristian Rosenvold
  *
  * All rights reserved.
  *
@@ -130,7 +130,6 @@ public class Policy {
         }
     }
 
-
     /**
      * Retrieves a CSS Property from the Policy.
      *
@@ -175,7 +174,6 @@ public class Policy {
 
     }
 
-
     /**
      * This retrieves a Policy based on the File object passed in
      *
@@ -191,7 +189,6 @@ public class Policy {
             throw new PolicyException(e);
         }
     }
-
 
     /**
      * This retrieves a Policy based on the URL object passed in.
@@ -232,7 +229,7 @@ public class Policy {
 
     protected static ParseContext getSimpleParseContext(Element topLevelElement) throws PolicyException {
         ParseContext parseContext = new ParseContext();
-        if (getByTagName(topLevelElement, "include").iterator().hasNext()){
+        if (getByTagName(topLevelElement, "include").iterator().hasNext()) {
             throw new IllegalArgumentException("A policy file loaded with an InputStream cannot contain include references");
 
         }
@@ -274,10 +271,8 @@ public class Policy {
             }
 
             return getTopLevelElement( source);
-        } catch (SAXException e) {
-            // This can't actually happen. See JavaDoc for resolveEntity(String, URL)
-            throw new PolicyException(e);
-        } catch (IOException e) {
+        } catch (SAXException | IOException e) {
+            // SAXException can't actually happen. See JavaDoc for resolveEntity(String, URL)
             throw new PolicyException(e);
         }
     }
@@ -300,11 +295,7 @@ public class Policy {
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document dom = db.parse(source);
             return dom.getDocumentElement();
-        } catch (SAXException e) {
-            throw new PolicyException(e);
-        } catch (ParserConfigurationException e) {
-            throw new PolicyException(e);
-        } catch (IOException e) {
+        } catch (SAXException | ParserConfigurationException | IOException e) {
             throw new PolicyException(e);
         }
     }
@@ -355,18 +346,7 @@ public class Policy {
                     source = new InputSource(url.openStream());
                     source.setSystemId(href);
 
-                } catch (MalformedURLException except) {
-                    try {
-                        String absURL = URIUtils.resolveAsString(href, baseUrl.toString());
-                        url = new URL(absURL);
-                        source = new InputSource(url.openStream());
-                        source.setSystemId(href);
-
-                    } catch (MalformedURLException ex2) {
-                        // nothing to do
-                    }
-
-                } catch (java.io.FileNotFoundException fnfe) {
+                } catch (MalformedURLException | java.io.FileNotFoundException e) {
                     try {
                         String absURL = URIUtils.resolveAsString(href, baseUrl.toString());
                         url = new URL(absURL);
@@ -405,11 +385,7 @@ public class Policy {
             }
 
             return null;
-        } catch (SAXException e) {
-            throw new PolicyException(e);
-        } catch (ParserConfigurationException e) {
-            throw new PolicyException(e);
-        } catch (IOException e) {
+        } catch (SAXException | ParserConfigurationException | IOException e) {
             throw new PolicyException(e);
         }
     }
@@ -494,7 +470,6 @@ public class Policy {
         for (Element ele : getByTagName(root, "attribute")) {
 
             String name = getAttributeValue(ele, "name");
-
             Attribute toAdd = commonAttributes.get(name.toLowerCase());
 
             if (toAdd != null) {
@@ -517,7 +492,6 @@ public class Policy {
         for (Element ele : getByTagName(root, "attribute")) {
 
             String name = getAttributeValue(ele, "name");
-
             Attribute toAdd = commonAttributes.get(name.toLowerCase());
 
             if (toAdd != null) {
@@ -563,7 +537,6 @@ public class Policy {
             String description = getAttributeValue(ele, "description");
             Attribute attribute = new Attribute(getAttributeValue(ele, "name"), allowedRegexps, allowedValues, onInvalidStr, description);
 
-
             commonAttributes1.put(name.toLowerCase(), attribute);
         }
     }
@@ -604,7 +577,7 @@ public class Policy {
             String regExpName = getAttributeValue(regExpNode, "name");
             String value = getAttributeValue(regExpNode, "value");
 
-            /*
+           /*
             * Look up common regular expression specified
             * by the "name" field. They can put a common
             * name in the "name" field or provide a custom
@@ -616,9 +589,9 @@ public class Policy {
                 AntiSamyPattern pattern = commonRegularExpressions1.get(regExpName);
                 if (pattern != null) {
                     allowedRegexps.add(pattern.getPattern());
-                } else {
-                    throw new PolicyException("Regular expression '" + regExpName + "' was referenced as a common regexp in definition of '" + tagName + "', but does not exist in <common-regexp>");
-                }
+                } else throw new PolicyException("Regular expression '" + regExpName +
+                      "' was referenced as a common regexp in definition of '" + tagName +
+                      "', but does not exist in <common-regexp>");
 
             } else if (value != null && value.length() > 0) {
                 allowedRegexps.add(Pattern.compile(value));
@@ -627,7 +600,9 @@ public class Policy {
         return allowedRegexps;
     }
 
-    private static List<Pattern> getAllowedRegexp3(Map<String, AntiSamyPattern> commonRegularExpressions1, Element ele, String name) throws PolicyException {
+    private static List<Pattern> getAllowedRegexp3(Map<String, AntiSamyPattern> commonRegularExpressions1,
+            Element ele, String name) throws PolicyException {
+
         List<Pattern> allowedRegExp = new ArrayList<Pattern>();
         for (Element regExpNode : getGrandChildrenByTagName(ele, "regexp-list", "regexp")) {
             String regExpName = getAttributeValue(regExpNode, "name");
@@ -639,14 +614,15 @@ public class Policy {
                 allowedRegExp.add(pattern.getPattern());
             } else if (value != null) {
                 allowedRegExp.add(Pattern.compile(value));
-            } else {
-                throw new PolicyException("Regular expression '" + regExpName + "' was referenced as a common regexp in definition of '" + name + "', but does not exist in <common-regexp>");
-            }
+            } else throw new PolicyException("Regular expression '" + regExpName +
+                  "' was referenced as a common regexp in definition of '" + name +
+                  "', but does not exist in <common-regexp>");
         }
         return allowedRegExp;
     }
-    
-    private static void parseTagRules(Element root, Map<String, Attribute> commonAttributes1, Map<String, AntiSamyPattern> commonRegularExpressions1, Map<String, Tag> tagRules1) throws PolicyException {
+
+    private static void parseTagRules(Element root, Map<String, Attribute> commonAttributes1, Map<String,
+             AntiSamyPattern> commonRegularExpressions1, Map<String, Tag> tagRules1) throws PolicyException {
 
         if (root == null) return;
 
@@ -675,29 +651,24 @@ public class Policy {
                 Attribute attribute = commonAttributes1.get(attrName);
 
                 /*
-                      * All they provided was the name, so they must want a common
-                      * attribute.
-                      */
+                 * All they provided was the name, so they must want a common attribute.
+                 */
                 if (attribute != null) {
-
                     /*
-                           * If they provide onInvalid/description values here they will
-                           * override the common values.
-                           */
+                     * If they provide onInvalid/description values here they will
+                     * override the common values.
+                     */
 
                     String onInvalid = getAttributeValue(attributeNode, "onInvalid");
                     String description = getAttributeValue(attributeNode, "description");
-
                     Attribute changed = attribute.mutate(onInvalid, description);
-
                     commonAttributes1.put(attrName, changed);
-
                     tagAttributes.put(attrName, changed);
 
                 } else {
-
-                    throw new PolicyException("Attribute '" + getAttributeValue(attributeNode, "name") + "' was referenced as a common attribute in definition of '" + tagName + "', but does not exist in <common-attributes>");
-
+                    throw new PolicyException("Attribute '" + getAttributeValue(attributeNode, "name") +
+                       "' was referenced as a common attribute in definition of '" + tagName +
+                       "', but does not exist in <common-attributes>");
                 }
 
             } else {
@@ -708,8 +679,8 @@ public class Policy {
                 Attribute attribute = new Attribute(getAttributeValue(attributeNode, "name"), allowedRegexps2, allowedValues2, onInvalid, description);
 
                 /*
-                      * Add fully built attribute.
-                      */
+                 * Add fully built attribute.
+                 */
                 tagAttributes.put(attrName, attribute);
             }
 
@@ -717,14 +688,12 @@ public class Policy {
         return tagAttributes;
     }
 
-
     private static void parseCSSRules(Element root, Map<String, Property> cssRules1, Map<String, AntiSamyPattern> commonRegularExpressions1) throws PolicyException {
 
         for (Element ele : getByTagName(root, "property")){
 
             String name = getAttributeValue(ele, "name");
             String description = getAttributeValue(ele, "description");
-
 
             List<Pattern> allowedRegexp3 = getAllowedRegexp3(commonRegularExpressions1, ele, name);
 
@@ -760,7 +729,6 @@ public class Policy {
      */
     public Attribute getGlobalAttributeByName(String name) {
         return globalAttributes.get(name.toLowerCase());
-
     }
 
     /**
@@ -843,17 +811,7 @@ public class Policy {
                 source = new InputSource(url.openStream());
                 source.setSystemId(systemId);
                 return source;
-            } catch (MalformedURLException except) {
-                try {
-                    String absURL = URIUtils.resolveAsString(systemId, baseUrl.toString());
-                    url = new URL(absURL);
-                    source = new InputSource(url.openStream());
-                    source.setSystemId(systemId);
-                    return source;
-                } catch (MalformedURLException ex2) {
-                    // nothing to do
-                }
-            } catch (java.io.FileNotFoundException fnfe) {
+            } catch (MalformedURLException | java.io.FileNotFoundException e) {
                 try {
                     String absURL = URIUtils.resolveAsString(systemId, baseUrl.toString());
                     url = new URL(absURL);
@@ -876,8 +834,7 @@ public class Policy {
         NodeList elementsByTagName = element.getElementsByTagName(tagName);
         if (elementsByTagName != null && elementsByTagName.getLength() > 0)
             return (Element) elementsByTagName.item(0);
-        else
-            return null;
+        else return null;
     }
 
     private static Iterable<Element>  getGrandChildrenByTagName(Element parent, String immediateChildName, String subChild){

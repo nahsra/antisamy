@@ -75,12 +75,9 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
             XMLDocumentFilter[] filters = { magicSAXFilter };
             try {
                 saxParser.setProperty("http://cyberneko.org/html/properties/filters", filters);
-            } catch (SAXNotRecognizedException e) {
-                throw new RuntimeException(e);
-            } catch (SAXNotSupportedException e) {
+            } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
                 throw new RuntimeException(e);
             }
-
         }
     }
 
@@ -88,18 +85,20 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
         super(policy);
     }
 
+    @Override
     public CleanResults getResults() {
         return null;
     }
 
+    @Override
     public CleanResults scan(String html) throws ScanException {
         return scan(html, this.policy);
     }
 
     public CleanResults scan(String html, Policy policy) throws ScanException {
        if (html == null) {
-            throw new ScanException(new NullPointerException("Null input"));
-        }
+           throw new ScanException(new NullPointerException("Null html input"));
+       }
 
        int maxInputSize = this.policy.getMaxInputSize();
 
@@ -199,9 +198,7 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
 
             parser.setProperty("http://cyberneko.org/html/properties/names/elems", "lower");
             return parser;
-        } catch (SAXNotRecognizedException e) {
-            throw new RuntimeException(e);
-        } catch (SAXNotSupportedException e) {
+        } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
             throw new RuntimeException(e);
         }
     }
