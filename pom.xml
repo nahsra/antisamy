@@ -3,7 +3,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.5.10</version>
+    <version>1.5.11</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -15,7 +15,7 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
- 
+
     <name>OWASP AntiSamy</name>
     <description>A library for performing fast, configurable cleansing of HTML coming from untrusted sources.</description>
     <url>https://github.com/nahsra/antisamy</url>
@@ -43,6 +43,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version.spotbugs>4.1.4</version.spotbugs>
     </properties>
 
     <dependencies>
@@ -79,7 +80,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.12</version>
+            <version>4.5.13</version>
             <exclusions>
                 <!-- exclude this as httpclient uses an older commons-codec and we want to eliminate the convergence mismatch -->
                 <exclusion>
@@ -88,6 +89,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- Note: Xerces 2.12.0 is subject to CVE-2020-14338. However, AntiSamy does not use the feature of Xerces
+                   subject to this vulnerability so it's not a risk for AntiSamy. We could not directly upgrade Xerces to
+                   eliminate the CVE because the Apache Xerces project hasn't addressed it yet. There is a patched Xerces library
+                   available from JBOSS via their Maven repo at coordinates 2.12.0.SP03 which you can use if you want but it
+                   requires you to add their maven repo to your pom to get it. Once Apache does release a patch, we do recommend
+                   ugprading directly and excluding the version we use here. -->
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
@@ -96,7 +103,21 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.14</version>
+            <version>1.15</version>
+        </dependency>
+
+        <!-- SpotBugs dependencies -->
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>${version.spotbugs}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>net.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+            <version>1.0</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- Test dependencies -->
@@ -110,15 +131,15 @@
     </dependencies>
 
     <build>
-    	<pluginManagement>
-    	    <plugins>
+        <pluginManagement>
+            <plugins>
                <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-dependency-plugin</artifactId>
                   <version>3.1.2</version>
                </plugin>
-    	    </plugins>
-    	</pluginManagement>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -145,7 +166,7 @@
                     <dependency>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>extra-enforcer-rules</artifactId>
-                        <version>1.2</version>
+                        <version>1.3</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -156,6 +177,7 @@
                             <rules>
                                 <enforceBytecodeVersion>
                                     <maxJdkVersion>1.7</maxJdkVersion>
+                                    <ignoreOptionals>true</ignoreOptionals>
                                     <ignoredScopes>test</ignoredScopes>
                                     <message>Dependencies shouldn't require Java 8+.</message>
                                 </enforceBytecodeVersion>
@@ -212,7 +234,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.9.0</version>
+                <version>3.9.1</version>
             </plugin>
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
@@ -234,14 +256,15 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.0.4</version>
+                <version>${version.spotbugs}</version>
                 <dependencies>
-                  <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs. Not necessary at this time.  - - >
+                  <!-- Overwrite dependency on SpotBugs if you want to specify the version of SpotBugs.
+                       SpotBugs itself is frequently several versions ahead of the spotbugs-maven-plugin -->
                   <dependency>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs</artifactId>
-                    <version>4.0.4</version>
-                  </dependency -->
+                    <version>${version.spotbugs}</version>
+                  </dependency>
                 </dependencies>
             </plugin>
         </plugins>
@@ -251,7 +274,7 @@
            <plugin>
                <groupId>org.codehaus.mojo</groupId>
                <artifactId>versions-maven-plugin</artifactId>
-               <version>2.7</version>
+               <version>2.8.1</version>
                <reportSets>
                  <reportSet>
                    <reports>
@@ -264,10 +287,11 @@
            <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-project-info-reports-plugin</artifactId>
-               <version>3.1.0</version>
+               <version>3.1.1</version>
                <reportSets>
                  <reportSet>
                    <reports>
+                     <report>index</report>
                      <report>dependency-convergence</report>
                    </reports>
                  </reportSet>
@@ -287,6 +311,8 @@
                            <version>1.10.1</version>
                        </plugin>
                    </plugins>
+                   <effort>Max</effort>
+                   <relaxed>false</relaxed>
                </configuration>
            </plugin>
         </plugins>

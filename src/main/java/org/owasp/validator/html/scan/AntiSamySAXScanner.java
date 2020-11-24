@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -32,6 +32,7 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -56,6 +57,12 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
 
     private static final TransformerFactory sTransformerFactory = TransformerFactory.newInstance();
 
+    static {
+        // Disable external entities, etc.
+        sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+    }
+
     static class CachedItem {
         private final Transformer transformer;
         private final SAXParser saxParser;
@@ -68,12 +75,9 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
             XMLDocumentFilter[] filters = { magicSAXFilter };
             try {
                 saxParser.setProperty("http://cyberneko.org/html/properties/filters", filters);
-            } catch (SAXNotRecognizedException e) {
-                throw new RuntimeException(e);
-            } catch (SAXNotSupportedException e) {
+            } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
                 throw new RuntimeException(e);
             }
-
         }
     }
 
@@ -81,18 +85,20 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
         super(policy);
     }
 
+    @Override
     public CleanResults getResults() {
         return null;
     }
 
+    @Override
     public CleanResults scan(String html) throws ScanException {
         return scan(html, this.policy);
     }
 
     public CleanResults scan(String html, Policy policy) throws ScanException {
        if (html == null) {
-            throw new ScanException(new NullPointerException("Null input"));
-        }
+           throw new ScanException(new NullPointerException("Null html input"));
+       }
 
        int maxInputSize = this.policy.getMaxInputSize();
 
@@ -192,9 +198,7 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
 
             parser.setProperty("http://cyberneko.org/html/properties/names/elems", "lower");
             return parser;
-        } catch (SAXNotRecognizedException e) {
-            throw new RuntimeException(e);
-        } catch (SAXNotSupportedException e) {
+        } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
             throw new RuntimeException(e);
         }
     }

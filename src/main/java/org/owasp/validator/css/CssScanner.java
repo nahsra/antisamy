@@ -138,14 +138,11 @@ public class CssScanner {
 	      // should already have been counted by the caller since it was
 	      // embedded in the HTML
 	        parser.parseStyleSheet(new InputSource(new StringReader(taintedCss)));
-	    } catch (IOException ioe) {
-	        throw new ScanException(ioe);
-
+	    } catch (IOException | ParseException e) {
             /*
-             * ParseExceptions, from batik, is unfortunately a RuntimeException.
+             * ParseException, from batik, is unfortunately a RuntimeException.
              */
-        } catch (ParseException pe) {
-            throw new ScanException(pe);
+	        throw new ScanException(e);
         }
 
         parseImportedStylesheets(stylesheets, handler, errorMessages, sizeLimit);
