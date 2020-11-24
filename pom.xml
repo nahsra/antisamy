@@ -16,13 +16,6 @@
         </repository>
     </distributionManagement>
 
-    <repositories> <!-- This repo is temporarily added so we can get the patched version of Xerces -->
-        <repository>
-            <id>jboss-repo</id>
-            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
-        </repository>
-    </repositories>
- 
     <name>OWASP AntiSamy</name>
     <description>A library for performing fast, configurable cleansing of HTML coming from untrusted sources.</description>
     <url>https://github.com/nahsra/antisamy</url>
@@ -96,12 +89,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Note: SP03 is a patch produced by JBOSS to address CVE-2020-14338 for Xerces used in JBoss.
-                   Since Apache hasn't patched this directly, we are using this patched verison for now. -->
+        <!-- Note: Xerces 2.12.0 is subject to CVE-2020-14338. However, AntiSamy does not use the feature of Xerces
+                   subject to this vulnerability so it's not a risk for AntiSamy. We could not directly upgrade Xerces to
+                   eliminate the CVE because the Apache Xerces project hasn't addressed it yet. There is a patched Xerces library
+                   available from JBOSS via their Maven repo at coordinates 2.12.0.SP03 which you can use if you want but it
+                   requires you to add their maven repo to your pom to get it. Once Apache does release a patch, we do recommend
+                   ugprading directly and excluding the version we use here. -->
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
-            <version>2.12.0.SP03</version>
+            <version>2.12.0</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
