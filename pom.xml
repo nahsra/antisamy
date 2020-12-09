@@ -3,7 +3,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.5.11</version>
+    <version>1.6.0-SNAPSHOT</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -43,7 +43,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.spotbugs>4.1.4</version.spotbugs>
+        <version.spotbugs>4.2.0</version.spotbugs>
     </properties>
 
     <dependencies>
@@ -256,7 +256,8 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>${version.spotbugs}</version>
+                <!--version>${version.spotbugs}</version-->
+                <version>4.1.4</version>
                 <dependencies>
                   <!-- Overwrite dependency on SpotBugs if you want to specify the version of SpotBugs.
                        SpotBugs itself is frequently several versions ahead of the spotbugs-maven-plugin -->
