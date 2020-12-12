@@ -24,20 +24,30 @@
 
 package org.owasp.validator.html;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.owasp.validator.html.model.AntiSamyPattern;
 import org.owasp.validator.html.model.Attribute;
@@ -48,10 +58,12 @@ import org.owasp.validator.html.util.URIUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
-import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Policy.java - This file holds the model for our policy engine.
@@ -63,6 +75,7 @@ public class Policy {
 
     public static final Pattern ANYTHING_REGEXP = Pattern.compile(".*");
 
+    private static final String POLICY_XSD_SCHEMA = "antisamy.xsd";
     protected static final String DEFAULT_POLICY_URI = "resources/antisamy.xml";
     private static final String DEFAULT_ONINVALID = "removeAttribute";
 
@@ -100,6 +113,12 @@ public class Policy {
 
     private final TagMatcher allowedEmptyTagsMatcher;
     private final TagMatcher requiresClosingTagsMatcher;
+    
+    /**
+     * XML Schema for policy validation
+     */
+    private static Schema schema = null;    
+    
 
     /**
      * Get the Tag specified by the provided tag name.
@@ -282,7 +301,14 @@ public class Policy {
     }
 
     protected static Element getTopLevelElement(InputSource source) throws PolicyException {
-        try {
+        try {	
+        	if (schema == null) {
+        		URI uri = Policy.class.getClassLoader().getResource(POLICY_XSD_SCHEMA).toURI();
+        		File file = new File (uri);
+        		schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+        				.newSchema(file);
+        	}
+        	
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
             /**
@@ -292,10 +318,14 @@ public class Policy {
             dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
             dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
             dbf.setFeature(LOAD_EXTERNAL_DTD, false);
+            dbf.setNamespaceAware(true);
+            dbf.setSchema(schema);
             DocumentBuilder db = dbf.newDocumentBuilder();
+            db.setErrorHandler(new SAXErrorHandler());
             Document dom = db.parse(source);
+
             return dom.getDocumentElement();
-        } catch (SAXException | ParserConfigurationException | IOException e) {
+        } catch (URISyntaxException | SAXException | ParserConfigurationException | IOException e) {
             throw new PolicyException(e);
         }
     }
@@ -875,4 +905,22 @@ public class Policy {
         return commonRegularExpressions.get(name);
     }
 
+    static class SAXErrorHandler implements ErrorHandler {
+
+		@Override
+		public void error(SAXParseException arg0) throws SAXException {
+			throw arg0;
+		}
+
+		@Override
+		public void fatalError(SAXParseException arg0) throws SAXException {
+			throw arg0;
+		}
+
+		@Override
+		public void warning(SAXParseException arg0) throws SAXException {
+			throw arg0;			
+		}
+    
+    }
 }
