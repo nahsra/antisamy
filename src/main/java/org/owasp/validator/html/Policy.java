@@ -113,16 +113,16 @@ public class Policy {
 
     private final TagMatcher allowedEmptyTagsMatcher;
     private final TagMatcher requiresClosingTagsMatcher;
-    
+
     /**
      * XML Schema for policy validation
      */
-    private static Schema schema = null;    
-    
+    private static Schema schema = null;
+
 
     /**
      * Get the Tag specified by the provided tag name.
-     * 
+     *
      * @param tagName
      *            The name of the Tag to return.
      * @return The requested Tag, or null if it doesn't exist.
@@ -301,14 +301,14 @@ public class Policy {
     }
 
     protected static Element getTopLevelElement(InputSource source) throws PolicyException {
-        try {	
+        try {
         	if (schema == null) {
         		URI uri = Policy.class.getClassLoader().getResource(POLICY_XSD_SCHEMA).toURI();
         		File file = new File (uri);
         		schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
         				.newSchema(file);
         	}
-        	
+
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
             /**
@@ -325,7 +325,7 @@ public class Policy {
             Document dom = db.parse(source);
 
             return dom.getDocumentElement();
-        } catch (URISyntaxException | SAXException | ParserConfigurationException | IOException e) {
+        } catch (SAXException | ParserConfigurationException | IOException | URISyntaxException e) {
             throw new PolicyException(e);
         }
     }
@@ -389,6 +389,13 @@ public class Policy {
                 }
             }
 
+            if (schema == null) {
+                URI uri = Policy.class.getClassLoader().getResource(POLICY_XSD_SCHEMA).toURI();
+                File file = new File (uri);
+                schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+                        .newSchema(file);
+            }
+
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
             /**
@@ -398,7 +405,10 @@ public class Policy {
             dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
             dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
             dbf.setFeature(LOAD_EXTERNAL_DTD, false);
+            dbf.setNamespaceAware(true);
+            dbf.setSchema(schema);
             DocumentBuilder db = dbf.newDocumentBuilder();
+            db.setErrorHandler(new SAXErrorHandler());
             Document dom;
 
             /**
@@ -415,7 +425,7 @@ public class Policy {
             }
 
             return null;
-        } catch (SAXException | ParserConfigurationException | IOException e) {
+        } catch (SAXException | ParserConfigurationException | IOException | URISyntaxException e) {
             throw new PolicyException(e);
         }
     }
@@ -811,7 +821,7 @@ public class Policy {
 
     /**
      * Resolves public and system IDs to files stored within the JAR.
-     * 
+     *
      * @param systemId The name of the entity we want to look up.
      * @param baseUrl The base location of the entity.
      * @return A String object containing the directive associated with the lookup name, or null if none is found.
@@ -919,8 +929,8 @@ public class Policy {
 
 		@Override
 		public void warning(SAXParseException arg0) throws SAXException {
-			throw arg0;			
+			throw arg0;
 		}
-    
+
     }
 }
