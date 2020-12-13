@@ -86,18 +86,35 @@ public class PolicyTest extends TestCase {
         assertTrue(policy.getAllowedEmptyTags().size() == Constants.defaultAllowedEmptyTags.size());
     }
     
-    public void testInvalidPolicy() throws PolicyException {
-        String allowedEmptyTagsSection = "<notSupportedTag>\n" +
+    public void testInvalidPolicies() {
+        String notSupportedTagsSection = "<notSupportedTag>\n" +
                                          "</notSupportedTag>\n";
-        String policyFile = assembleFile(allowedEmptyTagsSection);
+        String policyFile = assembleFile(notSupportedTagsSection);
         try {
 			policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
-	        fail("Not supported tag on policy, but not PolicyException Ocurred");
+	        fail("Not supported tag on policy, but not PolicyException occurred.");
 		} catch (PolicyException e) {
 			assertNotNull(e);
 		}
 
-    }
+        String duplicatedTagsSection = "<tag-rules>\n" +
+                                       "</tag-rules>\n";
+        policyFile = assembleFile(duplicatedTagsSection);
+        try {
+            policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+            fail("<tag-rules> is duplicated but it should not be, PolicyException was expected.");
+        } catch (PolicyException e) {
+            assertNotNull(e);
+        }
 
-    
+        policyFile = assembleFile(duplicatedTagsSection)
+                .replace("<tag-rules>", "")
+                .replace("</tag-rules>", "");
+        try {
+            policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+            fail("<tag-rules> is missing but it should not be, PolicyException was expected.");
+        } catch (PolicyException e) {
+            assertNotNull(e);
+        }
+    }
 }
