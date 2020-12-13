@@ -75,7 +75,7 @@ public class Policy {
 
     public static final Pattern ANYTHING_REGEXP = Pattern.compile(".*");
 
-    private static final String POLICY_XSD_SCHEMA = "antisamy.xsd";
+    private static final String POLICY_SCHEMA_URI = "antisamy.xsd";
     protected static final String DEFAULT_POLICY_URI = "resources/antisamy.xml";
     private static final String DEFAULT_ONINVALID = "removeAttribute";
 
@@ -118,7 +118,6 @@ public class Policy {
      * XML Schema for policy validation
      */
     private static Schema schema = null;
-
 
     /**
      * Get the Tag specified by the provided tag name.
@@ -302,12 +301,7 @@ public class Policy {
 
     protected static Element getTopLevelElement(InputSource source) throws PolicyException {
         try {
-        	if (schema == null) {
-        		URI uri = Policy.class.getClassLoader().getResource(POLICY_XSD_SCHEMA).toURI();
-        		File file = new File (uri);
-        		schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-        				.newSchema(file);
-        	}
+            getPolicySchema();
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
@@ -389,12 +383,7 @@ public class Policy {
                 }
             }
 
-            if (schema == null) {
-                URI uri = Policy.class.getClassLoader().getResource(POLICY_XSD_SCHEMA).toURI();
-                File file = new File (uri);
-                schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-                        .newSchema(file);
-            }
+            getPolicySchema();
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
@@ -915,8 +904,20 @@ public class Policy {
         return commonRegularExpressions.get(name);
     }
 
-    static class SAXErrorHandler implements ErrorHandler {
+    private static void getPolicySchema() throws URISyntaxException, SAXException {
+        if (schema == null) {
+            URI uri = Policy.class.getClassLoader().getResource(POLICY_SCHEMA_URI).toURI();
+            File file = new File(uri);
+            schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+                    .newSchema(file);
+        }
+    }
 
+    /**
+     * This class is implemented to just throw exception when
+     * validating the policy schema while parsing the document.
+     */
+    static class SAXErrorHandler implements ErrorHandler {
 		@Override
 		public void error(SAXParseException arg0) throws SAXException {
 			throw arg0;
@@ -931,6 +932,5 @@ public class Policy {
 		public void warning(SAXParseException arg0) throws SAXException {
 			throw arg0;
 		}
-
     }
 }
