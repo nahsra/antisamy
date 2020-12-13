@@ -107,7 +107,7 @@ public class PolicyTest extends TestCase {
             assertNotNull(e);
         }
 
-        policyFile = assembleFile(duplicatedTagsSection)
+        policyFile = assembleFile("")
                 .replace("<tag-rules>", "")
                 .replace("</tag-rules>", "");
         try {
