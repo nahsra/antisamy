@@ -85,4 +85,19 @@ public class PolicyTest extends TestCase {
 
         assertTrue(policy.getAllowedEmptyTags().size() == Constants.defaultAllowedEmptyTags.size());
     }
+    
+    public void testInvalidPolicy() throws PolicyException {
+        String allowedEmptyTagsSection = "<notSupportedTag>\n" +
+                                         "</notSupportedTag>\n";
+        String policyFile = assembleFile(allowedEmptyTagsSection);
+        try {
+			policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+	        fail("Not supported tag on policy, but not PolicyException Ocurred");
+		} catch (PolicyException e) {
+			assertNotNull(e);
+		}
+
+    }
+
+    
 }
