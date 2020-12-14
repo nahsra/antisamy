@@ -24,7 +24,7 @@
 
 package org.owasp.validator.html;
 
-import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,7 +63,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
 
 /**
  * Policy.java - This file holds the model for our policy engine.
