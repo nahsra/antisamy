@@ -43,8 +43,18 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <version.spotbugs>4.2.0</version.spotbugs>
     </properties>
+
+    <profiles>
+      <profile>
+        <id>release</id>
+        <properties>
+          <gpg.skip>false</gpg.skip>
+        </properties>
+      </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
@@ -196,6 +206,18 @@
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin> <!-- This plugin is disabled by default. Invoke the release profile (-Prelease) to enable it. -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals><goal>sign</goal></goals>
                     </execution>
                 </executions>
             </plugin>
