@@ -620,7 +620,6 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     private void removePI(Node node) {
         addError(ErrorMessageUtil.ERROR_PI_FOUND, new Object[]{HTMLEntityEncoder.htmlEntityEncode(node.getTextContent())});
         removeNode(node);
-        node.getParentNode().removeChild(node);
     }
 
     private void stripCData(Node node) {
