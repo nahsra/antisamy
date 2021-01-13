@@ -44,6 +44,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
+        <version.spotbugs.maven>4.2.0</version.spotbugs.maven>
         <version.spotbugs>4.2.0</version.spotbugs>
     </properties>
 
@@ -99,16 +100,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Note: Xerces 2.12.0 is subject to CVE-2020-14338. However, AntiSamy does not use the feature of Xerces
-                   subject to this vulnerability so it's not a risk for AntiSamy. We could not directly upgrade Xerces to
-                   eliminate the CVE because the Apache Xerces project hasn't addressed it yet. There is a patched Xerces library
-                   available from JBOSS via their Maven repo at coordinates 2.12.0.SP03 which you can use if you want but it
-                   requires you to add their maven repo to your pom to get it. Once Apache does release a patch, we do recommend
-                   ugprading directly and excluding the version we use here. -->
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
-            <version>2.12.0</version>
+            <version>2.12.1</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -148,6 +143,11 @@
                   <artifactId>maven-dependency-plugin</artifactId>
                   <version>3.1.2</version>
                </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-release-plugin</artifactId>
+                  <version>3.0.0-M1</version>
+               </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -167,6 +167,11 @@
                     <testTarget>1.7</testTarget>
                     <compilerArgument>-Xlint:unchecked</compilerArgument>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.0.0-M1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -255,6 +260,11 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.9.1</version>
             </plugin>
@@ -278,8 +288,7 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <!--version>${version.spotbugs}</version-->
-                <version>4.1.4</version>
+                <version>${version.spotbugs.maven}</version>
                 <dependencies>
                   <!-- Overwrite dependency on SpotBugs if you want to specify the version of SpotBugs.
                        SpotBugs itself is frequently several versions ahead of the spotbugs-maven-plugin -->
@@ -341,3 +350,4 @@
         </plugins>
     </reporting>
 </project>
+

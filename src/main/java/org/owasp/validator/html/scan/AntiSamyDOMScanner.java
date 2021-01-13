@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
  *
  * All rights reserved.
  *
@@ -38,7 +38,16 @@ import org.owasp.validator.html.model.Attribute;
 import org.owasp.validator.html.model.Tag;
 import org.owasp.validator.html.util.ErrorMessageUtil;
 import org.owasp.validator.html.util.HTMLEntityEncoder;
-import org.w3c.dom.*;
+import org.w3c.dom.Comment;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.ProcessingInstruction;
+import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -47,7 +56,8 @@ import org.xml.sax.SAXNotSupportedException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
@@ -620,7 +630,6 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     private void removePI(Node node) {
         addError(ErrorMessageUtil.ERROR_PI_FOUND, new Object[]{HTMLEntityEncoder.htmlEntityEncode(node.getTextContent())});
         removeNode(node);
-        node.getParentNode().removeChild(node);
     }
 
     private void stripCData(Node node) {
