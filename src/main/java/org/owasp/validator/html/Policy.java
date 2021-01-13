@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li, Kristian Rosenvold
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li, Kristian Rosenvold
  *
  * All rights reserved.
  *
@@ -934,3 +934,4 @@ public class Policy {
 		}
     }
 }
+
