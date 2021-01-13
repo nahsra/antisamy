@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -35,6 +35,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -61,7 +62,6 @@ import org.owasp.validator.html.PolicyException;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.model.Attribute;
 import org.owasp.validator.html.model.Tag;
-
 
 /**
  * This class tests AntiSamy functionality and the basic policy file which
@@ -1453,5 +1453,30 @@ static final String test33 = "<html>\n"
         
         assertThat(as.scan(danglingMarkup2, policy, AntiSamy.SAX).getCleanHTML(), not(containsString("//evilactor.com/")));
         assertThat(as.scan(danglingMarkup2, policy, AntiSamy.DOM).getCleanHTML(), not(containsString("//evilactor.com/")));
+    }
+
+ @Test
+    public void testGithubIssue62() {
+        // Concern is that when a processing instruction is at the root level, node removal gets messy and Null pointer exception arises.
+        // More test cases are added for PI removal.
+
+        try{
+            assertThat(as.scan("|<?ai aaa", policy, AntiSamy.DOM).getCleanHTML(), is("|"));
+            assertThat(as.scan("|<?ai aaa", policy, AntiSamy.SAX).getCleanHTML(), is("|"));
+
+            assertThat(as.scan("<div>|<?ai aaa", policy, AntiSamy.DOM).getCleanHTML(), is("<div>|</div>"));
+            assertThat(as.scan("<div>|<?ai aaa", policy, AntiSamy.SAX).getCleanHTML(), is("<div>|</div>"));
+
+            assertThat(as.scan("<div><?foo note=\"I am XML processing instruction. I wish to be excluded\" ?></div>", policy, AntiSamy.DOM)
+                    .getCleanHTML(), not(containsString("<?foo")));
+            assertThat(as.scan("<div><?foo note=\"I am XML processing instruction. I wish to be excluded\" ?></div>", policy, AntiSamy.SAX)
+                    .getCleanHTML(), not(containsString("<?foo")));
+
+            assertThat(as.scan("<?xml-stylesheet type=\"text/css\" href=\"style.css\"?>", policy, AntiSamy.DOM).getCleanHTML(), is(""));
+            assertThat(as.scan("<?xml-stylesheet type=\"text/css\" href=\"style.css\"?>", policy, AntiSamy.SAX).getCleanHTML(), is(""));
+
+        } catch (Exception exc) {
+            fail(exc.getMessage());
+        }
     }
 }
