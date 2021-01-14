@@ -46,6 +46,8 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -906,10 +908,10 @@ public class Policy {
 
     private static void getPolicySchema() throws URISyntaxException, SAXException {
         if (schema == null) {
-            URI uri = Policy.class.getClassLoader().getResource(POLICY_SCHEMA_URI).toURI();
-            File file = new File(uri);
+            InputStream schemaStream = Policy.class.getClassLoader().getResourceAsStream(POLICY_SCHEMA_URI);
+            Source schemaSource = new StreamSource(schemaStream);
             schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-                    .newSchema(file);
+                    .newSchema(schemaSource);
         }
     }
 
@@ -934,4 +936,3 @@ public class Policy {
 		}
     }
 }
-
