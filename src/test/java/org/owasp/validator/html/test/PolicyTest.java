@@ -153,7 +153,7 @@ public class PolicyTest extends TestCase {
             policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
             assertNotNull(policy);
         } catch (PolicyException e) {
-            fail("Not supported tag on policy, but not PolicyException occurred.");
+            fail("Schema validation is disabled, policy creation should not fail.");
         }
 
         // Enable validation again
