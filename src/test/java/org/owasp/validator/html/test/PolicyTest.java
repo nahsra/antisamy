@@ -115,7 +115,7 @@ public class PolicyTest extends TestCase {
         String policyFile = assembleFile(notSupportedTagsSection);
         try {
             policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
-            fail("Not supported tag on policy, but not PolicyException occurred.");
+            fail("Not supported tag on policy, but no PolicyException occurred.");
         } catch (PolicyException e) {
             assertNotNull(e);
         }
@@ -136,6 +136,32 @@ public class PolicyTest extends TestCase {
         try {
             policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
             fail("<tag-rules> is missing but it should not be, PolicyException was expected.");
+        } catch (PolicyException e) {
+            assertNotNull(e);
+        }
+    }
+
+    public void testSchemaValidationToggle() {
+        String notSupportedTagsSection = "<notSupportedTag>\n" +
+                "</notSupportedTag>\n";
+        String policyFile = assembleFile(notSupportedTagsSection);
+
+        // Disable validation
+        Policy.toggleSchemaValidation(false);
+
+        try {
+            policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+            assertNotNull(policy);
+        } catch (PolicyException e) {
+            fail("Not supported tag on policy, but not PolicyException occurred.");
+        }
+
+        // Enable validation again
+        Policy.toggleSchemaValidation(true);
+
+        try {
+            policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+            fail("Not supported tag on policy, but no PolicyException occurred.");
         } catch (PolicyException e) {
             assertNotNull(e);
         }

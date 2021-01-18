@@ -120,6 +120,7 @@ public class Policy {
      * XML Schema for policy validation
      */
     private static Schema schema = null;
+    private static boolean validateSchema = true;
 
     /**
      * Get the Tag specified by the provided tag name.
@@ -158,6 +159,16 @@ public class Policy {
      */
     public Property getPropertyByName(String propertyName) {
         return cssRules.get(propertyName.toLowerCase());
+    }
+
+    /**
+     * This can enable/disable the schema validation against AntiSamy XSD for the instantiated policies.
+     * It is enabled by default.
+     *
+     * @param enable Boolean value to specify if the schema validation should be performed. Use false to disable.
+     */
+    public static void toggleSchemaValidation(boolean enable) {
+        validateSchema = enable;
     }
 
     /**
@@ -303,7 +314,6 @@ public class Policy {
 
     protected static Element getTopLevelElement(InputSource source) throws PolicyException {
         try {
-            getPolicySchema();
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
@@ -314,14 +324,19 @@ public class Policy {
             dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
             dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
             dbf.setFeature(LOAD_EXTERNAL_DTD, false);
-            dbf.setNamespaceAware(true);
-            dbf.setSchema(schema);
+
+            if (validateSchema) {
+                getPolicySchema();
+                dbf.setNamespaceAware(true);
+                dbf.setSchema(schema);
+            }
+
             DocumentBuilder db = dbf.newDocumentBuilder();
             db.setErrorHandler(new SAXErrorHandler());
             Document dom = db.parse(source);
 
             return dom.getDocumentElement();
-        } catch (SAXException | ParserConfigurationException | IOException | URISyntaxException e) {
+        } catch (SAXException | ParserConfigurationException | IOException e) {
             throw new PolicyException(e);
         }
     }
@@ -385,8 +400,6 @@ public class Policy {
                 }
             }
 
-            getPolicySchema();
-
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
             /**
@@ -396,8 +409,13 @@ public class Policy {
             dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
             dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
             dbf.setFeature(LOAD_EXTERNAL_DTD, false);
-            dbf.setNamespaceAware(true);
-            dbf.setSchema(schema);
+
+            if (validateSchema) {
+                getPolicySchema();
+                dbf.setNamespaceAware(true);
+                dbf.setSchema(schema);
+            }
+
             DocumentBuilder db = dbf.newDocumentBuilder();
             db.setErrorHandler(new SAXErrorHandler());
             Document dom;
@@ -416,7 +434,7 @@ public class Policy {
             }
 
             return null;
-        } catch (SAXException | ParserConfigurationException | IOException | URISyntaxException e) {
+        } catch (SAXException | ParserConfigurationException | IOException e) {
             throw new PolicyException(e);
         }
     }
@@ -906,7 +924,7 @@ public class Policy {
         return commonRegularExpressions.get(name);
     }
 
-    private static void getPolicySchema() throws URISyntaxException, SAXException {
+    private static void getPolicySchema() throws SAXException {
         if (schema == null) {
             InputStream schemaStream = Policy.class.getClassLoader().getResourceAsStream(POLICY_SCHEMA_URI);
             Source schemaSource = new StreamSource(schemaStream);
