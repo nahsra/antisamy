@@ -35,6 +35,7 @@ import org.owasp.validator.html.TagMatcher;
 import org.owasp.validator.html.scan.Constants;
 
 import java.io.ByteArrayInputStream;
+import java.net.URL;
 
 /**
  * This class tests the Policy functionality to show that we can successfully parse the policy file.
@@ -141,7 +142,7 @@ public class PolicyTest extends TestCase {
         }
     }
 
-    public void testSchemaValidationToggle() {
+    public void testSchemaValidationToggleWithSource() {
         String notSupportedTagsSection = "<notSupportedTag>\n" +
                 "</notSupportedTag>\n";
         String policyFile = assembleFile(notSupportedTagsSection);
@@ -156,11 +157,52 @@ public class PolicyTest extends TestCase {
             fail("Schema validation is disabled, policy creation should not fail.");
         }
 
+        // This one should only print a warning on the console because validation is disabled
+        try {
+            policy = Policy.getInstance(new ByteArrayInputStream(assembleFile("").getBytes()));
+            assertNotNull(policy);
+        } catch (PolicyException e) {
+            fail("Schema validation is disabled, policy creation should not fail.");
+        }
+
         // Enable validation again
         Policy.toggleSchemaValidation(true);
 
         try {
             policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+            fail("Not supported tag on policy, but no PolicyException occurred.");
+        } catch (PolicyException e) {
+            assertNotNull(e);
+        }
+    }
+
+    public void testSchemaValidationToggleWithUrl() {
+        URL urlOfValidPolicy = getClass().getResource("/antisamy.xml");
+        URL urlOfInvalidPolicy = getClass().getResource("/invalidPolicy.xml");
+
+        // Disable validation
+        Policy.toggleSchemaValidation(false);
+
+        try {
+            policy = TestPolicy.getInstance(urlOfInvalidPolicy);
+            assertNotNull(policy);
+        } catch (PolicyException e) {
+            fail("Schema validation is disabled, policy creation should not fail.");
+        }
+
+        // This one should only print a warning on the console because validation is disabled
+        try {
+            policy = TestPolicy.getInstance(urlOfValidPolicy);
+            assertNotNull(policy);
+        } catch (PolicyException e) {
+            fail("Schema validation is disabled, policy creation should not fail.");
+        }
+
+        // Enable validation again
+        Policy.toggleSchemaValidation(true);
+
+        try {
+            policy = TestPolicy.getInstance(urlOfInvalidPolicy);
             fail("Not supported tag on policy, but no PolicyException occurred.");
         } catch (PolicyException e) {
             assertNotNull(e);

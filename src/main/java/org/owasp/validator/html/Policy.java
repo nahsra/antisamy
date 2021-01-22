@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
@@ -121,6 +121,7 @@ public class Policy {
      */
     private static Schema schema = null;
     private static boolean validateSchema = true;
+    private static SAXException savedSchemaValidationException;
 
     /**
      * Get the Tag specified by the provided tag name.
@@ -289,9 +290,19 @@ public class Policy {
         return parseContext;
     }
 
+    protected static Element getTopLevelElement(final URL baseUrl) throws PolicyException {
+        final InputSource source = getSourceFromUrl(baseUrl);
+        return getTopLevelElement(source, new Callable<InputSource>() {
+            @Override
+            public InputSource call() throws PolicyException {
+                return getSourceFromUrl(baseUrl);
+            }
+        });
+    }
+
     @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
-          + "a vulnerability because it points to a local JAR file.")
-    protected static Element getTopLevelElement(URL baseUrl) throws PolicyException {
+            + "a vulnerability because it points to a local JAR file.")
+    protected static InputSource getSourceFromUrl(URL baseUrl) throws PolicyException {
         try {
             InputSource source = resolveEntity(baseUrl.toExternalForm(), baseUrl);
             if (source == null) {
@@ -301,7 +312,7 @@ public class Policy {
                 source.setSystemId(baseUrl.toExternalForm());
             }
 
-            return getTopLevelElement( source);
+            return source;
         } catch (SAXException | IOException e) {
             // SAXException can't actually happen. See JavaDoc for resolveEntity(String, URL)
             throw new PolicyException(e);
@@ -309,36 +320,64 @@ public class Policy {
     }
 
     private static Element getTopLevelElement(InputStream is) throws PolicyException {
-        return getTopLevelElement(new InputSource(is));
+        final InputSource source = new InputSource(is);
+        source.getByteStream().mark(0);
+        return getTopLevelElement(source, new Callable<InputSource>() {
+            @Override
+            public InputSource call() throws IOException {
+                source.getByteStream().reset();
+                return  source;
+            }
+        });
     }
 
-    protected static Element getTopLevelElement(InputSource source) throws PolicyException {
+    protected static Element getTopLevelElement(InputSource source, Callable<InputSource> getResetSource) throws PolicyException {
         try {
-
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-            /**
-             * Disable external entities, etc.
-             */
-            dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
-            dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
-            dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
-            dbf.setFeature(LOAD_EXTERNAL_DTD, false);
-
-            if (validateSchema) {
-                getPolicySchema();
-                dbf.setNamespaceAware(true);
-                dbf.setSchema(schema);
+            return getDocumentElementFromSource(source, true);
+        } catch (SAXException e) {
+            if (!validateSchema) {
+                try {
+                    savedSchemaValidationException = e;
+                    source = getResetSource.call();
+                    return getDocumentElementFromSource(source, false);
+                } catch (Exception e2) {
+                    savedSchemaValidationException = null;
+                    throw new PolicyException(e2);
+                }
+            } else {
+                throw new PolicyException(e);
             }
-
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            db.setErrorHandler(new SAXErrorHandler());
-            Document dom = db.parse(source);
-
-            return dom.getDocumentElement();
-        } catch (SAXException | ParserConfigurationException | IOException e) {
+        } catch (ParserConfigurationException | IOException e) {
             throw new PolicyException(e);
         }
+    }
+
+    private static Element getDocumentElementFromSource(InputSource source, boolean schemaValidationEnabled)
+            throws ParserConfigurationException, SAXException, IOException {
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        /**
+         * Disable external entities, etc.
+         */
+        dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+        dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
+        dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
+        dbf.setFeature(LOAD_EXTERNAL_DTD, false);
+
+        if (schemaValidationEnabled) {
+            getPolicySchema();
+            dbf.setNamespaceAware(true);
+            dbf.setSchema(schema);
+        }
+
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        db.setErrorHandler(new SAXErrorHandler());
+        Document dom = db.parse(source);
+
+        triggerSchemaValidationWarnings();
+
+        return dom.getDocumentElement();
     }
 
     private static void parsePolicy(Element topLevelElement, ParseContext parseContext)
@@ -365,77 +404,106 @@ public class Policy {
      */
     @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
           + "a vulnerability because only local file URLs are allowed.")
-    private static Element getPolicy(String href, URL baseUrl)
-            throws PolicyException {
-
+    private static Element getPolicy(String href, URL baseUrl) throws PolicyException {
         try {
-            InputSource source = null;
-
-            // Can't resolve public id, but might be able to resolve relative
-            // system id, since we have a base URI.
-            if (href != null && baseUrl != null) {
-
-                if (!"file".equals(baseUrl.getProtocol())) {
-                    throw new MalformedURLException(
-                        "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
-                }
-
-                URL url;
-
+            return getDocumentElementByUrl(href, baseUrl, true);
+        } catch (SAXException e) {
+            if (!validateSchema) {
                 try {
-                    url = new URL(baseUrl, href);
+                    savedSchemaValidationException = e;
+                    return getDocumentElementByUrl(href, baseUrl, false);
+                } catch (SAXException | ParserConfigurationException | IOException e2) {
+                    savedSchemaValidationException = null;
+                    throw new PolicyException(e2);
+                }
+            } else {
+                throw new PolicyException(e);
+            }
+        } catch (ParserConfigurationException | IOException e) {
+            throw new PolicyException(e);
+        }
+    }
+
+    private static Element getDocumentElementByUrl(String href, URL baseUrl, boolean schemaValidationEnabled)
+            throws IOException, ParserConfigurationException, SAXException {
+
+        InputSource source = null;
+
+        // Can't resolve public id, but might be able to resolve relative
+        // system id, since we have a base URI.
+        if (href != null && baseUrl != null) {
+
+            if (!"file".equals(baseUrl.getProtocol())) {
+                throw new MalformedURLException(
+                    "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
+            }
+
+            URL url;
+
+            try {
+                url = new URL(baseUrl, href);
+                source = new InputSource(url.openStream());
+                source.setSystemId(href);
+
+            } catch (MalformedURLException | java.io.FileNotFoundException e) {
+                try {
+                    String absURL = URIUtils.resolveAsString(href, baseUrl.toString());
+                    url = new URL(absURL);
                     source = new InputSource(url.openStream());
                     source.setSystemId(href);
 
-                } catch (MalformedURLException | java.io.FileNotFoundException e) {
-                    try {
-                        String absURL = URIUtils.resolveAsString(href, baseUrl.toString());
-                        url = new URL(absURL);
-                        source = new InputSource(url.openStream());
-                        source.setSystemId(href);
-
-                    } catch (MalformedURLException ex2) {
-                        // nothing to do
-                    }
+                } catch (MalformedURLException ex2) {
+                    // nothing to do
                 }
             }
+        }
 
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        /**
+         * Disable external entities, etc.
+         */
+        dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+        dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
+        dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
+        dbf.setFeature(LOAD_EXTERNAL_DTD, false);
+
+        if (schemaValidationEnabled) {
+            getPolicySchema();
+            dbf.setNamespaceAware(true);
+            dbf.setSchema(schema);
+        }
+
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        db.setErrorHandler(new SAXErrorHandler());
+        Document dom;
+
+        /**
+         * Load and parse the file.
+         */
+        if (source != null) {
+            dom = db.parse(source);
+
+            triggerSchemaValidationWarnings();
 
             /**
-             * Disable external entities, etc.
+             * Get the policy information out of it!
              */
-            dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
-            dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
-            dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
-            dbf.setFeature(LOAD_EXTERNAL_DTD, false);
 
-            if (validateSchema) {
-                getPolicySchema();
-                dbf.setNamespaceAware(true);
-                dbf.setSchema(schema);
-            }
+            return dom.getDocumentElement();
+        }
 
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            db.setErrorHandler(new SAXErrorHandler());
-            Document dom;
+        return null;
+    }
 
-            /**
-             * Load and parse the file.
-             */
-            if (source != null) {
-                dom = db.parse(source);
+    private static void triggerSchemaValidationWarnings() {
+        if (!validateSchema) {
+            System.out.println("WARNING: XML schema validation for the policy is disabled, but it should not be.");
+        }
 
-                /**
-                 * Get the policy information out of it!
-                 */
-
-                return dom.getDocumentElement();
-            }
-
-            return null;
-        } catch (SAXException | ParserConfigurationException | IOException e) {
-            throw new PolicyException(e);
+        if (savedSchemaValidationException != null) {
+            System.out.println("WARNING: " + savedSchemaValidationException.getMessage());
+            savedSchemaValidationException = null;
         }
     }
 
