@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-css</artifactId>
-            <version>1.13</version>
+            <version>1.14</version>
             <exclusions>
                 <!-- exclude this as batik-css has a dependency that uses an older commons-logging and we want to eliminate the convergence mismatch -->
                 <exclusion>
