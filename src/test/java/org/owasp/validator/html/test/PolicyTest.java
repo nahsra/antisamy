@@ -35,6 +35,7 @@ import org.owasp.validator.html.TagMatcher;
 import org.owasp.validator.html.scan.Constants;
 
 import java.io.ByteArrayInputStream;
+import java.net.URL;
 
 /**
  * This class tests the Policy functionality to show that we can successfully parse the policy file.
@@ -55,6 +56,7 @@ public class PolicyTest extends TestCase {
     private static final String COMMON_REGEXPS = "<common-regexps>\n</common-regexps>";
     private static final String FOOTER = "</anti-samy-rules>";
 
+    // Returns a valid policy file with the specified allowedEmptyTags
     private String assembleFile(String allowedEmptyTagsSection) {
         return HEADER + DIRECTIVES + COMMON_REGEXPS + COMMON_ATTRIBUTES + GLOBAL_TAG_ATTRIBUTES + DYNAMIC_TAG_ATTRIBUTES + TAG_RULES + CSS_RULES +
                allowedEmptyTagsSection + FOOTER;
@@ -90,8 +92,7 @@ public class PolicyTest extends TestCase {
     }
     
     public void testGetAllowedEmptyTags_emptySection() throws PolicyException {
-        String allowedEmptyTagsSection = "<allowed-empty-tags>\n" +
-                                         "</allowed-empty-tags>\n";
+        String allowedEmptyTagsSection = "<allowed-empty-tags>\n" + "</allowed-empty-tags>\n";
         String policyFile = assembleFile(allowedEmptyTagsSection);
 
         policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
@@ -110,32 +111,101 @@ public class PolicyTest extends TestCase {
     }
     
     public void testInvalidPolicies() {
-        String notSupportedTagsSection = "<notSupportedTag>\n" +
-                                         "</notSupportedTag>\n";
+
+        // Default is to now enforce schema validation on policy files. These tests verify
+        // various schema violations are detected and flagged.
+        String notSupportedTagsSection = "<notSupportedTag>\n" + "</notSupportedTag>\n";
         String policyFile = assembleFile(notSupportedTagsSection);
         try {
             policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
-            fail("Not supported tag on policy, but not PolicyException occurred.");
+            fail("No PolicyException thrown for <notSupportedTag> with schema validation enabled.");
         } catch (PolicyException e) {
             assertNotNull(e);
         }
 
-        String duplicatedTagsSection = "<tag-rules>\n" +
-                                       "</tag-rules>\n";
+        String duplicatedTagsSection = "<tag-rules>\n" + "</tag-rules>\n";
         policyFile = assembleFile(duplicatedTagsSection);
         try {
             policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
-            fail("<tag-rules> is duplicated but it should not be, PolicyException was expected.");
+            fail("No PolicyException thrown when <tag-rules> duplicated and schema validation enabled.");
         } catch (PolicyException e) {
             assertNotNull(e);
         }
 
-        policyFile = assembleFile("")
-                .replace("<tag-rules>", "")
-                .replace("</tag-rules>", "");
+        policyFile = assembleFile("").replace("<tag-rules>", "").replace("</tag-rules>", "");
         try {
             policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
-            fail("<tag-rules> is missing but it should not be, PolicyException was expected.");
+            fail("No PolicyException thrown when <tag-rules> missing and schema validation enabled.");
+        } catch (PolicyException e) {
+            assertNotNull(e);
+        }
+    }
+
+    public void testSchemaValidationToggleWithSource() {
+        String notSupportedTagsSection = "<notSupportedTag>\n" + "</notSupportedTag>\n";
+        String policyFile = assembleFile(notSupportedTagsSection);
+
+        // Disable validation
+        Policy.setSchemaValidation(false);
+
+        try {
+            System.out.println("TESTING: A schema invalid WARNING should mention the invalid tag: <notSupportedTag>");
+            policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+            assertNotNull(policy);
+        } catch (PolicyException e) {
+            fail("Policy creation should not fail when schema validation is disabled.");
+        }
+
+        // This one should only print a warning on the console because validation is disabled
+        try {
+            System.out.println("TESTING: A WARNING should mention that schema validation should not be disabled.");
+            policy = Policy.getInstance(new ByteArrayInputStream(assembleFile("").getBytes()));
+            assertNotNull(policy);
+        } catch (PolicyException e) {
+            fail("Policy creation should not fail when schema validation is disabled.");
+        }
+
+        // Enable validation again
+        Policy.setSchemaValidation(true);
+
+        try {
+            policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+            fail("Not supported tag on policy, but no PolicyException occurred.");
+        } catch (PolicyException e) {
+            assertNotNull(e);
+        }
+    }
+
+    public void testSchemaValidationToggleWithUrl() {
+        URL urlOfValidPolicy = getClass().getResource("/antisamy.xml");
+        URL urlOfInvalidPolicy = getClass().getResource("/invalidPolicy.xml");
+
+        // Disable validation
+        Policy.setSchemaValidation(false);
+
+        try {
+            System.out.println("TESTING: A schema invalid WARNING should follow:");
+            policy = TestPolicy.getInstance(urlOfInvalidPolicy);
+            assertNotNull(policy);
+        } catch (PolicyException e) {
+            fail("Policy creation should not fail for invalid policy when schema validation disabled.");
+        }
+
+        // This one should only print a warning on the console because validation is disabled
+        try {
+            System.out.println("TESTING: A WARNING should mention that schema validation should not be disabled.");
+            policy = TestPolicy.getInstance(urlOfValidPolicy);
+            assertNotNull(policy);
+        } catch (PolicyException e) {
+            fail("Policy creation should not fail for valid policy when schema validation disabled.");
+        }
+
+        // Enable validation again
+        Policy.setSchemaValidation(true);
+
+        try {
+            policy = TestPolicy.getInstance(urlOfInvalidPolicy);
+            fail("PolicyException not thrown for policy w/invalid schema and schema validation enabled.");
         } catch (PolicyException e) {
             assertNotNull(e);
         }
