@@ -210,5 +210,31 @@ public class PolicyTest extends TestCase {
             assertNotNull(e);
         }
     }
+
+    public void testSchemaValidationToggleWithInclude() {
+        // This policy will also include invalidPolicy.xml
+        URL url = getClass().getResource("/emptyPolicyWithInclude.xml");
+
+        // Disable validation
+        Policy.setSchemaValidation(false);
+
+        try {
+            System.out.println("TESTING: A schema invalid WARNING should follow:");
+            policy = TestPolicy.getInstance(url);
+            assertNotNull(policy);
+        } catch (PolicyException e) {
+            fail("Policy creation should not fail for invalid policy when schema validation disabled.");
+        }
+
+        // Enable validation again
+        Policy.setSchemaValidation(true);
+
+        try {
+            policy = TestPolicy.getInstance(url);
+            fail("PolicyException not thrown for policy w/invalid schema and schema validation enabled.");
+        } catch (PolicyException e) {
+            assertNotNull(e);
+        }
+    }
 }
 
