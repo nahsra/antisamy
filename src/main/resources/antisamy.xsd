@@ -4,6 +4,7 @@
 	<xsd:element name="anti-samy-rules">
 		<xsd:complexType>
 			<xsd:sequence>
+				<xsd:element name="include" type="Include" minOccurs="0" maxOccurs="unbounded"/>
 				<xsd:element name="directives" type="Directives"/>
 				<xsd:element name="common-regexps" type="CommonRegexps"/>
 				<xsd:element name="common-attributes" type="AttributeList"/>
@@ -16,6 +17,10 @@
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
+
+	<xsd:complexType name="Include">
+		<xsd:attribute name="href" use="required" type="xsd:string"/>
+	</xsd:complexType>
 
 	<xsd:complexType name="Directives">
 		<xsd:sequence maxOccurs="unbounded">
