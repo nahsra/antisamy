@@ -207,8 +207,8 @@ public class Policy {
      * @throws PolicyException If there is a problem parsing the input stream.
      */
     public static Policy getInstance(InputStream inputStream) throws PolicyException {
+        logger.info("Attempting to load policy from an input stream");
         return new InternalPolicy(null, getSimpleParseContext(getTopLevelElement(inputStream)));
-
     }
 
     /**
@@ -238,6 +238,7 @@ public class Policy {
      * @throws PolicyException If the file is not found or there is a problem parsing the file.
      */
     public static Policy getInstance(URL url) throws PolicyException {
+        logger.info("Attempting to load policy from URL: " + url.toString());
         return new InternalPolicy(url, getParseContext(getTopLevelElement(url), url));
     }
 
@@ -466,6 +467,9 @@ public class Policy {
 
             try {
                 url = new URL(baseUrl, href);
+
+                logger.info("Attempting to load policy from URL: " + url.toString());
+
                 source = new InputSource(url.openStream());
                 source.setSystemId(href);
 
