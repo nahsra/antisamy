@@ -28,6 +28,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -79,7 +80,7 @@ import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
 
 public class Policy {
 
-	private static final Logger logger = LogManager.getLogger(Policy.class);
+    private static final Logger logger = LogManager.getLogger(Policy.class);
 
     public static final Pattern ANYTHING_REGEXP = Pattern.compile(".*");
 
@@ -207,7 +208,10 @@ public class Policy {
      * @throws PolicyException If there is a problem parsing the input stream.
      */
     public static Policy getInstance(InputStream inputStream) throws PolicyException {
-        logger.info("Attempting to load policy from an input stream");
+        final String logMsg = "Attempting to load policy from an input stream.";
+        // If schema validation is disabled, we elevate this msg to the warn level to match the
+        // level of the mandatory warning that will follow. We do the same below.
+        if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
         return new InternalPolicy(null, getSimpleParseContext(getTopLevelElement(inputStream)));
     }
 
@@ -238,7 +242,8 @@ public class Policy {
      * @throws PolicyException If the file is not found or there is a problem parsing the file.
      */
     public static Policy getInstance(URL url) throws PolicyException {
-        logger.info("Attempting to load policy from URL: " + url.toString());
+        String logMsg = "Attempting to load policy from URL: " + url.toString();
+        if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
         return new InternalPolicy(url, getParseContext(getTopLevelElement(url), url));
     }
 
@@ -267,8 +272,8 @@ public class Policy {
     protected static ParseContext getSimpleParseContext(Element topLevelElement) throws PolicyException {
         ParseContext parseContext = new ParseContext();
         if (getByTagName(topLevelElement, "include").iterator().hasNext()) {
-            throw new IllegalArgumentException("A policy file loaded with an InputStream cannot contain include references");
-
+            throw new IllegalArgumentException(
+                    "A policy file loaded with an InputStream cannot contain include references");
         }
         parsePolicy(topLevelElement, parseContext);
         return parseContext;
@@ -407,7 +412,7 @@ public class Policy {
         parseCSSRules(getFirstChild(topLevelElement, "css-rules"), parseContext.cssRules, parseContext.commonRegularExpressions);
 
         parseAllowedEmptyTags(getFirstChild(topLevelElement, "allowed-empty-tags"), parseContext.allowedEmptyTags);
-        parseRequiresClosingTags(getFirstChild(topLevelElement, "require-closing-tags"), parseContext.requireClosingTags);
+        parseRequireClosingTags(getFirstChild(topLevelElement, "require-closing-tags"), parseContext.requireClosingTags);
     }
 
     /**
@@ -416,7 +421,6 @@ public class Policy {
     @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
           + "a vulnerability because only local file URLs are allowed.")
     private static Element getPolicy(String href, URL baseUrl) throws PolicyException {
-        // TODO: Write Unit tests for this method as apparently there aren't any.
         // Track whether an exception was ever thrown while processing policy file
         Exception thrownException = null;
         try {
@@ -467,13 +471,11 @@ public class Policy {
 
             try {
                 url = new URL(baseUrl, href);
-
-                logger.info("Attempting to load policy from URL: " + url.toString());
-
+                final String logMsg = "Attempting to load policy from URL: " + url.toString();
+                if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
                 source = new InputSource(url.openStream());
                 source.setSystemId(href);
-
-            } catch (MalformedURLException | java.io.FileNotFoundException e) {
+            } catch (MalformedURLException | FileNotFoundException e) {
                 try {
                     String absURL = URIUtils.resolveAsString(href, baseUrl.toString());
                     url = new URL(absURL);
@@ -481,6 +483,8 @@ public class Policy {
                     source.setSystemId(href);
                 } catch (MalformedURLException ex2) {
                     // nothing to do
+                    // TODO: Is this true? Or should we at least log the original exception, or
+                    // rethrow it?
                 }
             }
         }
@@ -495,6 +499,8 @@ public class Policy {
         dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
         dbf.setFeature(LOAD_EXTERNAL_DTD, false);
 
+        // This code doesn't have the retry logic if schema validation fails because schemaValidationEnabled is
+        // passed in. It is up to the caller to try again, if this fails the first time (if they want to).
         if (schemaValidationEnabled) {
             getPolicySchema();
             dbf.setNamespaceAware(true);
@@ -503,18 +509,12 @@ public class Policy {
 
         DocumentBuilder db = dbf.newDocumentBuilder();
         db.setErrorHandler(new SAXErrorHandler());
-        Document dom;
 
-        /**
-         * Load and parse the file.
-         */
+        // Load and parse the file.
         if (source != null) {
-            dom = db.parse(source);
+            Document dom = db.parse(source);
 
-            /**
-             * Get the policy information out of it!
-             */
-
+            // Get the policy information out of it!
             return dom.getDocumentElement();
         }
 
@@ -553,42 +553,38 @@ public class Policy {
      * @param allowedEmptyTagsListNode Top level of <allowed-empty-tags>
      * @param allowedEmptyTags         The tags that can be empty
      */
-    private static void parseAllowedEmptyTags(Element allowedEmptyTagsListNode, List<String> allowedEmptyTags) throws PolicyException {
+    private static void parseAllowedEmptyTags(Element allowedEmptyTagsListNode,
+                                              List<String> allowedEmptyTags) throws PolicyException {
         if (allowedEmptyTagsListNode != null) {
-            for (Element literalNode : getGrandChildrenByTagName(allowedEmptyTagsListNode, "literal-list", "literal")) {
+            for (Element literalNode :
+                    getGrandChildrenByTagName(allowedEmptyTagsListNode, "literal-list", "literal")) {
 
                 String value = getAttributeValue(literalNode, "value");
-
                 if (value != null && value.length() > 0) {
                     allowedEmptyTags.add(value);
                 }
             }
-        } else {
-            allowedEmptyTags.addAll(Constants.defaultAllowedEmptyTags);
-        }
+        } else allowedEmptyTags.addAll(Constants.defaultAllowedEmptyTags);
     }
 
     /**
      * Go through <require-closing-tags> section of the policy file.
      *
-     * @param requiresClosingTagsListNode Top level of <require-closing-tags>
-     * @param requiresClosingTags         The list of tags that require closing
+     * @param requireClosingTagsListNode Top level of <require-closing-tags>
+     * @param requireClosingTags         The list of tags that require closing
      */
-    private static void parseRequiresClosingTags(Element requiresClosingTagsListNode,
-                                                 List<String> requiresClosingTags) throws PolicyException {
-
-        if (requiresClosingTagsListNode != null) {
-            for (Element literalNode : getGrandChildrenByTagName(requiresClosingTagsListNode,
-                                                                 "literal-list", "literal")) {
+    private static void parseRequireClosingTags(Element requireClosingTagsListNode,
+                                                 List<String> requireClosingTags) throws PolicyException {
+        if (requireClosingTagsListNode != null) {
+            for (Element literalNode :
+                    getGrandChildrenByTagName(requireClosingTagsListNode, "literal-list", "literal")) {
 
                 String value = getAttributeValue(literalNode, "value");
                 if (value != null && value.length() > 0) {
-                    requiresClosingTags.add(value);
+                    requireClosingTags.add(value);
                 }
             }
-        } else {
-            requiresClosingTags.addAll(Constants.defaultRequiresClosingTags);
-        }
+        } else requireClosingTags.addAll(Constants.defaultRequireClosingTags);
     }
 
     /**
@@ -605,11 +601,9 @@ public class Policy {
             String name = getAttributeValue(ele, "name");
             Attribute toAdd = commonAttributes.get(name.toLowerCase());
 
-            if (toAdd != null) {
-                globalAttributes1.put(name.toLowerCase(), toAdd);
-            } else {
-                throw new PolicyException("Global attribute '" + name + "' was not defined in <common-attributes>");
-            }
+            if (toAdd != null) globalAttributes1.put(name.toLowerCase(), toAdd);
+              else throw new PolicyException("Global attribute '" + name
+                                             + "' was not defined in <common-attributes>");
         }
     }
 
@@ -630,9 +624,8 @@ public class Policy {
             if (toAdd != null) {
                 String attrName = name.toLowerCase().substring(0, name.length() - 1);
                 dynamicAttributes.put(attrName, toAdd);
-            } else {
-                throw new PolicyException("Dynamic attribute '" + name + "' was not defined in <common-attributes>");
-            }
+            } else throw new PolicyException("Dynamic attribute '" + name
+                                             + "' was not defined in <common-attributes>");
         }
     }
 
@@ -647,14 +640,14 @@ public class Policy {
 
             String name = getAttributeValue(ele, "name");
             Pattern pattern = Pattern.compile(getAttributeValue(ele, "value"));
-
             commonRegularExpressions1.put(name, new AntiSamyPattern(pattern));
         }
     }
 
-    private static void parseCommonAttributes(Element root, Map<String, Attribute> commonAttributes1, Map<String, AntiSamyPattern> commonRegularExpressions1) {
-        for (Element ele : getByTagName(root, "attribute")) {
+    private static void parseCommonAttributes(Element root, Map<String, Attribute> commonAttributes1,
+                                              Map<String, AntiSamyPattern> commonRegularExpressions1) {
 
+        for (Element ele : getByTagName(root, "attribute")) {
             String onInvalid = getAttributeValue(ele, "onInvalid");
             String name = getAttributeValue(ele, "name");
 
@@ -664,12 +657,11 @@ public class Policy {
             final String onInvalidStr;
             if (onInvalid != null && onInvalid.length() > 0) {
                 onInvalidStr = onInvalid;
-            } else {
-                onInvalidStr = DEFAULT_ONINVALID;
-            }
-            String description = getAttributeValue(ele, "description");
-            Attribute attribute = new Attribute(getAttributeValue(ele, "name"), allowedRegexps, allowedValues, onInvalidStr, description);
+            } else onInvalidStr = DEFAULT_ONINVALID;
 
+            String description = getAttributeValue(ele, "description");
+            Attribute attribute = new Attribute(getAttributeValue(ele, "name"), allowedRegexps,
+                                                allowedValues, onInvalidStr, description);
             commonAttributes1.put(name.toLowerCase(), attribute);
         }
     }
@@ -684,7 +676,6 @@ public class Policy {
             } else if (literalNode.getNodeValue() != null) {
                 allowedValues.add(literalNode.getNodeValue());
             }
-
         }
         return allowedValues;
     }
@@ -697,14 +688,13 @@ public class Policy {
 
             if (regExpName != null && regExpName.length() > 0) {
                 allowedRegExp.add(commonRegularExpressions1.get(regExpName).getPattern());
-            } else {
-                allowedRegExp.add(Pattern.compile(value));
-            }
+            } else allowedRegExp.add(Pattern.compile(value));
         }
         return allowedRegExp;
     }
 
-    private static List<Pattern> getAllowedRegexps2(Map<String, AntiSamyPattern> commonRegularExpressions1, Element attributeNode, String tagName) throws PolicyException {
+    private static List<Pattern> getAllowedRegexps2(Map<String, AntiSamyPattern> commonRegularExpressions1,
+                                                    Element attributeNode, String tagName) throws PolicyException {
         List<Pattern> allowedRegexps = new ArrayList<Pattern>();
         for (Element regExpNode : getGrandChildrenByTagName(attributeNode, "regexp-list", "regexp")) {
             String regExpName = getAttributeValue(regExpNode, "name");
@@ -718,14 +708,12 @@ public class Policy {
             * one or the other, not both.
             */
             if (regExpName != null && regExpName.length() > 0) {
-
                 AntiSamyPattern pattern = commonRegularExpressions1.get(regExpName);
                 if (pattern != null) {
                     allowedRegexps.add(pattern.getPattern());
                 } else throw new PolicyException("Regular expression '" + regExpName +
                       "' was referenced as a common regexp in definition of '" + tagName +
                       "', but does not exist in <common-regexp>");
-
             } else if (value != null && value.length() > 0) {
                 allowedRegexps.add(Pattern.compile(value));
             }
@@ -760,7 +748,6 @@ public class Policy {
         if (root == null) return;
 
         for (Element tagNode : getByTagName(root, "tag")) {
-
             String name = getAttributeValue(tagNode, "name");
             String action = getAttributeValue(tagNode, "action");
 
@@ -772,20 +759,18 @@ public class Policy {
         }
     }
 
-    private static Map<String, Attribute> getTagAttributes(Map<String, Attribute> commonAttributes1, Map<String, AntiSamyPattern> commonRegularExpressions1, NodeList attributeList, String tagName) throws PolicyException {
+    private static Map<String, Attribute> getTagAttributes(Map<String, Attribute> commonAttributes1, Map<String,
+       AntiSamyPattern> commonRegularExpressions1, NodeList attributeList, String tagName) throws PolicyException {
+
         Map<String,Attribute> tagAttributes = new HashMap<String, Attribute>();
         for (int j = 0; j < attributeList.getLength(); j++) {
-
             Element attributeNode = (Element) attributeList.item(j);
 
             String attrName = getAttributeValue(attributeNode, "name").toLowerCase();
             if (!attributeNode.hasChildNodes()) {
-
                 Attribute attribute = commonAttributes1.get(attrName);
 
-                /*
-                 * All they provided was the name, so they must want a common attribute.
-                 */
+                // All they provided was the name, so they must want a common attribute.
                 if (attribute != null) {
                     /*
                      * If they provide onInvalid/description values here they will
@@ -798,11 +783,9 @@ public class Policy {
                     commonAttributes1.put(attrName, changed);
                     tagAttributes.put(attrName, changed);
 
-                } else {
-                    throw new PolicyException("Attribute '" + getAttributeValue(attributeNode, "name") +
+                } else throw new PolicyException("Attribute '" + getAttributeValue(attributeNode, "name") +
                        "' was referenced as a common attribute in definition of '" + tagName +
                        "', but does not exist in <common-attributes>");
-                }
 
             } else {
                 List<Pattern> allowedRegexps2 = getAllowedRegexps2(commonRegularExpressions1, attributeNode, tagName);
@@ -811,20 +794,16 @@ public class Policy {
                 String description = getAttributeValue(attributeNode, "description");
                 Attribute attribute = new Attribute(getAttributeValue(attributeNode, "name"), allowedRegexps2, allowedValues2, onInvalid, description);
 
-                /*
-                 * Add fully built attribute.
-                 */
+                // Add fully built attribute.
                 tagAttributes.put(attrName, attribute);
             }
-
         }
         return tagAttributes;
     }
 
     private static void parseCSSRules(Element root, Map<String, Property> cssRules1, Map<String, AntiSamyPattern> commonRegularExpressions1) throws PolicyException {
 
-        for (Element ele : getByTagName(root, "property")){
-
+        for (Element ele : getByTagName(root, "property")) {
             String name = getAttributeValue(ele, "name");
             String description = getAttributeValue(ele, "description");
 
@@ -844,11 +823,9 @@ public class Policy {
             final String onInvalidStr;
             if (onInvalid != null && onInvalid.length() > 0) {
                 onInvalidStr = onInvalid;
-            } else {
-                onInvalidStr = DEFAULT_ONINVALID;
-            }
-            Property property = new Property(name,allowedRegexp3, allowedValue, shortHandRefs, description, onInvalidStr );
+            } else onInvalidStr = DEFAULT_ONINVALID;
 
+            Property property = new Property(name,allowedRegexp3, allowedValue, shortHandRefs, description, onInvalidStr);
             cssRules1.put(name.toLowerCase(), property);
         }
     }
@@ -865,8 +842,7 @@ public class Policy {
     }
 
     /**
-     * A method for returning one of the dynamic &lt;global-attribute&gt; entries by
-     * name.
+     * A method for returning one of the dynamic &lt;global-attribute&gt; entries by name.
      *
      * @param name The name of the dynamic global-attribute we want to look up.
      * @return An Attribute associated with the global-attribute lookup name specified,
@@ -978,9 +954,8 @@ public class Policy {
     }
 
     private static Iterable<Element> getByTagName(Element parent, String tagName) {
-        if (parent == null) {
-            return Collections.emptyList();
-        }
+        if (parent == null) return Collections.emptyList();
+
         final NodeList nodes = parent.getElementsByTagName(tagName);
         return new Iterable<Element>() {
             public Iterator<Element> iterator() {
@@ -1018,23 +993,23 @@ public class Policy {
     }
 
     /**
-     * This class is implemented to just throw exception when
+     * This class is implemented to just throw an exception when
      * validating the policy schema while parsing the document.
      */
     static class SAXErrorHandler implements ErrorHandler {
-		@Override
-		public void error(SAXParseException arg0) throws SAXException {
-			throw arg0;
-		}
+        @Override
+        public void error(SAXParseException arg0) throws SAXException {
+            throw arg0;
+        }
 
-		@Override
-		public void fatalError(SAXParseException arg0) throws SAXException {
-			throw arg0;
-		}
+        @Override
+        public void fatalError(SAXParseException arg0) throws SAXException {
+            throw arg0;
+        }
 
-		@Override
-		public void warning(SAXParseException arg0) throws SAXException {
-			throw arg0;
-		}
+        @Override
+        public void warning(SAXParseException arg0) throws SAXException {
+            throw arg0;
+        }
     }
 }
