@@ -82,7 +82,7 @@ public class Policy {
 
     private static final Logger logger = LogManager.getLogger(Policy.class);
 
-    public static final Pattern ANYTHING_REGEXP = Pattern.compile(".*");
+    public static final Pattern ANYTHING_REGEXP = Pattern.compile(".*", Pattern.DOTALL);
 
     private static final String POLICY_SCHEMA_URI = "antisamy.xsd";
     protected static final String DEFAULT_POLICY_URI = "resources/antisamy.xml";
@@ -639,7 +639,7 @@ public class Policy {
         for (Element ele : getByTagName(root, "regexp")) {
 
             String name = getAttributeValue(ele, "name");
-            Pattern pattern = Pattern.compile(getAttributeValue(ele, "value"));
+            Pattern pattern = Pattern.compile(getAttributeValue(ele, "value"), Pattern.DOTALL);
             commonRegularExpressions1.put(name, new AntiSamyPattern(pattern));
         }
     }
@@ -688,7 +688,7 @@ public class Policy {
 
             if (regExpName != null && regExpName.length() > 0) {
                 allowedRegExp.add(commonRegularExpressions1.get(regExpName).getPattern());
-            } else allowedRegExp.add(Pattern.compile(value));
+            } else allowedRegExp.add(Pattern.compile(value, Pattern.DOTALL));
         }
         return allowedRegExp;
     }
@@ -715,7 +715,7 @@ public class Policy {
                       "' was referenced as a common regexp in definition of '" + tagName +
                       "', but does not exist in <common-regexp>");
             } else if (value != null && value.length() > 0) {
-                allowedRegexps.add(Pattern.compile(value));
+                allowedRegexps.add(Pattern.compile(value, Pattern.DOTALL));
             }
         }
         return allowedRegexps;
@@ -734,7 +734,7 @@ public class Policy {
             if (pattern != null) {
                 allowedRegExp.add(pattern.getPattern());
             } else if (value != null) {
-                allowedRegExp.add(Pattern.compile(value));
+                allowedRegExp.add(Pattern.compile(value, Pattern.DOTALL));
             } else throw new PolicyException("Regular expression '" + regExpName +
                   "' was referenced as a common regexp in definition of '" + name +
                   "', but does not exist in <common-regexp>");

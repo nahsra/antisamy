@@ -29,6 +29,7 @@
 package org.owasp.validator.html.test;
 
 import junit.framework.TestCase;
+import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
 import org.owasp.validator.html.TagMatcher;
@@ -36,6 +37,9 @@ import org.owasp.validator.html.scan.Constants;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * This class tests the Policy functionality to show that we can successfully parse the policy file.
@@ -234,6 +238,29 @@ public class PolicyTest extends TestCase {
             fail("PolicyException not thrown for policy w/invalid schema and schema validation enabled.");
         } catch (PolicyException e) {
             assertNotNull(e);
+        }
+    }
+
+    public void testGithubIssue66() {
+        // Concern is that LSEP characters are not being considered on .* pattern
+        // Note: Change was done in Policy loading, so test is located here
+        String tagRules = "<tag-rules>" +
+                            "<tag name=\"tag1\" action=\"validate\">" +
+                            "   <attribute name=\"attribute1\">" +
+                            "       <regexp-list>" +
+                            "           <regexp value=\".*\"/>" +
+                            "       </regexp-list>" +
+                            "   </attribute>" +
+                            "</tag>" +
+                            "</tag-rules>";
+        String rawPolicy = HEADER + DIRECTIVES + COMMON_REGEXPS + COMMON_ATTRIBUTES + GLOBAL_TAG_ATTRIBUTES + tagRules + CSS_RULES + FOOTER;
+
+        try {
+            policy = Policy.getInstance(new ByteArrayInputStream(rawPolicy.getBytes()));
+            assertThat(new AntiSamy().scan("<tag1 attribute1='Line 1\u2028Line 2'>Content</tag1>", policy, AntiSamy.DOM).getCleanHTML(), containsString("Line 1"));
+            assertThat(new AntiSamy().scan("<tag1 attribute1='Line 1\u2028Line 2'>Content</tag1>", policy, AntiSamy.SAX).getCleanHTML(), containsString("Line 1"));
+        } catch (Exception e) {
+            fail("Policy nor scan should fail:" + e.getMessage());
         }
     }
 }
