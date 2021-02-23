@@ -127,7 +127,19 @@ public class Policy {
      * XML Schema for policy validation
      */
     private static volatile Schema schema = null;
-    private static boolean validateSchema = true; // Default is to validate schemas.
+    private static boolean validateSchema = true; // Default is to validate schemas
+    public static final String VALIDATIONPROPERTY = "owasp.antisamy.validateschema";
+
+	// Support the ability to change the default schema validation behavior by setting the
+	// System property "owasp.antisamy.validateschema".
+    static {
+        String validateProperty = System.getProperty(VALIDATIONPROPERTY);
+        if (validateProperty != null) {
+            validateSchema = Boolean.getBoolean(validateProperty);
+            logger.warn("Setting AntiSamy policy schema validation to '" + validateSchema
+                + "' because '" + VALIDATIONPROPERTY + "' system property set to: '" + validateProperty + "'");
+        }
+    }
 
     /**
      * Get the Tag specified by the provided tag name.
@@ -166,6 +178,15 @@ public class Policy {
      */
     public Property getPropertyByName(String propertyName) {
         return cssRules.get(propertyName.toLowerCase());
+    }
+
+    /**
+     * Is XSD schema validation across all policies enabled or not? It is enabled by default.
+     *
+     * @return True if schema validation enabled. False otherwise.
+     */
+    public static boolean getSchemaValidation() {
+        return validateSchema;
     }
 
     /**
