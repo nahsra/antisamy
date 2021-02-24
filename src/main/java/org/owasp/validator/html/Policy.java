@@ -128,7 +128,7 @@ public class Policy {
      */
     private static volatile Schema schema = null;
     private static boolean validateSchema = true; // Default is to validate schemas
-    public static final String VALIDATIONPROPERTY = "owasp.antisamy.validateschema";
+    public static final String VALIDATIONPROPERTY = "owasp.validator.validateschema";
 
 	// Support the ability to change the default schema validation behavior by setting the
 	// System property "owasp.antisamy.validateschema".

@@ -24,11 +24,11 @@ Chances are that your site’s use case for AntiSamy is at least roughly compara
 
 Slashdot is a techie news site that allows users to respond anonymously to news posts with very limited HTML markup. Now, Slashdot is not only one of the coolest sites around, it’s also one that’s been subject to many different successful attacks. The rules for Slashdot are fairly strict: users can only submit the following HTML tags and no CSS: `<b>`, `<u>`, `<i>`, `<a>`, `<blockquote>`.
 
-Accordingly, we’ve built a policy file that allows fairly similar functionality. All text-formatting tags that operate directly on the font, color or emphasis have been allowed.
+Accordingly, we’ve built a policy file that allows fairly similar functionality. All text-formatting tags that operate directly on the font, color, or emphasis have been allowed.
 
 2) antisamy-ebay.xml
 
-eBay is the most popular online auction site in the universe, as far as I can tell. It is a public site so anyone is allowed to post listings with rich HTML content. It’s not surprising that given the attractiveness of eBay as a target that it has been subject to a few complex XSS attacks. Listings are allowed to contain much more rich content than, say, Slashdot -- so it’s attack surface is considerably larger. 
+eBay is the most popular online auction site in the universe, as far as I can tell. It is a public site so anyone is allowed to post listings with rich HTML content. It’s not surprising that given the attractiveness of eBay as a target that it has been subject to a few complex XSS attacks. Listings are allowed to contain much more rich content than, say, Slashdot -- so it’s attack surface is considerably larger.
 
 3) antisamy-myspace.xml
 
@@ -37,6 +37,18 @@ MySpace was, at the time this project was born, the most popular social networki
 4) antisamy-anythinggoes.xml
 
 I don’t know of a possible use case for this policy file. If you wanted to allow every single valid HTML and CSS element (but without JavaScript or blatant CSS-related phishing attacks), you can use this policy file. Not even MySpace was this crazy. However, it does serve as a good reference because it contains base rules for every element, so you can use it as a knowledge base when using tailoring the other policy files.
+
+### NOTE: Schema validation behavior change starting with AntiSamy 1.6.0
+
+While working on some improvements to AntiSamy's XML Schema Definition (XSD) for AntiSamy policy files, we noticed that AntiSamy was NOT actually enforcing the XSD. So, we've CHANGED the default behavior starting with AntiSamy 1.6.0 to enforce the schema, and not continue if the AntiSamy policy is invalid. However ...
+
+we recognize that it might not be possible for developers to fix their AntiSamy policies right away if they are non-compliant, and yet still want to upgrade AntiSamy to pick up any security improvements, feature enhancements, and bug fixes. As such, we've provided two ways to (temporarily!) disable schema validation:
+
+1) Set the Java System property: owasp.validator.validateschema to false. This can be done at the command line (e.g., -Dowasp.validator.validateschema=false) or via the Java System properties file. Neither requires a code change.
+
+2) Change the code using AntiSamy to invoke: Policy.setSchemaValidation(false) before loading the AntiSamy policy. This is a static call so once disabled, it is disabled for all new Policy instances.
+
+To encourage AntiSamy users to only use XSD compliant policies, AntiSamy will always issue some type of warning when schema validation is disabled. It will either WARN that the policy is non-compliant so it can be fixed, or it will WARN that the policy is compliant, but schema validation is OFF, so validation should be turned back on (i.e., stop disabling it).
 
 ### 3. Tailoring the policy file
 You may want to deploy AntiSamy in a default configuration, but it’s equally likely that a site may want to have strict, business-driven rules for what users can allow. The discussion that decides the tailoring should also consider attack surface - which grows in relative proportion to the policy file.
@@ -85,6 +97,11 @@ The `CleanResults` object provides a lot of useful stuff.
 __Important Note__: There has been much confusion about the `getErrorMessages()` method. The `getErrorMessages()` method does not subtly answer the question "is this safe input?" in the affirmative if it returns an empty list. You must always use the sanitized input and there is no way to be sure the input passed in had no attacks.
 
 The serialization and deserialization process that is critical to the effectiveness of the sanitizer is purposefully lossy and will filter out attacks via a number of attack vectors. Unfortunately, one of the tradeoffs of this strategy is that we don't always know in retrospect that an attack was seen. Thus, the `getErrorMessages()` API is there to help users understand their well-intentioned input meet the requirements of the system, not help a developer detect if an attack was present. 
+
+## Other Documentation
+
+Additional documentation is available on this Github project's wiki page: https://github.com/nahsra/antisamy/wiki
+and the OWASP AntiSamy Project Page: https://owasp.org/www-project-antisamy/
 
 ## Contributing to AntiSamy
 
