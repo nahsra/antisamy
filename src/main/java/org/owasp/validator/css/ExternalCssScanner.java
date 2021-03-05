@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -32,6 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
@@ -42,11 +43,13 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+
 import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.util.ErrorMessageUtil;
 import org.owasp.validator.html.util.HTMLEntityEncoder;
+
 import org.w3c.css.sac.InputSource;
 
 public class ExternalCssScanner extends CssScanner {
@@ -66,106 +69,95 @@ public class ExternalCssScanner extends CssScanner {
 	 * @throws ScanException if an error occurs during scanning
 	 */
 	protected void parseImportedStylesheets(LinkedList<?> stylesheets, CssHandler handler,
-			ArrayList<String> errorMessages, int sizeLimit) throws ScanException {
-			
-			int importedStylesheets = 0;
-			
-			// if stylesheets were imported by the inline style declaration,
-			// continue parsing the nested styles. Note this only happens
-			// if CSS importing was enabled in the policy file
-			if (!stylesheets.isEmpty()) {
-				// Ensure that we have appropriate timeout values so we don't
-			    // get DoSed waiting for returns
-			    int timeout = DEFAULT_TIMEOUT;
-			    try {
-			    	timeout = Integer.parseInt(policy.getDirective(Policy.CONNECTION_TIMEOUT));
-			    } catch (NumberFormatException nfe) {
-			    }
-			    
-			    RequestConfig requestConfig = RequestConfig.custom()
-						  .setSocketTimeout(timeout)
-						  .setConnectTimeout(timeout)
-						  .setConnectionRequestTimeout(timeout)
-						  .build();
-			    
-			    HttpClient httpClient = HttpClientBuilder.create().
-			    		disableAutomaticRetries().
-			    		disableConnectionState().
-			    		disableCookieManagement().
-			    		setDefaultRequestConfig(requestConfig).
-			    		build();
-			
-			    int allowedImports = Policy.DEFAULT_MAX_STYLESHEET_IMPORTS;
-			    try {
-					allowedImports = Integer.parseInt(policy.getDirective("maxStyleSheetImports"));
-			    } catch (NumberFormatException nfe) {
-			    }
-			
-			    while (!stylesheets.isEmpty()) {
-			
+		ArrayList<String> errorMessages, int sizeLimit) throws ScanException {
+
+		int importedStylesheets = 0;
+
+		// if stylesheets were imported by the inline style declaration,
+		// continue parsing the nested styles. Note this only happens
+		// if CSS importing was enabled in the policy file
+		if (!stylesheets.isEmpty()) {
+			// Ensure that we have appropriate timeout values so we don't
+			// get DoSed waiting for returns
+			int timeout = DEFAULT_TIMEOUT;
+			try {
+				timeout = Integer.parseInt(policy.getDirective(Policy.CONNECTION_TIMEOUT));
+			} catch (NumberFormatException nfe) {
+			}
+
+			RequestConfig requestConfig = RequestConfig.custom()
+					.setSocketTimeout(timeout)
+					.setConnectTimeout(timeout)
+					.setConnectionRequestTimeout(timeout)
+					.build();
+
+			HttpClient httpClient = HttpClientBuilder.create().
+					disableAutomaticRetries().
+					disableConnectionState().
+					disableCookieManagement().
+					setDefaultRequestConfig(requestConfig).
+					build();
+
+			int allowedImports = Policy.DEFAULT_MAX_STYLESHEET_IMPORTS;
+			try {
+				allowedImports = Integer.parseInt(policy.getDirective("maxStyleSheetImports"));
+			} catch (NumberFormatException nfe) {
+			}
+
+			while (!stylesheets.isEmpty()) {
+
 				URI stylesheetUri = (URI) stylesheets.removeFirst();
-			
+
 				if (++importedStylesheets > allowedImports) {
-				    errorMessages.add(ErrorMessageUtil.getMessage(
-				    	messages,
-					    ErrorMessageUtil.ERROR_CSS_IMPORT_EXCEEDED,
-					    new Object[] {
-						    HTMLEntityEncoder
-							    .htmlEntityEncode(stylesheetUri
-								    .toString()),
-						    String.valueOf(allowedImports) }));
-				    continue;
+					errorMessages.add(ErrorMessageUtil.getMessage(
+						messages,
+						ErrorMessageUtil.ERROR_CSS_IMPORT_EXCEEDED,
+						new Object[] {
+							HTMLEntityEncoder.htmlEntityEncode(stylesheetUri.toString()),
+							String.valueOf(allowedImports) }));
+					continue;
 				}
-			
+
 				HttpGet stylesheetRequest = new HttpGet(stylesheetUri);
-			
+
 				byte[] stylesheet = null;
 				try {
-				    // pull down stylesheet, observing size limit
-				    HttpResponse response = httpClient.execute(stylesheetRequest);
-				    stylesheet = EntityUtils.toByteArray(response.getEntity());
-				    if(stylesheet != null && stylesheet.length > sizeLimit) {
-				    	errorMessages
-					    .add(ErrorMessageUtil
-						    .getMessage(
-						    	messages,
-							    ErrorMessageUtil.ERROR_CSS_IMPORT_INPUT_SIZE,
-							    new Object[] {
-								    HTMLEntityEncoder
-									    .htmlEntityEncode(stylesheetUri
-										    .toString()),
-								    String.valueOf(policy
-									    .getMaxInputSize()) }));
-				    	stylesheet = null;
-				    }
+					// pull down stylesheet, observing size limit
+					HttpResponse response = httpClient.execute(stylesheetRequest);
+					stylesheet = EntityUtils.toByteArray(response.getEntity());
+					if (stylesheet != null && stylesheet.length > sizeLimit) {
+						errorMessages.add(ErrorMessageUtil.getMessage(
+							messages,
+							ErrorMessageUtil.ERROR_CSS_IMPORT_INPUT_SIZE,
+							new Object[] {
+								HTMLEntityEncoder.htmlEntityEncode(stylesheetUri.toString()),
+								String.valueOf(policy.getMaxInputSize()) }));
+						stylesheet = null;
+					}
 				} catch (IOException ioe) {
-				    errorMessages.add(ErrorMessageUtil
-					    .getMessage(
-					    	messages,
-						    ErrorMessageUtil.ERROR_CSS_IMPORT_FAILURE,
-						    new Object[] { HTMLEntityEncoder
-							    .htmlEntityEncode(stylesheetUri
-								    .toString()) }));
+					errorMessages.add(ErrorMessageUtil.getMessage(
+						messages,
+						ErrorMessageUtil.ERROR_CSS_IMPORT_FAILURE,
+						new Object[] { HTMLEntityEncoder.htmlEntityEncode(stylesheetUri.toString()) }));
 				} finally {
-				    stylesheetRequest.releaseConnection();
+					stylesheetRequest.releaseConnection();
 				}
-			
+
 				if (stylesheet != null) {
-				    // decrease the size limit based on the
-				    sizeLimit -= stylesheet.length;
-			
-				    try {
-					InputSource nextStyleSheet = new InputSource(
-						new InputStreamReader(new ByteArrayInputStream(
-							stylesheet)));
-					parser.parseStyleSheet(nextStyleSheet);
-			
-				    } catch (IOException ioe) {
-					throw new ScanException(ioe);
-				    }
-			
+					// decrease the size limit based on the
+					sizeLimit -= stylesheet.length;
+
+					try {
+						InputSource nextStyleSheet = new InputSource(
+							new InputStreamReader(new ByteArrayInputStream(stylesheet),
+									Charset.defaultCharset()));
+						parser.parseStyleSheet(nextStyleSheet);
+
+					} catch (IOException ioe) {
+						throw new ScanException(ioe);
+					}
 				}
-			}
-		}
-	}
+			} // end while
+		} // end if
+	} // end parseImportedStylesheets()
 }

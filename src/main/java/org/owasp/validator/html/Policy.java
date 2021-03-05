@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li, Kristian Rosenvold
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li, Kristian Rosenvold
  *
  * All rights reserved.
  *
@@ -28,16 +28,32 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import org.owasp.validator.html.model.AntiSamyPattern;
 import org.owasp.validator.html.model.Attribute;
@@ -45,11 +61,14 @@ import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.model.Tag;
 import org.owasp.validator.html.scan.Constants;
 import org.owasp.validator.html.util.URIUtils;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
 
@@ -61,8 +80,11 @@ import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
 
 public class Policy {
 
-    public static final Pattern ANYTHING_REGEXP = Pattern.compile(".*");
+    private static final Logger logger = LogManager.getLogger(Policy.class);
 
+    public static final Pattern ANYTHING_REGEXP = Pattern.compile(".*", Pattern.DOTALL);
+
+    private static final String POLICY_SCHEMA_URI = "antisamy.xsd";
     protected static final String DEFAULT_POLICY_URI = "resources/antisamy.xml";
     private static final String DEFAULT_ONINVALID = "removeAttribute";
 
@@ -102,8 +124,26 @@ public class Policy {
     private final TagMatcher requiresClosingTagsMatcher;
 
     /**
+     * XML Schema for policy validation
+     */
+    private static volatile Schema schema = null;
+    private static boolean validateSchema = true; // Default is to validate schemas
+    public static final String VALIDATIONPROPERTY = "owasp.validator.validateschema";
+
+	// Support the ability to change the default schema validation behavior by setting the
+	// System property "owasp.antisamy.validateschema".
+    static {
+        String validateProperty = System.getProperty(VALIDATIONPROPERTY);
+        if (validateProperty != null) {
+            validateSchema = Boolean.getBoolean(validateProperty);
+            logger.warn("Setting AntiSamy policy schema validation to '" + validateSchema
+                + "' because '" + VALIDATIONPROPERTY + "' system property set to: '" + validateProperty + "'");
+        }
+    }
+
+    /**
      * Get the Tag specified by the provided tag name.
-     * 
+     *
      * @param tagName
      *            The name of the Tag to return.
      * @return The requested Tag, or null if it doesn't exist.
@@ -141,6 +181,25 @@ public class Policy {
     }
 
     /**
+     * Is XSD schema validation across all policies enabled or not? It is enabled by default.
+     *
+     * @return True if schema validation enabled. False otherwise.
+     */
+    public static boolean getSchemaValidation() {
+        return validateSchema;
+    }
+
+    /**
+     * This can enable/disable the schema validation against AntiSamy XSD for the instantiated
+     * policies. It is enabled by default.
+     *
+     * @param enable boolean value to specify if the schema validation should be performed. Use false to disable.
+     */
+    public static void setSchemaValidation(boolean enable) {
+        validateSchema = enable;
+    }
+
+    /**
      * This retrieves a Policy based on a default location ("resources/antisamy.xml")
      *
      * @return A populated Policy object based on the XML policy file located in the default location.
@@ -170,8 +229,11 @@ public class Policy {
      * @throws PolicyException If there is a problem parsing the input stream.
      */
     public static Policy getInstance(InputStream inputStream) throws PolicyException {
+        final String logMsg = "Attempting to load policy from an input stream.";
+        // If schema validation is disabled, we elevate this msg to the warn level to match the
+        // level of the mandatory warning that will follow. We do the same below.
+        if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
         return new InternalPolicy(null, getSimpleParseContext(getTopLevelElement(inputStream)));
-
     }
 
     /**
@@ -201,9 +263,10 @@ public class Policy {
      * @throws PolicyException If the file is not found or there is a problem parsing the file.
      */
     public static Policy getInstance(URL url) throws PolicyException {
+        String logMsg = "Attempting to load policy from URL: " + url.toString();
+        if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
         return new InternalPolicy(url, getParseContext(getTopLevelElement(url), url));
     }
-
 
     protected Policy(ParseContext parseContext) throws PolicyException {
         this.allowedEmptyTagsMatcher = new TagMatcher(parseContext.allowedEmptyTags);
@@ -230,8 +293,8 @@ public class Policy {
     protected static ParseContext getSimpleParseContext(Element topLevelElement) throws PolicyException {
         ParseContext parseContext = new ParseContext();
         if (getByTagName(topLevelElement, "include").iterator().hasNext()) {
-            throw new IllegalArgumentException("A policy file loaded with an InputStream cannot contain include references");
-
+            throw new IllegalArgumentException(
+                    "A policy file loaded with an InputStream cannot contain include references");
         }
         parsePolicy(topLevelElement, parseContext);
         return parseContext;
@@ -258,9 +321,19 @@ public class Policy {
         return parseContext;
     }
 
+    protected static Element getTopLevelElement(final URL baseUrl) throws PolicyException {
+        final InputSource source = getSourceFromUrl(baseUrl);
+        return getTopLevelElement(source, new Callable<InputSource>() {
+            @Override
+            public InputSource call() throws PolicyException {
+                return getSourceFromUrl(baseUrl);
+            }
+        });
+    }
+
     @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
-          + "a vulnerability because it points to a local JAR file.")
-    protected static Element getTopLevelElement(URL baseUrl) throws PolicyException {
+            + "a vulnerability because it points to a local JAR file.")
+    protected static InputSource getSourceFromUrl(URL baseUrl) throws PolicyException {
         try {
             InputSource source = resolveEntity(baseUrl.toExternalForm(), baseUrl);
             if (source == null) {
@@ -270,7 +343,7 @@ public class Policy {
                 source.setSystemId(baseUrl.toExternalForm());
             }
 
-            return getTopLevelElement( source);
+            return source;
         } catch (SAXException | IOException e) {
             // SAXException can't actually happen. See JavaDoc for resolveEntity(String, URL)
             throw new PolicyException(e);
@@ -278,26 +351,70 @@ public class Policy {
     }
 
     private static Element getTopLevelElement(InputStream is) throws PolicyException {
-        return getTopLevelElement(new InputSource(is));
+        final InputSource source = new InputSource(is);
+        source.getByteStream().mark(0);
+        return getTopLevelElement(source, new Callable<InputSource>() {
+            @Override
+            public InputSource call() throws IOException {
+                source.getByteStream().reset();
+                return  source;
+            }
+        });
     }
 
-    protected static Element getTopLevelElement(InputSource source) throws PolicyException {
+    protected static Element getTopLevelElement(InputSource source, Callable<InputSource> getResetSource) throws PolicyException {
+        // Track whether an exception was ever thrown while processing policy file
+        Exception thrownException = null;
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-            /**
-             * Disable external entities, etc.
-             */
-            dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
-            dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
-            dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
-            dbf.setFeature(LOAD_EXTERNAL_DTD, false);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document dom = db.parse(source);
-            return dom.getDocumentElement();
-        } catch (SAXException | ParserConfigurationException | IOException e) {
+            return getDocumentElementFromSource(source, true);
+        } catch (SAXException e) {
+            thrownException = e;
+            if (!validateSchema) {
+                try {
+                    source = getResetSource.call();
+                    Element theElement = getDocumentElementFromSource(source, false);
+                    // We warn when the policy has an invalid schema, but schema validation is disabled.
+                    logger.warn("Invalid policy file: " + e.getMessage());
+                    return theElement;
+                } catch (Exception e2) {
+                    throw new PolicyException(e2);
+                }
+            } else throw new PolicyException(e);
+        } catch (ParserConfigurationException | IOException e) {
+            thrownException = e;
             throw new PolicyException(e);
+        } finally {
+            if (!validateSchema && (thrownException == null)) {
+                // We warn when the policy has a valid schema, but schema validation is disabled.
+                logger.warn("XML schema validation is disabled for a valid policy. Please reenable policy validation.");
+            }
         }
+    }
+
+    private static Element getDocumentElementFromSource(InputSource source, boolean schemaValidationEnabled)
+            throws ParserConfigurationException, SAXException, IOException {
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        /**
+         * Disable external entities, etc.
+         */
+        dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+        dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
+        dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
+        dbf.setFeature(LOAD_EXTERNAL_DTD, false);
+
+        if (schemaValidationEnabled) {
+            getPolicySchema();
+            dbf.setNamespaceAware(true);
+            dbf.setSchema(schema);
+        }
+
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        db.setErrorHandler(new SAXErrorHandler());
+        Document dom = db.parse(source);
+
+        return dom.getDocumentElement();
     }
 
     private static void parsePolicy(Element topLevelElement, ParseContext parseContext)
@@ -316,7 +433,7 @@ public class Policy {
         parseCSSRules(getFirstChild(topLevelElement, "css-rules"), parseContext.cssRules, parseContext.commonRegularExpressions);
 
         parseAllowedEmptyTags(getFirstChild(topLevelElement, "allowed-empty-tags"), parseContext.allowedEmptyTags);
-        parseRequiresClosingTags(getFirstChild(topLevelElement, "require-closing-tags"), parseContext.requireClosingTags);
+        parseRequireClosingTags(getFirstChild(topLevelElement, "require-closing-tags"), parseContext.requireClosingTags);
     }
 
     /**
@@ -324,70 +441,105 @@ public class Policy {
      */
     @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
           + "a vulnerability because only local file URLs are allowed.")
-    private static Element getPolicy(String href, URL baseUrl)
-            throws PolicyException {
-
+    private static Element getPolicy(String href, URL baseUrl) throws PolicyException {
+        // Track whether an exception was ever thrown while processing policy file
+        Exception thrownException = null;
         try {
-            InputSource source = null;
-
-            // Can't resolve public id, but might be able to resolve relative
-            // system id, since we have a base URI.
-            if (href != null && baseUrl != null) {
-
-                if (!"file".equals(baseUrl.getProtocol())) {
-                    throw new MalformedURLException(
-                        "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
-                }
-
-                URL url;
-
+            return getDocumentElementByUrl(href, baseUrl, true);
+        } catch (SAXException e) {
+            thrownException = e;
+            if (!validateSchema) {
                 try {
-                    url = new URL(baseUrl, href);
+                    Element theElement = getDocumentElementByUrl(href, baseUrl, false);
+                    // We warn when the policy has an invalid schema, but schema validation is disabled.
+                    logger.warn("Invalid policy file: " + e.getMessage());
+                    return theElement;
+                } catch (SAXException | ParserConfigurationException | IOException e2) {
+                    throw new PolicyException(e2);
+                }
+            } else {
+                throw new PolicyException(e);
+            }
+        } catch (ParserConfigurationException | IOException e) {
+            thrownException = e;
+            throw new PolicyException(e);
+        } finally {
+            if (!validateSchema && (thrownException == null)) {
+                // We warn when the policy has a valid schema, but schema validation is disabled.
+                logger.warn("XML schema validation is disabled for a valid policy. Please reenable policy validation.");
+            }
+        }
+    }
+
+    // TODO: Add JavaDocs for this new method.
+    @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
+            + "a vulnerability because only local file URLs are allowed.")
+    private static Element getDocumentElementByUrl(String href, URL baseUrl, boolean schemaValidationEnabled)
+            throws IOException, ParserConfigurationException, SAXException {
+
+        InputSource source = null;
+
+        // Can't resolve public id, but might be able to resolve relative
+        // system id, since we have a base URI.
+        if (href != null && baseUrl != null) {
+
+            if (!"file".equals(baseUrl.getProtocol())) {
+                throw new MalformedURLException(
+                    "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
+            }
+
+            URL url;
+
+            try {
+                url = new URL(baseUrl, href);
+                final String logMsg = "Attempting to load policy from URL: " + url.toString();
+                if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
+                source = new InputSource(url.openStream());
+                source.setSystemId(href);
+            } catch (MalformedURLException | FileNotFoundException e) {
+                try {
+                    String absURL = URIUtils.resolveAsString(href, baseUrl.toString());
+                    url = new URL(absURL);
                     source = new InputSource(url.openStream());
                     source.setSystemId(href);
-
-                } catch (MalformedURLException | java.io.FileNotFoundException e) {
-                    try {
-                        String absURL = URIUtils.resolveAsString(href, baseUrl.toString());
-                        url = new URL(absURL);
-                        source = new InputSource(url.openStream());
-                        source.setSystemId(href);
-
-                    } catch (MalformedURLException ex2) {
-                        // nothing to do
-                    }
+                } catch (MalformedURLException ex2) {
+                    // nothing to do
+                    // TODO: Is this true? Or should we at least log the original exception, or
+                    // rethrow it?
                 }
             }
-
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-            /**
-             * Disable external entities, etc.
-             */
-            dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
-            dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
-            dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
-            dbf.setFeature(LOAD_EXTERNAL_DTD, false);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document dom;
-
-            /**
-             * Load and parse the file.
-             */
-            if (source != null) {
-                dom = db.parse(source);
-
-                /**
-                 * Get the policy information out of it!
-                 */
-
-                return dom.getDocumentElement();
-            }
-
-            return null;
-        } catch (SAXException | ParserConfigurationException | IOException e) {
-            throw new PolicyException(e);
         }
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        /**
+         * Disable external entities, etc.
+         */
+        dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+        dbf.setFeature(EXTERNAL_PARAM_ENTITIES, false);
+        dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
+        dbf.setFeature(LOAD_EXTERNAL_DTD, false);
+
+        // This code doesn't have the retry logic if schema validation fails because schemaValidationEnabled is
+        // passed in. It is up to the caller to try again, if this fails the first time (if they want to).
+        if (schemaValidationEnabled) {
+            getPolicySchema();
+            dbf.setNamespaceAware(true);
+            dbf.setSchema(schema);
+        }
+
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        db.setErrorHandler(new SAXErrorHandler());
+
+        // Load and parse the file.
+        if (source != null) {
+            Document dom = db.parse(source);
+
+            // Get the policy information out of it!
+            return dom.getDocumentElement();
+        }
+
+        return null;
     }
 
     /**
@@ -422,40 +574,38 @@ public class Policy {
      * @param allowedEmptyTagsListNode Top level of <allowed-empty-tags>
      * @param allowedEmptyTags         The tags that can be empty
      */
-    private static void parseAllowedEmptyTags(Element allowedEmptyTagsListNode, List<String> allowedEmptyTags) throws PolicyException {
+    private static void parseAllowedEmptyTags(Element allowedEmptyTagsListNode,
+                                              List<String> allowedEmptyTags) throws PolicyException {
         if (allowedEmptyTagsListNode != null) {
-            for (Element literalNode : getGrandChildrenByTagName(allowedEmptyTagsListNode, "literal-list", "literal")) {
+            for (Element literalNode :
+                    getGrandChildrenByTagName(allowedEmptyTagsListNode, "literal-list", "literal")) {
 
                 String value = getAttributeValue(literalNode, "value");
-
                 if (value != null && value.length() > 0) {
                     allowedEmptyTags.add(value);
                 }
             }
-        } else {
-            allowedEmptyTags.addAll(Constants.defaultAllowedEmptyTags);
-        }
+        } else allowedEmptyTags.addAll(Constants.defaultAllowedEmptyTags);
     }
 
     /**
      * Go through <require-closing-tags> section of the policy file.
      *
-     * @param requiresClosingTagsListNode Top level of <require-closing-tags>
-     * @param requiresClosingTags         The list of tags that require closing
+     * @param requireClosingTagsListNode Top level of <require-closing-tags>
+     * @param requireClosingTags         The list of tags that require closing
      */
-    private static void parseRequiresClosingTags(Element requiresClosingTagsListNode, List<String> requiresClosingTags) throws PolicyException {
-        if (requiresClosingTagsListNode != null) {
-            for (Element literalNode : getGrandChildrenByTagName(requiresClosingTagsListNode, "literal-list", "literal")) {
+    private static void parseRequireClosingTags(Element requireClosingTagsListNode,
+                                                 List<String> requireClosingTags) throws PolicyException {
+        if (requireClosingTagsListNode != null) {
+            for (Element literalNode :
+                    getGrandChildrenByTagName(requireClosingTagsListNode, "literal-list", "literal")) {
 
                 String value = getAttributeValue(literalNode, "value");
-
                 if (value != null && value.length() > 0) {
-                    requiresClosingTags.add(value);
+                    requireClosingTags.add(value);
                 }
             }
-        } else {
-            requiresClosingTags.addAll(Constants.defaultRequiresClosingTags);
-        }
+        } else requireClosingTags.addAll(Constants.defaultRequireClosingTags);
     }
 
     /**
@@ -472,11 +622,9 @@ public class Policy {
             String name = getAttributeValue(ele, "name");
             Attribute toAdd = commonAttributes.get(name.toLowerCase());
 
-            if (toAdd != null) {
-                globalAttributes1.put(name.toLowerCase(), toAdd);
-            } else {
-                throw new PolicyException("Global attribute '" + name + "' was not defined in <common-attributes>");
-            }
+            if (toAdd != null) globalAttributes1.put(name.toLowerCase(), toAdd);
+              else throw new PolicyException("Global attribute '" + name
+                                             + "' was not defined in <common-attributes>");
         }
     }
 
@@ -497,9 +645,8 @@ public class Policy {
             if (toAdd != null) {
                 String attrName = name.toLowerCase().substring(0, name.length() - 1);
                 dynamicAttributes.put(attrName, toAdd);
-            } else {
-                throw new PolicyException("Dynamic attribute '" + name + "' was not defined in <common-attributes>");
-            }
+            } else throw new PolicyException("Dynamic attribute '" + name
+                                             + "' was not defined in <common-attributes>");
         }
     }
 
@@ -513,15 +660,15 @@ public class Policy {
         for (Element ele : getByTagName(root, "regexp")) {
 
             String name = getAttributeValue(ele, "name");
-            Pattern pattern = Pattern.compile(getAttributeValue(ele, "value"));
-
+            Pattern pattern = Pattern.compile(getAttributeValue(ele, "value"), Pattern.DOTALL);
             commonRegularExpressions1.put(name, new AntiSamyPattern(pattern));
         }
     }
 
-    private static void parseCommonAttributes(Element root, Map<String, Attribute> commonAttributes1, Map<String, AntiSamyPattern> commonRegularExpressions1) {
-        for (Element ele : getByTagName(root, "attribute")) {
+    private static void parseCommonAttributes(Element root, Map<String, Attribute> commonAttributes1,
+                                              Map<String, AntiSamyPattern> commonRegularExpressions1) {
 
+        for (Element ele : getByTagName(root, "attribute")) {
             String onInvalid = getAttributeValue(ele, "onInvalid");
             String name = getAttributeValue(ele, "name");
 
@@ -531,12 +678,11 @@ public class Policy {
             final String onInvalidStr;
             if (onInvalid != null && onInvalid.length() > 0) {
                 onInvalidStr = onInvalid;
-            } else {
-                onInvalidStr = DEFAULT_ONINVALID;
-            }
-            String description = getAttributeValue(ele, "description");
-            Attribute attribute = new Attribute(getAttributeValue(ele, "name"), allowedRegexps, allowedValues, onInvalidStr, description);
+            } else onInvalidStr = DEFAULT_ONINVALID;
 
+            String description = getAttributeValue(ele, "description");
+            Attribute attribute = new Attribute(getAttributeValue(ele, "name"), allowedRegexps,
+                                                allowedValues, onInvalidStr, description);
             commonAttributes1.put(name.toLowerCase(), attribute);
         }
     }
@@ -551,7 +697,6 @@ public class Policy {
             } else if (literalNode.getNodeValue() != null) {
                 allowedValues.add(literalNode.getNodeValue());
             }
-
         }
         return allowedValues;
     }
@@ -564,14 +709,13 @@ public class Policy {
 
             if (regExpName != null && regExpName.length() > 0) {
                 allowedRegExp.add(commonRegularExpressions1.get(regExpName).getPattern());
-            } else {
-                allowedRegExp.add(Pattern.compile(value));
-            }
+            } else allowedRegExp.add(Pattern.compile(value, Pattern.DOTALL));
         }
         return allowedRegExp;
     }
 
-    private static List<Pattern> getAllowedRegexps2(Map<String, AntiSamyPattern> commonRegularExpressions1, Element attributeNode, String tagName) throws PolicyException {
+    private static List<Pattern> getAllowedRegexps2(Map<String, AntiSamyPattern> commonRegularExpressions1,
+                                                    Element attributeNode, String tagName) throws PolicyException {
         List<Pattern> allowedRegexps = new ArrayList<Pattern>();
         for (Element regExpNode : getGrandChildrenByTagName(attributeNode, "regexp-list", "regexp")) {
             String regExpName = getAttributeValue(regExpNode, "name");
@@ -585,16 +729,14 @@ public class Policy {
             * one or the other, not both.
             */
             if (regExpName != null && regExpName.length() > 0) {
-
                 AntiSamyPattern pattern = commonRegularExpressions1.get(regExpName);
                 if (pattern != null) {
                     allowedRegexps.add(pattern.getPattern());
                 } else throw new PolicyException("Regular expression '" + regExpName +
                       "' was referenced as a common regexp in definition of '" + tagName +
                       "', but does not exist in <common-regexp>");
-
             } else if (value != null && value.length() > 0) {
-                allowedRegexps.add(Pattern.compile(value));
+                allowedRegexps.add(Pattern.compile(value, Pattern.DOTALL));
             }
         }
         return allowedRegexps;
@@ -613,7 +755,7 @@ public class Policy {
             if (pattern != null) {
                 allowedRegExp.add(pattern.getPattern());
             } else if (value != null) {
-                allowedRegExp.add(Pattern.compile(value));
+                allowedRegExp.add(Pattern.compile(value, Pattern.DOTALL));
             } else throw new PolicyException("Regular expression '" + regExpName +
                   "' was referenced as a common regexp in definition of '" + name +
                   "', but does not exist in <common-regexp>");
@@ -627,7 +769,6 @@ public class Policy {
         if (root == null) return;
 
         for (Element tagNode : getByTagName(root, "tag")) {
-
             String name = getAttributeValue(tagNode, "name");
             String action = getAttributeValue(tagNode, "action");
 
@@ -639,20 +780,18 @@ public class Policy {
         }
     }
 
-    private static Map<String, Attribute> getTagAttributes(Map<String, Attribute> commonAttributes1, Map<String, AntiSamyPattern> commonRegularExpressions1, NodeList attributeList, String tagName) throws PolicyException {
+    private static Map<String, Attribute> getTagAttributes(Map<String, Attribute> commonAttributes1, Map<String,
+       AntiSamyPattern> commonRegularExpressions1, NodeList attributeList, String tagName) throws PolicyException {
+
         Map<String,Attribute> tagAttributes = new HashMap<String, Attribute>();
         for (int j = 0; j < attributeList.getLength(); j++) {
-
             Element attributeNode = (Element) attributeList.item(j);
 
             String attrName = getAttributeValue(attributeNode, "name").toLowerCase();
             if (!attributeNode.hasChildNodes()) {
-
                 Attribute attribute = commonAttributes1.get(attrName);
 
-                /*
-                 * All they provided was the name, so they must want a common attribute.
-                 */
+                // All they provided was the name, so they must want a common attribute.
                 if (attribute != null) {
                     /*
                      * If they provide onInvalid/description values here they will
@@ -665,11 +804,9 @@ public class Policy {
                     commonAttributes1.put(attrName, changed);
                     tagAttributes.put(attrName, changed);
 
-                } else {
-                    throw new PolicyException("Attribute '" + getAttributeValue(attributeNode, "name") +
+                } else throw new PolicyException("Attribute '" + getAttributeValue(attributeNode, "name") +
                        "' was referenced as a common attribute in definition of '" + tagName +
                        "', but does not exist in <common-attributes>");
-                }
 
             } else {
                 List<Pattern> allowedRegexps2 = getAllowedRegexps2(commonRegularExpressions1, attributeNode, tagName);
@@ -678,20 +815,16 @@ public class Policy {
                 String description = getAttributeValue(attributeNode, "description");
                 Attribute attribute = new Attribute(getAttributeValue(attributeNode, "name"), allowedRegexps2, allowedValues2, onInvalid, description);
 
-                /*
-                 * Add fully built attribute.
-                 */
+                // Add fully built attribute.
                 tagAttributes.put(attrName, attribute);
             }
-
         }
         return tagAttributes;
     }
 
     private static void parseCSSRules(Element root, Map<String, Property> cssRules1, Map<String, AntiSamyPattern> commonRegularExpressions1) throws PolicyException {
 
-        for (Element ele : getByTagName(root, "property")){
-
+        for (Element ele : getByTagName(root, "property")) {
             String name = getAttributeValue(ele, "name");
             String description = getAttributeValue(ele, "description");
 
@@ -711,11 +844,9 @@ public class Policy {
             final String onInvalidStr;
             if (onInvalid != null && onInvalid.length() > 0) {
                 onInvalidStr = onInvalid;
-            } else {
-                onInvalidStr = DEFAULT_ONINVALID;
-            }
-            Property property = new Property(name,allowedRegexp3, allowedValue, shortHandRefs, description, onInvalidStr );
+            } else onInvalidStr = DEFAULT_ONINVALID;
 
+            Property property = new Property(name,allowedRegexp3, allowedValue, shortHandRefs, description, onInvalidStr);
             cssRules1.put(name.toLowerCase(), property);
         }
     }
@@ -732,8 +863,7 @@ public class Policy {
     }
 
     /**
-     * A method for returning one of the dynamic &lt;global-attribute&gt; entries by
-     * name.
+     * A method for returning one of the dynamic &lt;global-attribute&gt; entries by name.
      *
      * @param name The name of the dynamic global-attribute we want to look up.
      * @return An Attribute associated with the global-attribute lookup name specified,
@@ -781,7 +911,7 @@ public class Policy {
 
     /**
      * Resolves public and system IDs to files stored within the JAR.
-     * 
+     *
      * @param systemId The name of the entity we want to look up.
      * @param baseUrl The base location of the entity.
      * @return A String object containing the directive associated with the lookup name, or null if none is found.
@@ -845,9 +975,8 @@ public class Policy {
     }
 
     private static Iterable<Element> getByTagName(Element parent, String tagName) {
-        if (parent == null) {
-            return Collections.emptyList();
-        }
+        if (parent == null) return Collections.emptyList();
+
         final NodeList nodes = parent.getElementsByTagName(tagName);
         return new Iterable<Element>() {
             public Iterator<Element> iterator() {
@@ -875,4 +1004,33 @@ public class Policy {
         return commonRegularExpressions.get(name);
     }
 
+    private static void getPolicySchema() throws SAXException {
+        if (schema == null) {
+            InputStream schemaStream = Policy.class.getClassLoader().getResourceAsStream(POLICY_SCHEMA_URI);
+            Source schemaSource = new StreamSource(schemaStream);
+            schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+                    .newSchema(schemaSource);
+        }
+    }
+
+    /**
+     * This class is implemented to just throw an exception when
+     * validating the policy schema while parsing the document.
+     */
+    static class SAXErrorHandler implements ErrorHandler {
+        @Override
+        public void error(SAXParseException arg0) throws SAXException {
+            throw arg0;
+        }
+
+        @Override
+        public void fatalError(SAXParseException arg0) throws SAXException {
+            throw arg0;
+        }
+
+        @Override
+        public void warning(SAXParseException arg0) throws SAXException {
+            throw arg0;
+        }
+    }
 }

@@ -34,7 +34,7 @@ public class Constants {
     public static final String DEFAULT_ENCODING_ALGORITHM = "UTF-8";
     public static final Tag BASIC_PARAM_TAG_RULE;
     public static final List<String> defaultAllowedEmptyTags;
-    public static final List<String> defaultRequiresClosingTags;
+    public static final List<String> defaultRequireClosingTags;
     
     private static final String[] allowedEmptyTags = {
          "br", "hr", "a", "img", "link", "iframe", "script", "object", "applet",
@@ -61,7 +61,7 @@ public class Constants {
 
         List<String> requiresClosingTagsList = new ArrayList<String>();
         requiresClosingTagsList.addAll(Arrays.asList(requiresClosingTags));
-        defaultRequiresClosingTags = Collections.unmodifiableList(requiresClosingTagsList);
+        defaultRequireClosingTags = Collections.unmodifiableList(requiresClosingTagsList);
     }
     
     public static final String DEFAULT_LOCALE_LANG = "en";

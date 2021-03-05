@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -25,10 +25,19 @@
 package org.owasp.validator.html.scan;
 
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import org.apache.xml.serialize.OutputFormat;
-import org.owasp.validator.html.*;
+
+import org.owasp.validator.html.CleanResults;
+import org.owasp.validator.html.InternalPolicy;
+import org.owasp.validator.html.Policy;
+import org.owasp.validator.html.PolicyException;
+import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.util.ErrorMessageUtil;
 
 public abstract class AbstractAntiSamyScanner {
@@ -47,6 +56,7 @@ public abstract class AbstractAntiSamyScanner {
     public abstract CleanResults getResults();
 
     public AbstractAntiSamyScanner(Policy policy) {
+        assert policy instanceof InternalPolicy : policy.getClass();
         this.policy = (InternalPolicy) policy;
     }
 
@@ -58,15 +68,15 @@ public abstract class AbstractAntiSamyScanner {
         try {
             return ResourceBundle.getBundle("AntiSamy", Locale.getDefault());
         } catch (MissingResourceException mre) {
-            return  ResourceBundle.getBundle("AntiSamy", new Locale(Constants.DEFAULT_LOCALE_LANG, Constants.DEFAULT_LOCALE_LOC));
+            return  ResourceBundle.getBundle("AntiSamy", new Locale(Constants.DEFAULT_LOCALE_LANG,
+                        Constants.DEFAULT_LOCALE_LOC));
         }
     }
 
     protected void addError(String errorKey, Object[] objs) {
         errorMessages.add(ErrorMessageUtil.getMessage(messages, errorKey, objs));
     }
-    
-    
+
     protected OutputFormat getOutputFormat() {
 
         OutputFormat format = new OutputFormat();
@@ -74,22 +84,22 @@ public abstract class AbstractAntiSamyScanner {
         format.setOmitDocumentType(policy.isOmitDoctypeDeclaration());
         format.setPreserveEmptyAttributes(true);
         format.setPreserveSpace(policy.isPreserveSpace());
-        
+
         if (policy.isFormatOutput()) {
             format.setLineWidth(80);
             format.setIndenting(true);
             format.setIndent(2);
         }
-        
+
         return format;
     }
-  
+
     protected org.apache.xml.serialize.HTMLSerializer getHTMLSerializer(Writer w, OutputFormat format) {
 
-    if(policy.isUseXhtml()) {
+        if (policy.isUseXhtml()) {
             return new ASXHTMLSerializer(w, format, policy);
         }
-        
+
         return new ASHTMLSerializer(w, format, policy);
     }
 
@@ -103,7 +113,7 @@ public abstract class AbstractAntiSamyScanner {
                 }
             }
         }
-        
+
         return cleaned;
     }
 }

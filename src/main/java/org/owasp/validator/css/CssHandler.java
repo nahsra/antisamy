@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -30,13 +30,18 @@ package org.owasp.validator.css;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.util.ErrorMessageUtil;
 import org.owasp.validator.html.util.HTMLEntityEncoder;
+
 import org.w3c.css.sac.CSSException;
 import org.w3c.css.sac.DocumentHandler;
 import org.w3c.css.sac.InputSource;
@@ -144,6 +149,7 @@ public class CssHandler implements DocumentHandler {
 	 */
 	public CssHandler(Policy policy, LinkedList<URI> embeddedStyleSheets,
 			List<String> errorMessages, String tagName, ResourceBundle messages) {
+		assert policy instanceof InternalPolicy : policy.getClass();
 		this.policy = (InternalPolicy) policy;
 		this.errorMessages = errorMessages;
 		this.messages = messages;
@@ -168,9 +174,9 @@ public class CssHandler implements DocumentHandler {
 	 * @return the error messages generated during parsing
 	 */
 	public Collection<String> getErrorMessages() {
-	    return new ArrayList<String>(errorMessages);
+		return new ArrayList<String>(errorMessages);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -178,9 +184,9 @@ public class CssHandler implements DocumentHandler {
 	 */
 	public void comment(String text) throws CSSException {
 		errorMessages.add(ErrorMessageUtil.getMessage(
-				messages,
-				ErrorMessageUtil.ERROR_COMMENT_REMOVED,
-				new Object[] { HTMLEntityEncoder.htmlEntityEncode(text) }));
+			messages,
+			ErrorMessageUtil.ERROR_COMMENT_REMOVED,
+			new Object[] { HTMLEntityEncoder.htmlEntityEncode(text) }));
 	}
 
 	/*
@@ -194,7 +200,7 @@ public class CssHandler implements DocumentHandler {
 		// CSS2+ stuff
 		if (tagName != null) {
 			errorMessages.add(ErrorMessageUtil.getMessage(
-					messages,
+				messages,
 				ErrorMessageUtil.ERROR_CSS_TAG_RULE_NOTFOUND,
 				new Object[] { 
 					HTMLEntityEncoder.htmlEntityEncode(tagName), 
@@ -202,11 +208,11 @@ public class CssHandler implements DocumentHandler {
 				}));
 		} else {
 			errorMessages.add(ErrorMessageUtil.getMessage(
-					messages,
+				messages,
 				ErrorMessageUtil.ERROR_STYLESHEET_RULE_NOTFOUND,
 				new Object[] {  
 					HTMLEntityEncoder.htmlEntityEncode(atRule)
-				}));		    
+				}));
 		}
 	}
 
@@ -221,22 +227,22 @@ public class CssHandler implements DocumentHandler {
 
 		if (!policy.isEmbedStyleSheets()) {
 			errorMessages.add(ErrorMessageUtil.getMessage(
-					messages,
-					ErrorMessageUtil.ERROR_CSS_IMPORT_DISABLED,
-					new Object[] {}));
+				messages,
+				ErrorMessageUtil.ERROR_CSS_IMPORT_DISABLED,
+				new Object[] {}));
 			return;
 		}
-				
+
 		try {
 			// check for non-nullness (validate after canonicalization)
 			if (uri == null) {
-			    errorMessages.add(ErrorMessageUtil.getMessage(
-						messages,
+				errorMessages.add(ErrorMessageUtil.getMessage(
+					messages,
 					ErrorMessageUtil.ERROR_CSS_IMPORT_URL_INVALID,
 					new Object[] {}));
-			    return;			
+				return;
 			} 
-			
+
 			URI importedStyleSheet = new URI(uri);
 
 			// canonicalize the URI
@@ -244,36 +250,34 @@ public class CssHandler implements DocumentHandler {
 
 			// validate the URL
 
-            if (!policy.getCommonRegularExpressions("offsiteURL").matches(importedStyleSheet.toString())
+			if (!policy.getCommonRegularExpressions("offsiteURL").matches(importedStyleSheet.toString())
 				&& !policy.getCommonRegularExpressions("onsiteURL").matches(importedStyleSheet.toString())) {
-			    errorMessages.add(ErrorMessageUtil.getMessage(
-						messages,
+				errorMessages.add(ErrorMessageUtil.getMessage(
+					messages,
 					ErrorMessageUtil.ERROR_CSS_IMPORT_URL_INVALID,
 					new Object[] { HTMLEntityEncoder.htmlEntityEncode(uri) }));
-			    return;			
-			} 
-
+				return;
+			}
 			
 			if (!importedStyleSheet.isAbsolute()) {
 				// we have no concept of relative reference for free form
 				// text as an end user can't know where the corresponding
 				// free form will end up
-			    	if (tagName != null) {
-			    	    errorMessages.add(ErrorMessageUtil.getMessage(
-			    				messages,
-					ErrorMessageUtil.ERROR_CSS_TAG_RELATIVE,
-					new Object[] { 
-						HTMLEntityEncoder.htmlEntityEncode(tagName),
-						HTMLEntityEncoder.htmlEntityEncode(uri) }));
-			    	} else {
-			    	    errorMessages.add(ErrorMessageUtil.getMessage(
-			    				messages,
-					ErrorMessageUtil.ERROR_STYLESHEET_RELATIVE,
-					new Object[] { HTMLEntityEncoder.htmlEntityEncode(uri) }));
-			    	}
+				if (tagName != null) {
+					errorMessages.add(ErrorMessageUtil.getMessage(
+						messages,
+						ErrorMessageUtil.ERROR_CSS_TAG_RELATIVE,
+						new Object[] {
+							HTMLEntityEncoder.htmlEntityEncode(tagName),
+							HTMLEntityEncoder.htmlEntityEncode(uri) }));
+				} else {
+					errorMessages.add(ErrorMessageUtil.getMessage(
+						messages,
+						ErrorMessageUtil.ERROR_STYLESHEET_RELATIVE,
+						new Object[] { HTMLEntityEncoder.htmlEntityEncode(uri) }));
+				}
 				return;
 			}
-
 
 			importedStyleSheets.add(importedStyleSheet);
 		} catch (URISyntaxException use) {
@@ -281,7 +285,6 @@ public class CssHandler implements DocumentHandler {
 					messages,
 				ErrorMessageUtil.ERROR_CSS_IMPORT_URL_INVALID,
 				new Object[] { HTMLEntityEncoder.htmlEntityEncode(uri) }));
-			return;
 		}	
 	}
 
@@ -393,22 +396,22 @@ public class CssHandler implements DocumentHandler {
 					isValidSelector = validator.isValidSelector(selectorName,
 							selector);
 				} catch (ScanException se) {
-				    if (tagName != null) {					
-					errorMessages.add(ErrorMessageUtil.getMessage(
+					if (tagName != null) {
+						errorMessages.add(ErrorMessageUtil.getMessage(
 							messages,
-						ErrorMessageUtil.ERROR_CSS_TAG_SELECTOR_NOTFOUND,
-						new Object[] {
-							HTMLEntityEncoder.htmlEntityEncode(selector.toString())
-						}));
-				    } else {
-					errorMessages.add(ErrorMessageUtil.getMessage(
+							ErrorMessageUtil.ERROR_CSS_TAG_SELECTOR_NOTFOUND,
+							new Object[] {
+								HTMLEntityEncoder.htmlEntityEncode(selector.toString())
+							}));
+					} else {
+						errorMessages.add(ErrorMessageUtil.getMessage(
 							messages,
-						ErrorMessageUtil.ERROR_STYLESHEET_SELECTOR_NOTFOUND,
-						new Object[] {
-							HTMLEntityEncoder.htmlEntityEncode(tagName),
-							HTMLEntityEncoder.htmlEntityEncode(selector.toString())
-						}));
-				    }
+							ErrorMessageUtil.ERROR_STYLESHEET_SELECTOR_NOTFOUND,
+							new Object[] {
+								HTMLEntityEncoder.htmlEntityEncode(tagName),
+								HTMLEntityEncoder.htmlEntityEncode(selector.toString())
+							}));
+					}
 				}
 
 				// if the selector is valid, add to list
@@ -421,25 +424,22 @@ public class CssHandler implements DocumentHandler {
 
 					selectorCount++;
 
+				} else if (tagName != null) {
+					errorMessages.add(ErrorMessageUtil.getMessage(
+						messages,
+						ErrorMessageUtil.ERROR_CSS_TAG_SELECTOR_DISALLOWED,
+						new Object[] {
+							HTMLEntityEncoder.htmlEntityEncode(tagName),
+							HTMLEntityEncoder.htmlEntityEncode(selector.toString())
+						}));
+
 				} else {
-					if (tagName != null) {
-						errorMessages.add(ErrorMessageUtil.getMessage(
-								messages,
-								ErrorMessageUtil.ERROR_CSS_TAG_SELECTOR_DISALLOWED,
-								new Object[] {
-									HTMLEntityEncoder.htmlEntityEncode(tagName),
-									HTMLEntityEncoder.htmlEntityEncode(selector.toString())
-								}));
-
-					} else {
-						errorMessages.add(ErrorMessageUtil.getMessage(
-								messages,
-								ErrorMessageUtil.ERROR_STYLESHEET_SELECTOR_DISALLOWED,
-								new Object[] {
-									HTMLEntityEncoder.htmlEntityEncode(selector.toString())
-								}));								
-					}
-
+					errorMessages.add(ErrorMessageUtil.getMessage(
+						messages,
+						ErrorMessageUtil.ERROR_STYLESHEET_SELECTOR_DISALLOWED,
+						new Object[] {
+							HTMLEntityEncoder.htmlEntityEncode(selector.toString())
+						}));
 				}
 			}
 		}
@@ -501,27 +501,23 @@ public class CssHandler implements DocumentHandler {
 			styleSheet.append(';');
 			if (!isInline) { styleSheet.append('\n'); }
 
+		} else if (tagName != null) {
+			errorMessages.add(ErrorMessageUtil.getMessage(
+				messages,
+				ErrorMessageUtil.ERROR_CSS_TAG_PROPERTY_INVALID,
+				new Object[] {
+					HTMLEntityEncoder.htmlEntityEncode(tagName),
+					HTMLEntityEncoder.htmlEntityEncode(name),
+					HTMLEntityEncoder.htmlEntityEncode(validator
+						.lexicalValueToString(value)) }));
 		} else {
-
-			if (tagName != null) {
-				errorMessages.add(ErrorMessageUtil.getMessage(
-					messages,
-					ErrorMessageUtil.ERROR_CSS_TAG_PROPERTY_INVALID,
-					new Object[] {
-						HTMLEntityEncoder.htmlEntityEncode(tagName),
-						HTMLEntityEncoder.htmlEntityEncode(name),
-						HTMLEntityEncoder.htmlEntityEncode(validator
-							.lexicalValueToString(value)) }));			
-			} else {
-			    	errorMessages.add(ErrorMessageUtil.getMessage(
-			    		messages,
-			    		ErrorMessageUtil.ERROR_STYLESHEET_PROPERTY_INVALID,
-					new Object[] {
-						HTMLEntityEncoder.htmlEntityEncode(name),
-						HTMLEntityEncoder.htmlEntityEncode(validator
-							.lexicalValueToString(value)) }));
-			}
-
+			errorMessages.add(ErrorMessageUtil.getMessage(
+				messages,
+				ErrorMessageUtil.ERROR_STYLESHEET_PROPERTY_INVALID,
+				new Object[] {
+					HTMLEntityEncoder.htmlEntityEncode(name),
+					HTMLEntityEncoder.htmlEntityEncode(validator
+						.lexicalValueToString(value)) }));
 		}
 	}
 }

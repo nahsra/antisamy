@@ -13,8 +13,8 @@ to dropping a 0-day on all applications using AntiSamy. Instead, we encourage
 responsible disclosure.
 
 If you wish to be acknowledged for finding the vulnerability, then please follow
-this process. One of the project leaders will try to contact you within
-at least 5 business days.
+this process. One of the project leaders will try to contact you within 1-2 business days.
+
 If you eventually wish to have it published as a CVE, we will also work with you
 to ensure that you are given proper credit with MITRE and NIST. Even if you do
 not wish to report the vulnerability as a CVE, we will acknowledge you when we
@@ -30,4 +30,3 @@ These are the known CVEs reported for AntiSamy:
 
 * AntiSamy CVE #1 - CVE-2016-10006: XSS Bypass in AntiSamy before v1.5.5 - https://www.cvedetails.com/cve/CVE-2016-10006
 * AntiSamy CVE #2 - CVE-2017-14735: XSS via HTML5 Entities in AntiSamy before v1.5.7 - https://www.cvedetails.com/cve/CVE-2017-14735
-
