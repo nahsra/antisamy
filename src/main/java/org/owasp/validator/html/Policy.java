@@ -52,9 +52,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
 import org.owasp.validator.html.model.AntiSamyPattern;
 import org.owasp.validator.html.model.Attribute;
 import org.owasp.validator.html.model.Property;
@@ -62,6 +59,8 @@ import org.owasp.validator.html.model.Tag;
 import org.owasp.validator.html.scan.Constants;
 import org.owasp.validator.html.util.URIUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -80,7 +79,7 @@ import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
 
 public class Policy {
 
-    private static final Logger logger = LogManager.getLogger(Policy.class);
+    private static final Logger logger = LoggerFactory.getLogger(Policy.class);
 
     public static final Pattern ANYTHING_REGEXP = Pattern.compile(".*", Pattern.DOTALL);
 
