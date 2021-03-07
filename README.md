@@ -48,7 +48,9 @@ we recognize that it might not be possible for developers to fix their AntiSamy 
 
 2) Change the code using AntiSamy to invoke: Policy.setSchemaValidation(false) before loading the AntiSamy policy. This is a static call so once disabled, it is disabled for all new Policy instances.
 
-To encourage AntiSamy users to only use XSD compliant policies, AntiSamy will always issue some type of warning when schema validation is disabled. It will either WARN that the policy is non-compliant so it can be fixed, or it will WARN that the policy is compliant, but schema validation is OFF, so validation should be turned back on (i.e., stop disabling it).
+To encourage AntiSamy users to only use XSD compliant policies, AntiSamy will always log some type of warning when schema validation is disabled. It will either WARN that the policy is non-compliant so it can be fixed, or it will WARN that the policy is compliant, but schema validation is OFF, so validation should be turned back on (i.e., stop disabling it).
+
+### Logging: The logging introduced in 1.6.0 accidentally used log4j, while declaring slf4 as the logging API. This was quickly fixed in 1.6.1 to use slf4j APIs only. AntiSamy optionally includes the slf4j-simple library for its logging, but AntiSamy users have to import the slf4j compatible logging library they want to use in order to get these warning from AntiSamy.
 
 ### 3. Tailoring the policy file
 You may want to deploy AntiSamy in a default configuration, but it’s equally likely that a site may want to have strict, business-driven rules for what users can allow. The discussion that decides the tailoring should also consider attack surface - which grows in relative proportion to the policy file.
