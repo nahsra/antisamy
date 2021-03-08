@@ -228,7 +228,7 @@ public class Policy {
      * @throws PolicyException If there is a problem parsing the input stream.
      */
     public static Policy getInstance(InputStream inputStream) throws PolicyException {
-        final String logMsg = "Attempting to load policy from an input stream.";
+        final String logMsg = "Attempting to load AntiSamy policy from an input stream.";
         // If schema validation is disabled, we elevate this msg to the warn level to match the
         // level of the mandatory warning that will follow. We do the same below.
         if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
@@ -262,7 +262,7 @@ public class Policy {
      * @throws PolicyException If the file is not found or there is a problem parsing the file.
      */
     public static Policy getInstance(URL url) throws PolicyException {
-        String logMsg = "Attempting to load policy from URL: " + url.toString();
+        String logMsg = "Attempting to load AntiSamy policy from URL: " + url.toString();
         if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
         return new InternalPolicy(url, getParseContext(getTopLevelElement(url), url));
     }
@@ -373,7 +373,7 @@ public class Policy {
                     source = getResetSource.call();
                     Element theElement = getDocumentElementFromSource(source, false);
                     // We warn when the policy has an invalid schema, but schema validation is disabled.
-                    logger.warn("Invalid policy file: " + e.getMessage());
+                    logger.warn("Invalid AntiSamy policy file: " + e.getMessage());
                     return theElement;
                 } catch (Exception e2) {
                     throw new PolicyException(e2);
@@ -385,7 +385,7 @@ public class Policy {
         } finally {
             if (!validateSchema && (thrownException == null)) {
                 // We warn when the policy has a valid schema, but schema validation is disabled.
-                logger.warn("XML schema validation is disabled for a valid policy. Please reenable policy validation.");
+                logger.warn("XML schema validation is disabled for a valid AntiSamy policy. Please reenable policy validation.");
             }
         }
     }
@@ -451,7 +451,7 @@ public class Policy {
                 try {
                     Element theElement = getDocumentElementByUrl(href, baseUrl, false);
                     // We warn when the policy has an invalid schema, but schema validation is disabled.
-                    logger.warn("Invalid policy file: " + e.getMessage());
+                    logger.warn("Invalid AntiSamy policy file: " + e.getMessage());
                     return theElement;
                 } catch (SAXException | ParserConfigurationException | IOException e2) {
                     throw new PolicyException(e2);
@@ -465,7 +465,7 @@ public class Policy {
         } finally {
             if (!validateSchema && (thrownException == null)) {
                 // We warn when the policy has a valid schema, but schema validation is disabled.
-                logger.warn("XML schema validation is disabled for a valid policy. Please reenable policy validation.");
+                logger.warn("XML schema validation is disabled for a valid AntiSamy policy. Please reenable policy validation.");
             }
         }
     }
@@ -491,7 +491,7 @@ public class Policy {
 
             try {
                 url = new URL(baseUrl, href);
-                final String logMsg = "Attempting to load policy from URL: " + url.toString();
+                final String logMsg = "Attempting to load AntiSamy policy from URL: " + url.toString();
                 if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
                 source = new InputSource(url.openStream());
                 source.setSystemId(href);

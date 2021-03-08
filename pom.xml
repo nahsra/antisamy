@@ -118,7 +118,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>${version.slf4j}</version>
-            <optional>true</optional>
         </dependency>
         <!-- While Java 7+ includes Xerces in the JRE, it apparently doesn't provide all the features we use
              that are in the Apache version. So we import it directly. -->
