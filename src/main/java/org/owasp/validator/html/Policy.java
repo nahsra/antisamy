@@ -129,9 +129,8 @@ public class Policy {
     private static boolean validateSchema = true; // Default is to validate schemas
     public static final String VALIDATIONPROPERTY = "owasp.validator.validateschema";
 
-    // Support the ability to change the default schema validation behavior by
-    // setting the
-    // System property "owasp.antisamy.validateschema".
+	// Support the ability to change the default schema validation behavior by setting the
+	// System property "owasp.antisamy.validateschema".
     static {
         loadValidateSchemaProperty();
     }
@@ -139,7 +138,8 @@ public class Policy {
     /**
      * Get the Tag specified by the provided tag name.
      *
-     * @param tagName The name of the Tag to return.
+     * @param tagName
+     *            The name of the Tag to return.
      * @return The requested Tag, or null if it doesn't exist.
      */
     public Tag getTagByLowercaseName(String tagName) {
@@ -178,16 +178,14 @@ public class Policy {
      * Retrieves a CSS Property from the Policy.
      *
      * @param propertyName The name of the CSS Property to look up.
-     * @return The CSS Property associated with the name specified, or null if none
-     *         is found.
+     * @return The CSS Property associated with the name specified, or null if none is found.
      */
     public Property getPropertyByName(String propertyName) {
         return cssRules.get(propertyName.toLowerCase());
     }
 
     /**
-     * Is XSD schema validation across all policies enabled or not? It is enabled by
-     * default.
+     * Is XSD schema validation across all policies enabled or not? It is enabled by default.
      *
      * @return True if schema validation enabled. False otherwise.
      */
@@ -196,24 +194,20 @@ public class Policy {
     }
 
     /**
-     * This can enable/disable the schema validation against AntiSamy XSD for the
-     * instantiated policies. It is enabled by default.
+     * This can enable/disable the schema validation against AntiSamy XSD for the instantiated
+     * policies. It is enabled by default.
      *
-     * @param enable boolean value to specify if the schema validation should be
-     *               performed. Use false to disable.
+     * @param enable boolean value to specify if the schema validation should be performed. Use false to disable.
      */
     public static void setSchemaValidation(boolean enable) {
         validateSchema = enable;
     }
 
     /**
-     * This retrieves a Policy based on a default location
-     * ("resources/antisamy.xml")
+     * This retrieves a Policy based on a default location ("resources/antisamy.xml")
      *
-     * @return A populated Policy object based on the XML policy file located in the
-     *         default location.
-     * @throws PolicyException If the file is not found or there is a problem
-     *                         parsing the file.
+     * @return A populated Policy object based on the XML policy file located in the default location.
+     * @throws PolicyException If the file is not found or there is a problem parsing the file.
      */
     public static Policy getInstance() throws PolicyException {
         return getInstance(DEFAULT_POLICY_URI);
@@ -223,10 +217,8 @@ public class Policy {
      * This retrieves a Policy based on the file name passed in
      *
      * @param filename The path to the XML policy file.
-     * @return A populated Policy object based on the XML policy file located in the
-     *         location passed in.
-     * @throws PolicyException If the file is not found or there is a problem
-     *                         parsing the file.
+     * @return A populated Policy object based on the XML policy file located in the location passed in.
+     * @throws PolicyException If the file is not found or there is a problem parsing the file.
      */
     public static Policy getInstance(String filename) throws PolicyException {
         File file = new File(filename);
@@ -237,14 +229,12 @@ public class Policy {
      * This retrieves a Policy based on the InputStream object passed in
      *
      * @param inputStream An InputStream which contains thhe XML policy information.
-     * @return A populated Policy object based on the XML policy file pointed to by
-     *         the inputStream parameter.
+     * @return A populated Policy object based on the XML policy file pointed to by the inputStream parameter.
      * @throws PolicyException If there is a problem parsing the input stream.
      */
     public static Policy getInstance(InputStream inputStream) throws PolicyException {
         final String logMsg = "Attempting to load AntiSamy policy from an input stream.";
-        // If schema validation is disabled, we elevate this msg to the warn level to
-        // match the
+        // If schema validation is disabled, we elevate this msg to the warn level to match the
         // level of the mandatory warning that will follow. We do the same below.
         if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
         return new InternalPolicy(null, getSimpleParseContext(getTopLevelElement(inputStream)));
@@ -254,10 +244,8 @@ public class Policy {
      * This retrieves a Policy based on the File object passed in
      *
      * @param file A File object which contains the XML policy information.
-     * @return A populated Policy object based on the XML policy file pointed to by
-     *         the File parameter.
-     * @throws PolicyException If the file is not found or there is a problem
-     *                         parsing the file.
+     * @return A populated Policy object based on the XML policy file pointed to by the File parameter.
+     * @throws PolicyException If the file is not found or there is a problem parsing the file.
      */
     public static Policy getInstance(File file) throws PolicyException {
         try {
@@ -269,16 +257,14 @@ public class Policy {
     }
 
     /**
-     * This retrieves a Policy based on the URL object passed in. <br>
-     * <br>
-     * NOTE: This is the only factory method that will work with &lt;include&gt;
-     * tags in AntiSamy policy files.
+     * This retrieves a Policy based on the URL object passed in.
+     * <br><br>
+     * NOTE: This is the only factory method that will work with &lt;include&gt; tags
+     * in AntiSamy policy files.
      *
      * @param url A URL object which contains the XML policy information.
-     * @return A populated Policy object based on the XML policy file pointed to by
-     *         the File parameter.
-     * @throws PolicyException If the file is not found or there is a problem
-     *                         parsing the file.
+     * @return A populated Policy object based on the XML policy file pointed to by the File parameter.
+     * @throws PolicyException If the file is not found or there is a problem parsing the file.
      */
     public static Policy getInstance(URL url) throws PolicyException {
         String logMsg = "Attempting to load AntiSamy policy from URL: " + url.toString();
@@ -322,11 +308,11 @@ public class Policy {
         ParseContext parseContext = new ParseContext();
 
         /**
-         * Are there any included policies? These are parsed here first so that rules in
-         * _this_ policy file will override included rules.
+         * Are there any included policies? These are parsed here first so that
+         * rules in _this_ policy file will override included rules.
          *
-         * NOTE that by this being here we only support one level of includes. To
-         * support recursion, move this into the parsePolicy method.
+         * NOTE that by this being here we only support one level of includes.
+         * To support recursion, move this into the parsePolicy method.
          */
         for (Element include : getByTagName(topLevelElement, "include")) {
             String href = getAttributeValue(include, "href");
@@ -349,7 +335,7 @@ public class Policy {
         });
     }
 
-    @SuppressFBWarnings(value = "SECURITY", justification = "Opening a stream to the provided URL is not "
+    @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
             + "a vulnerability because it points to a local JAR file.")
     protected static InputSource getSourceFromUrl(URL baseUrl) throws PolicyException {
         try {
@@ -363,8 +349,7 @@ public class Policy {
 
             return source;
         } catch (SAXException | IOException e) {
-            // SAXException can't actually happen. See JavaDoc for resolveEntity(String,
-            // URL)
+            // SAXException can't actually happen. See JavaDoc for resolveEntity(String, URL)
             throw new PolicyException(e);
         }
     }
@@ -376,7 +361,7 @@ public class Policy {
             @Override
             public InputSource call() throws IOException {
                 source.getByteStream().reset();
-                return source;
+                return  source;
             }
         });
     }
@@ -392,8 +377,7 @@ public class Policy {
                 try {
                     source = getResetSource.call();
                     Element theElement = getDocumentElementFromSource(source, false);
-                    // We warn when the policy has an invalid schema, but schema validation is
-                    // disabled.
+                    // We warn when the policy has an invalid schema, but schema validation is disabled.
                     logger.warn("Invalid AntiSamy policy file: " + e.getMessage());
                     return theElement;
                 } catch (Exception e2) {
@@ -405,8 +389,7 @@ public class Policy {
             throw new PolicyException(e);
         } finally {
             if (!validateSchema && (thrownException == null)) {
-                // We warn when the policy has a valid schema, but schema validation is
-                // disabled.
+                // We warn when the policy has a valid schema, but schema validation is disabled.
                 logger.warn("XML schema validation is disabled for a valid AntiSamy policy. Please reenable policy validation.");
             }
         }
@@ -460,8 +443,8 @@ public class Policy {
     /**
      * Returns the top level element of a loaded policy Document
      */
-    @SuppressFBWarnings(value = "SECURITY", justification = "Opening a stream to the provided URL is not "
-            + "a vulnerability because only local file URLs are allowed.")
+    @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
+          + "a vulnerability because only local file URLs are allowed.")
     private static Element getPolicy(String href, URL baseUrl) throws PolicyException {
         // Track whether an exception was ever thrown while processing policy file
         Exception thrownException = null;
@@ -472,8 +455,7 @@ public class Policy {
             if (!validateSchema) {
                 try {
                     Element theElement = getDocumentElementByUrl(href, baseUrl, false);
-                    // We warn when the policy has an invalid schema, but schema validation is
-                    // disabled.
+                    // We warn when the policy has an invalid schema, but schema validation is disabled.
                     logger.warn("Invalid AntiSamy policy file: " + e.getMessage());
                     return theElement;
                 } catch (SAXException | ParserConfigurationException | IOException e2) {
@@ -487,15 +469,14 @@ public class Policy {
             throw new PolicyException(e);
         } finally {
             if (!validateSchema && (thrownException == null)) {
-                // We warn when the policy has a valid schema, but schema validation is
-                // disabled.
+                // We warn when the policy has a valid schema, but schema validation is disabled.
                 logger.warn("XML schema validation is disabled for a valid AntiSamy policy. Please reenable policy validation.");
             }
         }
     }
 
     // TODO: Add JavaDocs for this new method.
-    @SuppressFBWarnings(value = "SECURITY", justification = "Opening a stream to the provided URL is not "
+    @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
             + "a vulnerability because only local file URLs are allowed.")
     private static Element getDocumentElementByUrl(String href, URL baseUrl, boolean schemaValidationEnabled)
             throws IOException, ParserConfigurationException, SAXException {
@@ -508,7 +489,7 @@ public class Policy {
 
             if (!"file".equals(baseUrl.getProtocol())) {
                 throw new MalformedURLException(
-                        "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
+                    "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
             }
 
             URL url;
@@ -543,10 +524,8 @@ public class Policy {
         dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
         dbf.setFeature(LOAD_EXTERNAL_DTD, false);
 
-        // This code doesn't have the retry logic if schema validation fails because
-        // schemaValidationEnabled is
-        // passed in. It is up to the caller to try again, if this fails the first time
-        // (if they want to).
+        // This code doesn't have the retry logic if schema validation fails because schemaValidationEnabled is
+        // passed in. It is up to the caller to try again, if this fails the first time (if they want to).
         if (schemaValidationEnabled) {
             getPolicySchema();
             dbf.setNamespaceAware(true);
@@ -569,8 +548,7 @@ public class Policy {
 
     /**
      * Creates a copy of this policy with an added/changed directive.
-     * 
-     * @param name  The directive to add/modify
+     * @param name The directive to add/modify
      * @param value The value
      * @return A clone of the policy with the updated directive
      */
@@ -638,8 +616,7 @@ public class Policy {
      * Go through <global-tag-attributes> section of the policy file.
      *
      * @param root              Top level of <global-tag-attributes>
-     * @param globalAttributes1 A HashMap of global Attributes that need validation
-     *                          for every tag.
+     * @param globalAttributes1 A HashMap of global Attributes that need validation for every tag.
      * @param commonAttributes  The common attributes
      * @throws PolicyException
      */
@@ -659,8 +636,7 @@ public class Policy {
      * Go through <dynamic-tag-attributes> section of the policy file.
      *
      * @param root              Top level of <dynamic-tag-attributes>
-     * @param dynamicAttributes A HashMap of dynamic Attributes that need validation
-     *                          for every tag.
+     * @param dynamicAttributes A HashMap of dynamic Attributes that need validation for every tag.
      * @param commonAttributes  The common attributes
      * @throws PolicyException
      */
@@ -694,7 +670,7 @@ public class Policy {
     }
 
     private static void parseCommonAttributes(Element root, Map<String, Attribute> commonAttributes1,
-            Map<String, AntiSamyPattern> commonRegularExpressions1) {
+                                              Map<String, AntiSamyPattern> commonRegularExpressions1) {
 
         for (Element ele : getByTagName(root, "attribute")) {
             String onInvalid = getAttributeValue(ele, "onInvalid");
@@ -743,17 +719,19 @@ public class Policy {
     }
 
     private static List<Pattern> getAllowedRegexps2(Map<String, AntiSamyPattern> commonRegularExpressions1,
-            Element attributeNode, String tagName) throws PolicyException {
+                                                    Element attributeNode, String tagName) throws PolicyException {
         List<Pattern> allowedRegexps = new ArrayList<Pattern>();
         for (Element regExpNode : getGrandChildrenByTagName(attributeNode, "regexp-list", "regexp")) {
             String regExpName = getAttributeValue(regExpNode, "name");
             String value = getAttributeValue(regExpNode, "value");
 
-            /*
-             * Look up common regular expression specified by the "name" field. They can put
-             * a common name in the "name" field or provide a custom value in the "value"
-             * field. They must choose one or the other, not both.
-             */
+           /*
+            * Look up common regular expression specified
+            * by the "name" field. They can put a common
+            * name in the "name" field or provide a custom
+            * value in the "value" field. They must choose
+            * one or the other, not both.
+            */
             if (regExpName != null && regExpName.length() > 0) {
                 AntiSamyPattern pattern = commonRegularExpressions1.get(regExpName);
                 if (pattern != null) {
@@ -809,7 +787,7 @@ public class Policy {
     private static Map<String, Attribute> getTagAttributes(Map<String, Attribute> commonAttributes1, Map<String,
        AntiSamyPattern> commonRegularExpressions1, NodeList attributeList, String tagName) throws PolicyException {
 
-        Map<String, Attribute> tagAttributes = new HashMap<String, Attribute>();
+        Map<String,Attribute> tagAttributes = new HashMap<String, Attribute>();
         for (int j = 0; j < attributeList.getLength(); j++) {
             Element attributeNode = (Element) attributeList.item(j);
 
@@ -820,8 +798,8 @@ public class Policy {
                 // All they provided was the name, so they must want a common attribute.
                 if (attribute != null) {
                     /*
-                     * If they provide onInvalid/description values here they will override the
-                     * common values.
+                     * If they provide onInvalid/description values here they will
+                     * override the common values.
                      */
 
                     String onInvalid = getAttributeValue(attributeNode, "onInvalid");
@@ -882,29 +860,27 @@ public class Policy {
      * name.
      *
      * @param name The name of the global-attribute we want to look up.
-     * @return An Attribute associated with the global-attribute lookup name
-     *         specified.
+     * @return An Attribute associated with the global-attribute lookup name specified.
      */
     public Attribute getGlobalAttributeByName(String name) {
         return globalAttributes.get(name.toLowerCase());
     }
 
     /**
-     * A method for returning one of the dynamic &lt;global-attribute&gt; entries by
-     * name.
+     * A method for returning one of the dynamic &lt;global-attribute&gt; entries by name.
      *
      * @param name The name of the dynamic global-attribute we want to look up.
-     * @return An Attribute associated with the global-attribute lookup name
-     *         specified, or null if not found.
+     * @return An Attribute associated with the global-attribute lookup name specified,
+     * or null if not found.
      */
     public Attribute getDynamicAttributeByName(String name) {
         Attribute dynamicAttribute = null;
         Set<Map.Entry<String, Attribute>> entries = dynamicAttributes.entrySet();
         for (Map.Entry<String, Attribute> entry : entries) {
-            if (name.startsWith(entry.getKey())) {
-                dynamicAttribute = entry.getValue();
-                break;
-            }
+          if (name.startsWith(entry.getKey())) {
+              dynamicAttribute = entry.getValue();
+              break;
+          }
         }
         return dynamicAttribute;
     }
@@ -912,19 +888,16 @@ public class Policy {
     /**
      * Return all the allowed empty tags configured in the Policy.
      *
-     * @return A String array of all the he allowed empty tags configured in the
-     *         Policy.
+     * @return A String array of all the he allowed empty tags configured in the Policy.
      */
     public TagMatcher getAllowedEmptyTags() {
         return allowedEmptyTagsMatcher;
     }
 
     /**
-     * Return all the tags that are required to be closed with an end tag, even if
-     * they have no child content.
+     * Return all the tags that are required to be closed with an end tag, even if they have no child content.
      *
-     * @return A String array of all the tags that are required to be closed with an
-     *         end tag, even if they have no child content.
+     * @return A String array of all the tags that are required to be closed with an end tag, even if they have no child content.
      */
     public TagMatcher getRequiresClosingTags() {
         return requiresClosingTagsMatcher;
@@ -934,8 +907,7 @@ public class Policy {
      * Return a directive value based on a lookup name.
      *
      * @param name The name of the directive we want to look up.
-     * @return A String object containing the directive associated with the lookup
-     *         name, or null if none is found.
+     * @return A String object containing the directive associated with the lookup name, or null if none is found.
      */
     public String getDirective(String name) {
         return directives.get(name);
@@ -945,15 +917,14 @@ public class Policy {
      * Resolves public and system IDs to files stored within the JAR.
      *
      * @param systemId The name of the entity we want to look up.
-     * @param baseUrl  The base location of the entity.
-     * @return A String object containing the directive associated with the lookup
-     *         name, or null if none is found.
-     * @throws IOException  if the specified URL can't be opened.
-     * @throws SAXException This exception can't actually be thrown, but left in the
-     *                      method signature for API compatibility reasons.
+     * @param baseUrl The base location of the entity.
+     * @return A String object containing the directive associated with the lookup name, or null if none is found.
+     * @throws IOException if the specified URL can't be opened.
+     * @throws SAXException This exception can't actually be thrown, but left in the method signature for
+     *                API compatibility reasons.
      */
-    @SuppressFBWarnings(value = "SECURITY", justification = "Opening a stream to the provided URL is not "
-            + "a vulnerability because only local file URLs are allowed.")
+    @SuppressFBWarnings(value = "SECURITY", justification="Opening a stream to the provided URL is not "
+          + "a vulnerability because only local file URLs are allowed.")
     public static InputSource resolveEntity(final String systemId, URL baseUrl) throws IOException, SAXException {
 
         InputSource source;
@@ -964,7 +935,7 @@ public class Policy {
 
             if (!"file".equals(baseUrl.getProtocol())) {
                 throw new MalformedURLException(
-                        "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
+                    "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
             }
 
             URL url;
@@ -1004,7 +975,7 @@ public class Policy {
         NodeList elementsByTagName = parent.getElementsByTagName(immediateChildName);
         if (elementsByTagName.getLength() == 0) return Collections.emptyList();
         Element regExpListNode = (Element) elementsByTagName.item(0);
-        return getByTagName(regExpListNode, subChild);
+        return getByTagName( regExpListNode, subChild);
     }
 
     private static Iterable<Element> getByTagName(Element parent, String tagName) {
@@ -1047,8 +1018,8 @@ public class Policy {
     }
 
     /**
-     * This class is implemented to just throw an exception when validating the
-     * policy schema while parsing the document.
+     * This class is implemented to just throw an exception when
+     * validating the policy schema while parsing the document.
      */
     static class SAXErrorHandler implements ErrorHandler {
         @Override
