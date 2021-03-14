@@ -48,6 +48,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -370,8 +371,18 @@ public class Policy {
         // Track whether an exception was ever thrown while processing policy file
         Exception thrownException = null;
         try {
-            return getDocumentElementFromSource(source, validateSchema);
-        } catch (SAXException | ParserConfigurationException | IOException e) {
+            Element element = getDocumentElementFromSource(source, validateSchema);
+            if (!validateSchema) {
+                // Schema validation against the loaded XML
+                try {
+                    schema.newValidator().validate(new DOMSource(element));
+                } catch (SAXException e) {
+                    logger.warn("Invalid AntiSamy policy file: "+ e.getMessage());
+                }
+            }
+            return element;
+            
+        } catch ( SAXException | ParserConfigurationException | IOException e) {
             thrownException = e;
             throw new PolicyException(e);
         } finally {
