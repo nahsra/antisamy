@@ -371,20 +371,7 @@ public class Policy {
         Exception thrownException = null;
         try {
             return getDocumentElementFromSource(source, validateSchema);
-        } catch (SAXException e) {
-            thrownException = e;
-            if (!validateSchema) {
-                try {
-                    source = getResetSource.call();
-                    Element theElement = getDocumentElementFromSource(source, false);
-                    // We warn when the policy has an invalid schema, but schema validation is disabled.
-                    logger.warn("Invalid AntiSamy policy file: " + e.getMessage());
-                    return theElement;
-                } catch (Exception e2) {
-                    throw new PolicyException(e2);
-                }
-            } else throw new PolicyException(e);
-        } catch (ParserConfigurationException | IOException e) {
+        } catch (SAXException | ParserConfigurationException | IOException e) {
             thrownException = e;
             throw new PolicyException(e);
         } finally {

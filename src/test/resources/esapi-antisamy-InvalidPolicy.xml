@@ -11,7 +11,7 @@
             (which is the default), which leaves its XML schema validation enabled (in which
             case the CTOR should fail with an exception).
 
-            @since: 2.2.3.0
+            @since: 1.6.2
     -->
 	<directives></directives>
 	<common-regexps></common-regexps>

@@ -19,6 +19,7 @@ public class ESAPIInvalidPolicyTest {
 	@After
 	public void resetSystemProp() throws Exception {
 		System.clearProperty(ANTISAMY_PROJECT_PROP_SCHEMA_VALIDATION);
+		Policy.setSchemaValidation(true);
 		reloadSchemaValidation();
 	}
 
@@ -54,7 +55,7 @@ public class ESAPIInvalidPolicyTest {
 	}
 
 	private void reloadSchemaValidation() throws Exception {
-		// Emulates the static code block fist called
+		// Emulates the static code block first called
 		Method method = Policy.class.getDeclaredMethod("loadValidateSchemaProperty");
 		method.setAccessible(true);
 		method.invoke(null);

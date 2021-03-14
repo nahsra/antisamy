@@ -8,29 +8,32 @@ import org.junit.Test;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
 
-public class AntiSammyMalformedPolicy {
+/**
+ * @author Gerardo Canedo
+ */
+public class AntiSamyMalformedPolicyTest {
 
     @Test
     public void testDirectConfigMalformedXMLNoSchemaValidation() throws Exception {
         Policy.setSchemaValidation(false);
-        InputStream stream = AntiSammyMalformedPolicy.class.getResourceAsStream("/invalidPolicyMalformedXml.xml");
+        InputStream stream = AntiSamyMalformedPolicyTest.class.getResourceAsStream("/invalidPolicyMalformedXml.xml");
         try {
             Policy.getInstance(stream);
             fail("Malformed XML, PolicyException expected ");
         } catch (PolicyException e) {
-            // Expected behaivour
+            // Expected behavior
         }
     }
 
     @Test
     public void testDirectConfigMalformedXMLSchemaValidation() throws Exception {
         Policy.setSchemaValidation(true);
-        InputStream stream = AntiSammyMalformedPolicy.class.getResourceAsStream("/invalidPolicyMalformedXml.xml");
+        InputStream stream = AntiSamyMalformedPolicyTest.class.getResourceAsStream("/invalidPolicyMalformedXml.xml");
         try {
             Policy.getInstance(stream);
             fail("Malformed XML, PolicyException expected ");
         } catch (PolicyException e) {
-            // Expected behaivour
+            // Expected behavior
         }
     }
 }
