@@ -48,6 +48,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -132,12 +133,7 @@ public class Policy {
 	// Support the ability to change the default schema validation behavior by setting the
 	// System property "owasp.antisamy.validateschema".
     static {
-        String validateProperty = System.getProperty(VALIDATIONPROPERTY);
-        if (validateProperty != null) {
-            validateSchema = Boolean.getBoolean(validateProperty);
-            logger.warn("Setting AntiSamy policy schema validation to '" + validateSchema
-                + "' because '" + VALIDATIONPROPERTY + "' system property set to: '" + validateProperty + "'");
-        }
+        loadValidateSchemaProperty();
     }
 
     /**
@@ -149,6 +145,16 @@ public class Policy {
      */
     public Tag getTagByLowercaseName(String tagName) {
         return tagRules.get(tagName);
+    }
+
+    // encapsulated to be simulated from test cases
+    private static void loadValidateSchemaProperty() {
+        String validateProperty = System.getProperty(VALIDATIONPROPERTY);
+        if (validateProperty != null) {
+            setSchemaValidation(Boolean.getBoolean(validateProperty));
+            logger.warn("Setting AntiSamy policy schema validation to '" + getSchemaValidation() + "' because '"
+                    + VALIDATIONPROPERTY + "' system property set to: '" + validateProperty + "'");
+        }
     }
 
     protected static class ParseContext {
@@ -365,21 +371,18 @@ public class Policy {
         // Track whether an exception was ever thrown while processing policy file
         Exception thrownException = null;
         try {
-            return getDocumentElementFromSource(source, true);
-        } catch (SAXException e) {
-            thrownException = e;
+            Element element = getDocumentElementFromSource(source, validateSchema);
             if (!validateSchema) {
+                // Schema validation against the loaded XML
                 try {
-                    source = getResetSource.call();
-                    Element theElement = getDocumentElementFromSource(source, false);
-                    // We warn when the policy has an invalid schema, but schema validation is disabled.
-                    logger.warn("Invalid AntiSamy policy file: " + e.getMessage());
-                    return theElement;
-                } catch (Exception e2) {
-                    throw new PolicyException(e2);
+                    schema.newValidator().validate(new DOMSource(element));
+                } catch (SAXException e) {
+                    logger.warn("Invalid AntiSamy policy file: "+ e.getMessage());
                 }
-            } else throw new PolicyException(e);
-        } catch (ParserConfigurationException | IOException e) {
+            }
+            return element;
+            
+        } catch ( SAXException | ParserConfigurationException | IOException e) {
             thrownException = e;
             throw new PolicyException(e);
         } finally {
