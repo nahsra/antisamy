@@ -113,7 +113,7 @@ public class ESAPIInvalidPolicyTest {
 		method.invoke(null);
 	}
 
-	private static InputStream toByteArrayStream(InputStream in) throws Exception {
+	static InputStream toByteArrayStream(InputStream in) throws Exception {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		int nRead;
 		byte[] data = new byte[1024];
