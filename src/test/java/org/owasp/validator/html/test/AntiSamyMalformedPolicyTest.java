@@ -19,7 +19,7 @@ public class AntiSamyMalformedPolicyTest {
         InputStream stream = AntiSamyMalformedPolicyTest.class.getResourceAsStream("/invalidPolicyMalformedXml.xml");
         try {
             Policy.getInstance(stream);
-            fail("Malformed XML, PolicyException expected ");
+            fail("For Malformed XML, PolicyException expected whether schema validation is enabled or not.");
         } catch (PolicyException e) {
             // Expected behavior
         }
@@ -31,7 +31,7 @@ public class AntiSamyMalformedPolicyTest {
         InputStream stream = AntiSamyMalformedPolicyTest.class.getResourceAsStream("/invalidPolicyMalformedXml.xml");
         try {
             Policy.getInstance(stream);
-            fail("Malformed XML, PolicyException expected ");
+            fail("For Malformed XML, PolicyException expected whether schema validation is enabled or not.");
         } catch (PolicyException e) {
             // Expected behavior
         }
