@@ -5,13 +5,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
+import static org.junit.Assert.fail;
 import org.junit.After;
 import org.junit.Test;
+
 import org.owasp.validator.html.Policy;
+import org.owasp.validator.html.PolicyException;
 
 public class ESAPIInvalidPolicyTest {
 	/**
-	 * Property specified by the Antisamy project which may be used to disable
+	 * Property specified by the AntiSamy project which may be used to disable
 	 * schema validation on policy files.
 	 */
 	private static final String ANTISAMY_PROJECT_PROP_SCHEMA_VALIDATION = "owasp.validator.validateschema";
@@ -24,22 +27,58 @@ public class ESAPIInvalidPolicyTest {
 	}
 
 	@Test
-	public void testDirectConfigAsBais() throws Exception {
+	public void testDirectConfigAsBaisValidationOn() throws Exception {
+		Policy.setSchemaValidation(true);
+		InputStream stream = ESAPIInvalidPolicyTest.class.getResourceAsStream("/esapi-antisamy-InvalidPolicy.xml");
+		try {
+			Policy.getInstance(toByteArrayStream(stream));
+			fail("Invalid policy with schema validation ON should throw exception.");
+		} catch (PolicyException e) {
+			// This is expected, so do nothing. Any other kind of exception is a failed test case.
+		}
+	}
+
+	@Test
+	public void testDirectConfigAsBaisValidationOff() throws Exception {
 		Policy.setSchemaValidation(false);
 		InputStream stream = ESAPIInvalidPolicyTest.class.getResourceAsStream("/esapi-antisamy-InvalidPolicy.xml");
 		Policy.getInstance(toByteArrayStream(stream));
 	}
 
 	@Test
-	public void testDirectConfig() throws Exception {
+	public void testDirectConfigValidationOn() throws Exception {
+		Policy.setSchemaValidation(true);
+		InputStream stream = ESAPIInvalidPolicyTest.class.getResourceAsStream("/esapi-antisamy-InvalidPolicy.xml");
+		try {
+			Policy.getInstance(stream);
+			fail("Invalid policy with schema validation ON should throw exception.");
+		} catch (PolicyException e) {
+			// This is expected, so do nothing. Any other kind of exception is a failed test case.
+		}
+	}
+
+	@Test
+	public void testDirectConfigValidationOff() throws Exception {
 		Policy.setSchemaValidation(false);
 		InputStream stream = ESAPIInvalidPolicyTest.class.getResourceAsStream("/esapi-antisamy-InvalidPolicy.xml");
 		Policy.getInstance(stream);
 	}
 
 	@Test
-	public void testSystemProp() throws Exception {
+	public void testSystemPropValidationOn() throws Exception {
+		System.setProperty(ANTISAMY_PROJECT_PROP_SCHEMA_VALIDATION, "true");
+		reloadSchemaValidation();
+		InputStream stream = ESAPIInvalidPolicyTest.class.getResourceAsStream("/esapi-antisamy-InvalidPolicy.xml");
+		try {
+			Policy.getInstance(stream);
+			fail("Invalid policy with schema validation ON should throw exception.");
+		} catch (PolicyException e) {
+			// This is expected, so do nothing. Any other kind of exception is a failed test case.
+		}
+	}
 
+	@Test
+	public void testSystemPropValidationOff() throws Exception {
 		System.setProperty(ANTISAMY_PROJECT_PROP_SCHEMA_VALIDATION, "false");
 		reloadSchemaValidation();
 		InputStream stream = ESAPIInvalidPolicyTest.class.getResourceAsStream("/esapi-antisamy-InvalidPolicy.xml");
@@ -47,21 +86,34 @@ public class ESAPIInvalidPolicyTest {
 	}
 
 	@Test
-	public void testSystemPropAsBais() throws Exception {
+	public void testSystemPropAsBaisValidationOn() throws Exception {
+		System.setProperty(ANTISAMY_PROJECT_PROP_SCHEMA_VALIDATION, "true");
+		reloadSchemaValidation();
+		InputStream stream = ESAPIInvalidPolicyTest.class.getResourceAsStream("/esapi-antisamy-InvalidPolicy.xml");
+		try {
+			Policy.getInstance(toByteArrayStream(stream));
+			fail("Invalid policy with schema validation ON should throw exception.");
+		} catch (PolicyException e) {
+			// This is expected, so do nothing. Any other kind of exception is a failed test case.
+		}
+	}
+
+	@Test
+	public void testSystemPropAsBaisValidationOff() throws Exception {
 		System.setProperty(ANTISAMY_PROJECT_PROP_SCHEMA_VALIDATION, "false");
 		reloadSchemaValidation();
 		InputStream stream = ESAPIInvalidPolicyTest.class.getResourceAsStream("/esapi-antisamy-InvalidPolicy.xml");
 		Policy.getInstance(toByteArrayStream(stream));
 	}
 
-	private void reloadSchemaValidation() throws Exception {
+	private static void reloadSchemaValidation() throws Exception {
 		// Emulates the static code block first called
 		Method method = Policy.class.getDeclaredMethod("loadValidateSchemaProperty");
 		method.setAccessible(true);
 		method.invoke(null);
 	}
 
-	private InputStream toByteArrayStream(InputStream in) throws Exception {
+	private static InputStream toByteArrayStream(InputStream in) throws Exception {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		int nRead;
 		byte[] data = new byte[1024];
@@ -72,6 +124,5 @@ public class ESAPIInvalidPolicyTest {
 		buffer.flush();
 		byte[] byteArray = buffer.toByteArray();
 		return new ByteArrayInputStream(byteArray);
-
 	}
 }

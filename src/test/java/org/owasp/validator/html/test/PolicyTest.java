@@ -28,7 +28,14 @@
 
 package org.owasp.validator.html.test;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
@@ -44,7 +51,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * This class tests the Policy functionality to show that we can successfully parse the policy file.
  */
-public class PolicyTest extends TestCase {
+public class PolicyTest {
 
     private Policy policy;
 
@@ -66,6 +73,12 @@ public class PolicyTest extends TestCase {
                allowedEmptyTagsSection + FOOTER;
     }
 
+    @Before
+    public void resetSystemProp() throws Exception {
+        Policy.setSchemaValidation(true);
+    }
+
+    @Test
     public void testGetAllowedEmptyTags() throws PolicyException {
         String allowedEmptyTagsSection = "<allowed-empty-tags>\n" +
                                          "    <literal-list>\n" +
@@ -83,6 +96,7 @@ public class PolicyTest extends TestCase {
         assertTrue(actualTags.matches("span"));
     }
 
+    @Test
     public void testGetAllowedEmptyTags_emptyList() throws PolicyException {
         String allowedEmptyTagsSection = "<allowed-empty-tags>\n" +
                                          "    <literal-list>\n" +
@@ -95,6 +109,7 @@ public class PolicyTest extends TestCase {
         assertEquals(0, policy.getAllowedEmptyTags().size());
     }
     
+    @Test
     public void testGetAllowedEmptyTags_emptySection() throws PolicyException {
         String allowedEmptyTagsSection = "<allowed-empty-tags>\n" + "</allowed-empty-tags>\n";
         String policyFile = assembleFile(allowedEmptyTagsSection);
@@ -104,6 +119,7 @@ public class PolicyTest extends TestCase {
         assertEquals(0, policy.getAllowedEmptyTags().size());
     }
 
+    @Test
     public void testGetAllowedEmptyTags_NoSection() throws PolicyException {
         String allowedEmptyTagsSection = "";
 
@@ -114,10 +130,10 @@ public class PolicyTest extends TestCase {
         assertTrue(policy.getAllowedEmptyTags().size() == Constants.defaultAllowedEmptyTags.size());
     }
     
+    @Test
     public void testInvalidPolicies() {
-
-        // Default is to now enforce schema validation on policy files. These tests verify
-        // various schema violations are detected and flagged.
+        // Default is to now enforce schema validation on policy files.
+        // These tests verify various schema violations are detected and flagged.
         String notSupportedTagsSection = "<notSupportedTag>\n" + "</notSupportedTag>\n";
         String policyFile = assembleFile(notSupportedTagsSection);
         try {
@@ -145,6 +161,7 @@ public class PolicyTest extends TestCase {
         }
     }
 
+    @Test
     public void testSchemaValidationToggleWithSource() {
         String notSupportedTagsSection = "<notSupportedTag>\n" + "</notSupportedTag>\n";
         String policyFile = assembleFile(notSupportedTagsSection);
@@ -180,6 +197,7 @@ public class PolicyTest extends TestCase {
         }
     }
 
+    @Test
     public void testSchemaValidationToggleWithUrl() {
         URL urlOfValidPolicy = getClass().getResource("/antisamy.xml");
         URL urlOfInvalidPolicy = getClass().getResource("/invalidPolicy.xml");
@@ -215,6 +233,7 @@ public class PolicyTest extends TestCase {
         }
     }
 
+    @Test
     public void testSchemaValidationToggleWithInclude() {
         // This policy will also include invalidPolicy.xml
         URL url = getClass().getResource("/emptyPolicyWithInclude.xml");
@@ -241,6 +260,7 @@ public class PolicyTest extends TestCase {
         }
     }
 
+    @Test
     public void testGithubIssue66() {
         // Concern is that LSEP characters are not being considered on .* pattern
         // Note: Change was done in Policy loading, so test is located here
@@ -264,4 +284,3 @@ public class PolicyTest extends TestCase {
         }
     }
 }
-

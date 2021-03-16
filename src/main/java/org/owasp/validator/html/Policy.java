@@ -362,11 +362,78 @@ public class Policy {
             @Override
             public InputSource call() throws IOException {
                 source.getByteStream().reset();
-                return  source;
+                return source;
             }
         });
     }
 
+// I added 4 validation ON test cases to ESAPIInvalidPolicyTests. 1 of these fail with the original implementation
+// and 2 fail in the NEW implementation.
+// They fail in that they DON'T throw an exception for invalid policy files.
+
+    // This is the original version of this method before Gerardo's changes:
+    protected static Element getTopLevelElement_Old(InputSource source, Callable<InputSource> getResetSource) throws PolicyException {
+        // Track whether an exception was ever thrown while processing policy file
+         Exception thrownException = null;
+         try {
+             return getDocumentElementFromSource(source, true);
+         } catch (SAXException e) {
+             thrownException = e;
+             if (!validateSchema) {
+                 try {
+                     source = getResetSource.call();
+                     Element theElement = getDocumentElementFromSource(source, false);
+                     // We warn when the policy has an invalid schema, but schema validation is disabled.
+                     logger.warn("Invalid AntiSamy policy file: " + e.getMessage());
+                     return theElement;
+                 } catch (Exception e2) {
+                     throw new PolicyException(e2);
+                 }
+             } else throw new PolicyException(e);
+         } catch (ParserConfigurationException | IOException e) {
+            thrownException = e;
+            throw new PolicyException(e);
+        } finally {
+            if (!validateSchema && (thrownException == null)) {
+                // We warn when the policy has a valid schema, but schema validation is disabled.
+                logger.warn("XML schema validation is disabled for a valid AntiSamy policy. Please reenable policy validation.");
+            }
+        }
+    }
+
+/* The above 'original' method above fails the current test cases as follows:
+[ERROR] Failures:
+[ERROR]   ESAPIInvalidPolicyTest.testSystemPropAsBaisValidationOn:95 Invalid policy with schema validation ON should throw exception.
+[ERROR] Errors:
+[ERROR]   ESAPIInvalidPolicyTest.testDirectConfigValidationOff:64 » Policy java.io.IOExc...
+[ERROR]   ESAPIInvalidPolicyTest.testSystemPropValidationOff:85 » Policy java.io.IOExcep...
+
+    The two errors occur because the source stream is closed, and can't
+    be reset(). Not sure why those two can't, and the other scenarios work. The method as modified by Gerardo
+    eliminates this problem, but has other errors (see below).
+
+    Also, the original version provided 'better' error messages when schema validation was disabled, like so:
+
+    Original: TESTING: A schema invalid WARNING should mention the invalid tag: <notSupportedTag>
+[main] WARN org.owasp.validator.html.Policy - Invalid AntiSamy policy file: cvc-complex-type.2.4.a: Invalid content 
+       was found starting with element 'notSupportedTag'. One of '{allowed-empty-tags}' is expected.
+
+    Output from new version: TESTING: A schema invalid WARNING should mention the invalid tag: <notSupportedTag>
+[main] WARN org.owasp.validator.html.Policy - AntiSamy policy file does not match schema, but validation is disabled: 
+cvc-elt.1.a: Cannot find the declaration of element 'anti-samy-rules'.
+
+ Notice that the error message always just states: Cannot find the declaration of element 'anti-samy-rules', rather 
+ than explaining what the actual problem is (e.g., Invalid content was found starting with element 'notSupportedTag')
+
+ TODO: We need to figure how to eliminate all the Test Failures AND Errors, while retaining the 'better' error
+   messages from the original implementation.
+
+ TO TEST: Just name the method you want to test getTopLevelElement(), and rename the other one to
+          getTopLevelElement_New/Old() as appropriate. This will allow you to tweak/fix the new or old
+          implementation to compare their behavior and try to figure out which one is the easiest to fix.
+*/
+
+    // New version of this method with Gerardo's changes (with a few fixes/improvements):
     protected static Element getTopLevelElement(InputSource source, Callable<InputSource> getResetSource) throws PolicyException {
         // Track whether an exception was ever thrown while processing policy file
         Exception thrownException = null;
@@ -377,13 +444,15 @@ public class Policy {
                 try {
                     schema.newValidator().validate(new DOMSource(element));
                 } catch (SAXException e) {
-                    logger.warn("Invalid AntiSamy policy file: "+ e.getMessage());
+                    thrownException = e;
+                    // We warn when the policy has an invalid schema, but schema validation is disabled.
+                    logger.warn("AntiSamy policy file does not match schema, but validation is disabled: "+ e.getMessage());
                 }
             }
             return element;
-            
         } catch ( SAXException | ParserConfigurationException | IOException e) {
             thrownException = e;
+            //TODO: DRW: Enable or remove this line - logger.warn("AntiSamy policy file is invalid: "+ e.getMessage());
             throw new PolicyException(e);
         } finally {
             if (!validateSchema && (thrownException == null)) {
@@ -392,6 +461,13 @@ public class Policy {
             }
         }
     }
+/* The new method above fails the current test cases as follows:
+[ERROR] Failures:
+[ERROR]   ESAPIInvalidPolicyTest.testSystemPropAsBaisValidationOn:95 Invalid policy with schema validation ON should throw exception.
+[ERROR]   ESAPIInvalidPolicyTest.testSystemPropValidationOn:74 Invalid policy with schema validation ON should throw exception.
+[INFO]
+[ERROR] Tests run: 84, Failures: 2, Errors: 0, Skipped: 0
+*/
 
     private static Element getDocumentElementFromSource(InputSource source, boolean schemaValidationEnabled)
             throws ParserConfigurationException, SAXException, IOException {
