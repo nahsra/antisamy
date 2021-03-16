@@ -50,7 +50,13 @@ we recognize that it might not be possible for developers to fix their AntiSamy 
 
 To encourage AntiSamy users to only use XSD compliant policies, AntiSamy will always log some type of warning when schema validation is disabled. It will either WARN that the policy is non-compliant so it can be fixed, or it will WARN that the policy is compliant, but schema validation is OFF, so validation should be turned back on (i.e., stop disabling it). We also added INFO level logging when AntiSamy schema's are loaded and validated.
 
-### Logging: The logging introduced in 1.6.0 accidentally used log4j, while declaring slf4 as the logging API. This was quickly fixed in 1.6.1 to use slf4j APIs only. AntiSamy now includes the slf4j-simple library for its logging, but AntiSamy users can import and use an alternate slf4j compatible logging library if they prefer. They can also then exclude slf4j-simple if they want to.
+### Logging: The logging introduced in 1.6.0 accidentally used log4j, while declaring slf4 as the logging API.
+
+This was quickly fixed in 1.6.1 to use slf4j APIs only. AntiSamy now includes the slf4j-simple library for its logging, but AntiSamy users can import and use an alternate slf4j compatible logging library if they prefer. They can also then exclude slf4j-simple if they want to.
+
+### Disabling schema validation is deprecated immediately, and will go away in AntiSamy 1.7+
+
+The ability to disable the new schema validation feature is intended to be temporary, to smooth the transition to properly valid AntiSamy policy files. We plan to drop this feature in the next major release. We estimate that this will be some time mid-late 2022, so not anytime soon. The idea is to give dev teams using AntiSamy directly, or through other libraries like ESAPI, plenty of time to get their policy files schema compliant before schema validation becomes required. 
 
 ### 3. Tailoring the policy file
 You may want to deploy AntiSamy in a default configuration, but it’s equally likely that a site may want to have strict, business-driven rules for what users can allow. The discussion that decides the tailoring should also consider attack surface - which grows in relative proportion to the policy file.

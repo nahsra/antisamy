@@ -153,7 +153,8 @@ public class Policy {
         if (validateProperty != null) {
             setSchemaValidation(Boolean.getBoolean(validateProperty));
             logger.warn("Setting AntiSamy policy schema validation to '" + getSchemaValidation() + "' because '"
-                    + VALIDATIONPROPERTY + "' system property set to: '" + validateProperty + "'");
+                    + VALIDATIONPROPERTY + "' system property set to: '" + validateProperty 
+                    + "'. Note: this feature is temporary and will go away in AntiSamy v1.7.0 (~mid/late 2022) when validation will become mandatory.");
         }
     }
 
@@ -189,7 +190,11 @@ public class Policy {
      * Is XSD schema validation across all policies enabled or not? It is enabled by default.
      *
      * @return True if schema validation enabled. False otherwise.
+     *
+     * @deprecated Temporary method to enable AntiSamy users to upgrade to 1.6.x while still using policy files that aren't 
+     * schema compliant. AntiSamy plans to make schema validation mandatory starting with v1.7.0 (~mid/late 2022).
      */
+    @Deprecated
     public static boolean getSchemaValidation() {
         return validateSchema;
     }
@@ -199,7 +204,11 @@ public class Policy {
      * policies. It is enabled by default.
      *
      * @param enable boolean value to specify if the schema validation should be performed. Use false to disable.
+     *
+     * @deprecated Temporary method to enable AntiSamy users to upgrade to 1.6.x while still using policy files that aren't 
+     * schema compliant. AntiSamy plans to make schema validation mandatory starting with v1.7.0 (~mid/late 2022).
      */
+    @Deprecated
     public static void setSchemaValidation(boolean enable) {
         validateSchema = enable;
     }
