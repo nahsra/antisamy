@@ -26,10 +26,13 @@ package org.owasp.validator.html;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -365,8 +368,8 @@ public class Policy {
     }
 
     private static Element getTopLevelElement(InputStream is) throws PolicyException {
-        final InputSource source = new InputSource(is);
-        source.getByteStream().mark(0);
+        final InputSource source = new InputSource(toByteArrayStream(is));
+
         return getTopLevelElement(source, new Callable<InputSource>() {
             @Override
             public InputSource call() throws IOException {
@@ -381,7 +384,7 @@ public class Policy {
 // They fail in that they DON'T throw an exception for invalid policy files.
 
     // This is the original version of this method before Gerardo's changes:
-    protected static Element getTopLevelElement_Old(InputSource source, Callable<InputSource> getResetSource) throws PolicyException {
+    protected static Element getTopLevelElement(InputSource source, Callable<InputSource> getResetSource) throws PolicyException {
         // Track whether an exception was ever thrown while processing policy file
          Exception thrownException = null;
          try {
@@ -413,15 +416,14 @@ public class Policy {
 /* The above 'original' method above fails the current test cases as follows:
 [ERROR] Failures:
 [ERROR]   ESAPIInvalidPolicyTest.testSystemPropAsBaisValidationOn:95 Invalid policy with schema validation ON should throw exception.
-[ERROR] Errors:
-[ERROR]   ESAPIInvalidPolicyTest.testDirectConfigValidationOff:64 » Policy java.io.IOExc...
-[ERROR]   ESAPIInvalidPolicyTest.testSystemPropValidationOff:85 » Policy java.io.IOExcep...
+[ERROR]   ESAPIInvalidPolicyTest.testSystemPropValidationOn:74 Invalid policy with schema validation ON should throw exception.
+[INFO]
+[ERROR] Tests run: 86, Failures: 2, Errors: 0, Skipped: 0
 
-    The two errors occur because the source stream is closed, and can't
-    be reset(). Not sure why those two can't, and the other scenarios work. The method as modified by Gerardo
-    eliminates this problem, but has other errors (see below).
+These failures are now identical to the NEW method below, but the original method retains the 'better' invalid
+schema warning info, as described below.
 
-    Also, the original version provided 'better' error messages when schema validation was disabled, like so:
+The original version provided 'better' error messages when schema validation was disabled, like so:
 
     Original: TESTING: A schema invalid WARNING should mention the invalid tag: <notSupportedTag>
 [main] WARN org.owasp.validator.html.Policy - Invalid AntiSamy policy file: cvc-complex-type.2.4.a: Invalid content 
@@ -434,7 +436,7 @@ cvc-elt.1.a: Cannot find the declaration of element 'anti-samy-rules'.
  Notice that the error message always just states: Cannot find the declaration of element 'anti-samy-rules', rather 
  than explaining what the actual problem is (e.g., Invalid content was found starting with element 'notSupportedTag')
 
- TODO: We need to figure how to eliminate all the Test Failures AND Errors, while retaining the 'better' error
+ TODO: We need to figure how to eliminate all the Test Failures, while retaining the 'better' error
    messages from the original implementation.
 
  TO TEST: Just name the method you want to test getTopLevelElement(), and rename the other one to
@@ -443,7 +445,7 @@ cvc-elt.1.a: Cannot find the declaration of element 'anti-samy-rules'.
 */
 
     // New version of this method with Gerardo's changes (with a few fixes/improvements):
-    protected static Element getTopLevelElement(InputSource source, Callable<InputSource> getResetSource) throws PolicyException {
+    protected static Element getTopLevelElement_New(InputSource source, Callable<InputSource> getResetSource) throws PolicyException {
         // Track whether an exception was ever thrown while processing policy file
         Exception thrownException = null;
         try {
@@ -475,8 +477,32 @@ cvc-elt.1.a: Cannot find the declaration of element 'anti-samy-rules'.
 [ERROR]   ESAPIInvalidPolicyTest.testSystemPropAsBaisValidationOn:95 Invalid policy with schema validation ON should throw exception.
 [ERROR]   ESAPIInvalidPolicyTest.testSystemPropValidationOn:74 Invalid policy with schema validation ON should throw exception.
 [INFO]
-[ERROR] Tests run: 84, Failures: 2, Errors: 0, Skipped: 0
+[ERROR] Tests run: 86, Failures: 2, Errors: 0, Skipped: 0
 */
+
+    /*
+     * This method takes an arbitrary input stream, copies its contents into a byte[], then returns it
+     * in a ByteArrayInputStream, closing the provided InputStream in the process. It's purpose is to
+     * ensure that the InputStream we are using can be reset to the beginning, as not all InputStream's properly
+     * allow this. We use this for AntiSamy XML policy files, which we never expect to get that large
+     * (e.g., a few Kb at most).
+     */
+    private static InputStream toByteArrayStream(InputStream in) throws PolicyException {
+        byte[] byteArray;
+        try (Reader reader = new InputStreamReader(in)) {
+            char[] charArray = new char[8 * 1024];
+            StringBuilder builder = new StringBuilder();
+            int numCharsRead;
+            while ((numCharsRead = reader.read(charArray, 0, charArray.length)) != -1) {
+                builder.append(charArray, 0, numCharsRead);
+            }
+            byteArray = builder.toString().getBytes();
+        } catch (IOException ioe) {
+            throw new PolicyException(ioe);
+        }
+
+        return new ByteArrayInputStream(byteArray);
+    }
 
     private static Element getDocumentElementFromSource(InputSource source, boolean schemaValidationEnabled)
             throws ParserConfigurationException, SAXException, IOException {
