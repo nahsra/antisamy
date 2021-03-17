@@ -149,8 +149,7 @@ public class ExternalCssScanner extends CssScanner {
 
 					try {
 						InputSource nextStyleSheet = new InputSource(
-							new InputStreamReader(new ByteArrayInputStream(stylesheet),
-									Charset.defaultCharset()));
+							new InputStreamReader(new ByteArrayInputStream(stylesheet), Charset.forName("UTF8")));
 						parser.parseStyleSheet(nextStyleSheet);
 
 					} catch (IOException ioe) {
