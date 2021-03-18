@@ -26,13 +26,17 @@ package org.owasp.validator.html;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -72,8 +76,45 @@ import org.xml.sax.SAXParseException;
 import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
 
 /**
- * Policy.java - This file holds the model for our policy engine.
+ * <p>Policy.java - This file holds the model for our policy engine.</p>
+ * 
+ * <p>## Schema validation behavior change starting with AntiSamy 1.6.0 ##</p>
+ * 
+ * <p>Prior to v1.6.0 AntiSamy was not actually enforcing it's defined XSD. Now, by default AntiSamy enforce the schema,
+ * and won't continue if the AntiSamy policy is invalid. However, we recognize that it might not be possible for
+ * developers to fix their AntiSamy policies right away if they are non-compliant, and yet still want to upgrade
+ * AntiSamy to pick up any security improvements, feature enhancements, and bug fixes. As such, we now provide two
+ * ways to (temporarily!) disable schema validation:</p>
  *
+ * <p>1) Set the Java System property: owasp.validator.validateschema to false. This can be done at the command line
+ * (e.g., -Dowasp.validator.validateschema=false) or via the Java System properties file. Neither requires a code
+ * change.</p>
+ * 
+ * <p>2) Change the code using AntiSamy to invoke: Policy.setSchemaValidation(false) before loading the AntiSamy policy.
+ * This is a static call so once disabled, it is disabled for all new Policy instances.</p>
+ * 
+ * <p>To encourage AntiSamy users to only use XSD compliant policies, AntiSamy will always log some type of warning
+ * when schema validation is disabled. It will either WARN that the policy is non-compliant so it can be fixed, or
+ * it will WARN that the policy is compliant, but schema validation is OFF, so validation should be turned back on
+ * (i.e., stop disabling it). We also added INFO level logging when AntiSamy schema's are loaded and validated.</p>
+ * 
+ * <p>## Disabling schema validation is <b>deprecated immediately</b>, and will go away in AntiSamy 1.7+ ##</p>
+ * 
+ * <p>The ability to disable the new schema validation feature is intended to be temporary, to smooth the transition to
+ * properly valid AntiSamy policy files. We plan to drop this feature in the next major release. We estimate that
+ * this will be some time mid-late 2022, so not any time soon. The idea is to give dev teams using AntiSamy directly,
+ * or through other libraries like ESAPI, plenty of time to get their policy files schema compliant before schema
+ * validation becomes required.</p>
+ * 
+ * <p>Logging: The logging introduced in 1.6+ uses slf4j. AntiSamy includes the slf4j-simple library for its logging,
+ * but AntiSamy users can import and use an alternate slf4j compatible logging library if they prefer. They can also
+ * then exclude slf4j-simple if they want to.</p>
+ * 
+ * <p><b>WARNING:</b>: AntiSamy's use of slf4j-simple, without any configuration file, logs messages in a buffered
+ * manner to standard output. As such, some or all of these log messages may get lost if an Exception, such as a
+ * PolicyException is thrown. This can likely be rectified by configuring slf4j-simple to log to standard error
+ * instead, or use an alternate slf4j logger that does so.</p>
+ * 
  * @author Arshan Dabirsiaghi
  */
 
@@ -132,12 +173,18 @@ public class Policy {
 	// Support the ability to change the default schema validation behavior by setting the
 	// System property "owasp.antisamy.validateschema".
     static {
+        loadValidateSchemaProperty();
+    }
+
+    // encapsulated to be simulated from test cases
+    private static void loadValidateSchemaProperty() {
         String validateProperty = System.getProperty(VALIDATIONPROPERTY);
         if (validateProperty != null) {
-            validateSchema = Boolean.getBoolean(validateProperty);
-            logger.warn("Setting AntiSamy policy schema validation to '" + validateSchema
-                + "' because '" + VALIDATIONPROPERTY + "' system property set to: '" + validateProperty + "'");
-        }
+            setSchemaValidation(Boolean.parseBoolean(validateProperty));
+            logger.warn("Setting AntiSamy policy schema validation to '" + getSchemaValidation() + "' because '"
+                    + VALIDATIONPROPERTY + "' system property set to: '" + validateProperty
+                    + "'. Note: this feature is temporary and will go away in AntiSamy v1.7.0 (~mid/late 2022) when validation will become mandatory.");
+        } else validateSchema = true; // default (or back to default if invoked multiple times during testing)
     }
 
     /**
@@ -183,7 +230,11 @@ public class Policy {
      * Is XSD schema validation across all policies enabled or not? It is enabled by default.
      *
      * @return True if schema validation enabled. False otherwise.
+     *
+     * @deprecated Temporary method to enable AntiSamy users to upgrade to 1.6.x while still using policy files that aren't 
+     * schema compliant. AntiSamy plans to make schema validation mandatory starting with v1.7.0 (~mid/late 2022).
      */
+    @Deprecated
     public static boolean getSchemaValidation() {
         return validateSchema;
     }
@@ -193,7 +244,11 @@ public class Policy {
      * policies. It is enabled by default.
      *
      * @param enable boolean value to specify if the schema validation should be performed. Use false to disable.
+     *
+     * @deprecated Temporary method to enable AntiSamy users to upgrade to 1.6.x while still using policy files that aren't 
+     * schema compliant. AntiSamy plans to make schema validation mandatory starting with v1.7.0 (~mid/late 2022).
      */
+    @Deprecated
     public static void setSchemaValidation(boolean enable) {
         validateSchema = enable;
     }
@@ -350,13 +405,13 @@ public class Policy {
     }
 
     private static Element getTopLevelElement(InputStream is) throws PolicyException {
-        final InputSource source = new InputSource(is);
-        source.getByteStream().mark(0);
+        final InputSource source = new InputSource(toByteArrayStream(is));
+
         return getTopLevelElement(source, new Callable<InputSource>() {
             @Override
             public InputSource call() throws IOException {
                 source.getByteStream().reset();
-                return  source;
+                return source;
             }
         });
     }
@@ -388,6 +443,30 @@ public class Policy {
                 logger.warn("XML schema validation is disabled for a valid AntiSamy policy. Please reenable policy validation.");
             }
         }
+    }
+
+    /*
+     * This method takes an arbitrary input stream, copies its contents into a byte[], then returns it
+     * in a ByteArrayInputStream, closing the provided InputStream in the process. It's purpose is to
+     * ensure that the InputStream we are using can be reset to the beginning, as not all InputStream's properly
+     * allow this. We use this for AntiSamy XML policy files, which we never expect to get that large
+     * (e.g., a few Kb at most).
+     */
+    private static InputStream toByteArrayStream(InputStream in) throws PolicyException {
+        byte[] byteArray;
+        try (Reader reader = new InputStreamReader(in, Charset.forName("UTF8"))) {
+            char[] charArray = new char[8 * 1024];
+            StringBuilder builder = new StringBuilder();
+            int numCharsRead;
+            while ((numCharsRead = reader.read(charArray, 0, charArray.length)) != -1) {
+                builder.append(charArray, 0, numCharsRead);
+            }
+            byteArray = builder.toString().getBytes(Charset.forName("UTF8"));
+        } catch (IOException ioe) {
+            throw new PolicyException(ioe);
+        }
+
+        return new ByteArrayInputStream(byteArray);
     }
 
     private static Element getDocumentElementFromSource(InputSource source, boolean schemaValidationEnabled)
