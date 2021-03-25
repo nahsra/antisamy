@@ -3,7 +3,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.2</version>
+    <version>1.6.3-SNAPSHOT</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -42,10 +42,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2021-18-03T18:02:00Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2021-26-03T18:02:00Z</project.build.outputTimestamp>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <version.slf4j>1.7.30</version.slf4j>
-        <version.spotbugs.maven>4.2.0</version.spotbugs.maven>
+        <version.spotbugs.maven>4.2.2</version.spotbugs.maven>
         <version.spotbugs>4.2.2</version.spotbugs>
     </properties>
 
@@ -239,6 +239,9 @@
                                     <ignoredScopes>test</ignoredScopes>
                                     <message>Dependencies shouldn't require Java 8+.</message>
                                 </enforceBytecodeVersion>
+                                <requireMavenVersion>
+                                    <version>3.2.5</version>
+                                </requireMavenVersion>
                             </rules>
                             <fail>true</fail>
                         </configuration>
@@ -331,6 +334,12 @@
                 <groupId>org.cyclonedx</groupId>
                 <artifactId>cyclonedx-maven-plugin</artifactId>
                 <version>2.3.0</version>
+                <executions>
+                  <execution>
+                    <phase>package</phase>
+                    <goals><goal>makeBom</goal></goals>
+                  </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
@@ -366,6 +375,16 @@
            <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-javadoc-plugin</artifactId>
+           </plugin>
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-pmd-plugin</artifactId>
+               <version>3.14.0</version>
+               <configuration>
+                   <targetJdk>1.7</targetJdk>
+                   <sourceEncoding>utf-8</sourceEncoding>
+                   <!-- excludeFromFailureFile>exclude-pmd.properties</excludeFromFailureFile -->
+               </configuration>
            </plugin>
            <plugin>
                <groupId>org.apache.maven.plugins</groupId>
