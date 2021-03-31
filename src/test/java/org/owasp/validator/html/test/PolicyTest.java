@@ -29,11 +29,13 @@
 package org.owasp.validator.html.test;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -325,4 +327,34 @@ public class PolicyTest {
 		method.invoke(null);
 	}
 
+    @Test
+    public void testGithubIssue79() {
+        URL policyUrl;
+
+        // Case 1: Loading policy from a URL beginning with "jar:file:"
+        try {
+            java.net.URLClassLoader child = new java.net.URLClassLoader(
+                    new URL[] {Thread.currentThread().getContextClassLoader().getResource("policy-in-external-library.jar")},
+                    this.getClass().getClassLoader()
+            );
+
+            policyUrl = Class.forName("org.owasp.antisamy.test.Dummy", true, child).getClassLoader().getResource("policyInsideJar.xml");
+            assertThat(policyUrl, notNullValue());
+
+            policy = Policy.getInstance(policyUrl);
+            assertThat(policy, notNullValue());
+        } catch (Exception e) {
+            fail("Policy nor scan should fail:" + e.getMessage());
+        }
+
+        // Case 2: Loading policy from a URL beginning with "jar:https:"
+        policyUrl = null;
+        try {
+            policyUrl = new URL("jar:https://somebadsite.com/foo.xml");
+            policy = Policy.getInstance(policyUrl);
+            fail("URL creation or policy loading should have failed");
+        } catch (Exception e) {
+        }
+        assertNull(policyUrl);
+    }
 }
