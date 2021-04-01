@@ -561,7 +561,7 @@ public class Policy {
         // system id, since we have a base URI.
         if (href != null && baseUrl != null) {
 
-            checkUrlProtocol(baseUrl);
+            verifyLocalUrl(baseUrl);
 
             URL url;
 
@@ -1004,7 +1004,7 @@ public class Policy {
         // system id, since we have a base URI.
         if (systemId != null && baseUrl != null) {
 
-            checkUrlProtocol(baseUrl);
+            verifyLocalUrl(baseUrl);
 
             URL url;
 
@@ -1031,10 +1031,21 @@ public class Policy {
         return null;
     }
 
-    private static void checkUrlProtocol(URL baseUrl) throws MalformedURLException {
-        if (!"file".equals(baseUrl.getProtocol()) && !"jar".equals(baseUrl.getProtocol())) {
-            throw new MalformedURLException(
-                    "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
+    /**
+     * Verify that the target of the URL is a local file only. Currently, we allow file: and jar: URLs.
+     * The target of the URL is typically an AntiSamy policy file.
+     * @param url The URL to verify.
+     * @throws MalformedURLException If the supplied URL does not reference a local file directly, or one inside
+     * a local JAR file.
+     */
+    private static void verifyLocalUrl(URL url) throws MalformedURLException {
+
+        switch (url.getProtocol()) {
+            case "file":
+            case "jar" : break; // These are OK.
+
+            default: throw new MalformedURLException(
+                "Only local files can be accessed with a policy URL. Illegal value supplied was: " + url);
         }
     }
 

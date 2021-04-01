@@ -167,33 +167,33 @@ public class PolicyTest {
 
     // Test various Policy schema validation static initializer settings:
 
-	@Test
-	public void testPolicyStaticInitializerTrue() throws Exception {
-		System.setProperty(Policy.VALIDATIONPROPERTY, "True");
-		reloadSchemaValidation();
-		assertTrue("AntiSamy XSD Validation should be enabled", Policy.getSchemaValidation());
-	}
+    @Test
+    public void testPolicyStaticInitializerTrue() throws Exception {
+        System.setProperty(Policy.VALIDATIONPROPERTY, "True");
+        reloadSchemaValidation();
+        assertTrue("AntiSamy XSD Validation should be enabled", Policy.getSchemaValidation());
+    }
 
-	@Test
-	public void testPolicyStaticInitializerFalse() throws Exception {
-		System.setProperty(Policy.VALIDATIONPROPERTY, "False");
-		reloadSchemaValidation();
-		assertFalse("AntiSamy XSD Validation should be disabled", Policy.getSchemaValidation());
-	}
+    @Test
+    public void testPolicyStaticInitializerFalse() throws Exception {
+        System.setProperty(Policy.VALIDATIONPROPERTY, "False");
+        reloadSchemaValidation();
+        assertFalse("AntiSamy XSD Validation should be disabled", Policy.getSchemaValidation());
+    }
 
-	@Test
-	public void testPolicyStaticInitializerBlank() throws Exception {
-		System.clearProperty(Policy.VALIDATIONPROPERTY);
-		reloadSchemaValidation();
-		assertTrue("AntiSamy XSD Validation should be enabled", Policy.getSchemaValidation());
-	}
+    @Test
+    public void testPolicyStaticInitializerBlank() throws Exception {
+        System.clearProperty(Policy.VALIDATIONPROPERTY);
+        reloadSchemaValidation();
+        assertTrue("AntiSamy XSD Validation should be enabled", Policy.getSchemaValidation());
+    }
 
-	@Test
-	public void testPolicyStaticInitializerJunk() throws Exception {
-		System.setProperty(Policy.VALIDATIONPROPERTY, "junk");
-		reloadSchemaValidation();
-		assertFalse("AntiSamy XSD Validation should be disabled", Policy.getSchemaValidation());
-	}
+    @Test
+    public void testPolicyStaticInitializerJunk() throws Exception {
+        System.setProperty(Policy.VALIDATIONPROPERTY, "junk");
+        reloadSchemaValidation();
+        assertFalse("AntiSamy XSD Validation should be disabled", Policy.getSchemaValidation());
+    }
 
 
     @Test
@@ -319,13 +319,13 @@ public class PolicyTest {
         }
     }
 
-	static void reloadSchemaValidation() throws Exception {
-		// Emulates the static code block used in Policy to set schema validation on/off if
-		// the Policy.VALIDATIONPROPERTY system property is set. If not set, it sets it to the default.
-		Method method = Policy.class.getDeclaredMethod("loadValidateSchemaProperty");
-		method.setAccessible(true);
-		method.invoke(null);
-	}
+    static void reloadSchemaValidation() throws Exception {
+        // Emulates the static code block used in Policy to set schema validation on/off if
+        // the Policy.VALIDATIONPROPERTY system property is set. If not set, it sets it to the default.
+        Method method = Policy.class.getDeclaredMethod("loadValidateSchemaProperty");
+        method.setAccessible(true);
+        method.invoke(null);
+    }
 
     @Test
     public void testGithubIssue79() {
