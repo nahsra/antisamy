@@ -561,10 +561,7 @@ public class Policy {
         // system id, since we have a base URI.
         if (href != null && baseUrl != null) {
 
-            if (!"file".equals(baseUrl.getProtocol())) {
-                throw new MalformedURLException(
-                    "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
-            }
+            checkUrlProtocol(baseUrl);
 
             URL url;
 
@@ -1007,10 +1004,7 @@ public class Policy {
         // system id, since we have a base URI.
         if (systemId != null && baseUrl != null) {
 
-            if (!"file".equals(baseUrl.getProtocol())) {
-                throw new MalformedURLException(
-                    "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
-            }
+            checkUrlProtocol(baseUrl);
 
             URL url;
 
@@ -1035,6 +1029,13 @@ public class Policy {
 
         // No resolving.
         return null;
+    }
+
+    private static void checkUrlProtocol(URL baseUrl) throws MalformedURLException {
+        if (!"file".equals(baseUrl.getProtocol()) && !"jar".equals(baseUrl.getProtocol())) {
+            throw new MalformedURLException(
+                    "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
+        }
     }
 
     private static Element getFirstChild(Element element, String tagName) {
