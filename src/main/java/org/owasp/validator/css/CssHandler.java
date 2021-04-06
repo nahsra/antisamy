@@ -498,6 +498,7 @@ public class CssHandler implements DocumentHandler {
 				styleSheet.append(validator.lexicalValueToString(value));
 				value = value.getNextLexicalUnit();
 			}
+			if (important) { styleSheet.append(" !important"); }
 			styleSheet.append(';');
 			if (!isInline) { styleSheet.append('\n'); }
 

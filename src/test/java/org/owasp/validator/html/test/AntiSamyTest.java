@@ -1479,5 +1479,16 @@ static final String test33 = "<html>\n"
             fail(exc.getMessage());
         }
     }
+
+    @Test
+    public void testGithubIssue81() throws ScanException, PolicyException {
+        // Concern is that "!important" is missing after processing CSS
+        assertThat(as.scan("<p style=\"color: red !important\">Some Text</p>", policy, AntiSamy.DOM).getCleanHTML(), containsString("!important"));
+        assertThat(as.scan("<p style=\"color: red !important\">Some Text</p>", policy, AntiSamy.SAX).getCleanHTML(), containsString("!important"));
+
+        // Just to check scan keeps working accordingly without "!important"
+        assertThat(as.scan("<p style=\"color: red\">Some Text</p>", policy, AntiSamy.DOM).getCleanHTML(), not(containsString("!important")));
+        assertThat(as.scan("<p style=\"color: red\">Some Text</p>", policy, AntiSamy.SAX).getCleanHTML(), not(containsString("!important")));
+    }
 }
 
