@@ -2,13 +2,12 @@ package org.owasp.validator.html;
 
 import org.owasp.validator.html.model.Tag;
 
-import java.net.URL;
 import java.util.Map;
 
 /**
  * Contains a bunch of optimized lookups over the regular Policy Class. For internal use only.
  *
- * Not part of any public api and may explode or self destruct at any given moment, preferably both.
+ * Not part of any public API and may explode or self-destruct at any given moment, preferably both.
  *
  * @author Kristian Rosenvold
  */
@@ -31,7 +30,7 @@ public class InternalPolicy extends Policy {
     private final boolean allowDynamicAttributes;
 
 
-    protected InternalPolicy(URL baseUrl, ParseContext parseContext) throws PolicyException {
+    protected InternalPolicy(ParseContext parseContext) throws PolicyException {
         super(parseContext);
         this.maxInputSize = determineMaxInputSize();
         this.isNofollowAnchors = isTrue(Policy.ANCHORS_NOFOLLOW);
@@ -41,8 +40,8 @@ public class InternalPolicy extends Policy {
         this.omitXmlDeclaration = isTrue(Policy.OMIT_XML_DECLARATION);
         this.omitDoctypeDeclaration = isTrue(Policy.OMIT_DOCTYPE_DECLARATION);
         this.entityEncodeIntlCharacters = isTrue(Policy.ENTITY_ENCODE_INTL_CHARS);
-        useXhtml = isTrue(Policy.USE_XHTML);
-        embedTag = getTagByLowercaseName("embed");
+        this.useXhtml = isTrue(Policy.USE_XHTML);
+        this.embedTag = getTagByLowercaseName("embed");
         this.onUnknownTag = getDirective("onUnknownTag");
         this.isEncodeUnknownTag = "encode".equals(onUnknownTag);
         this.preserveComments = isTrue(Policy.PRESERVE_COMMENTS);
@@ -61,8 +60,8 @@ public class InternalPolicy extends Policy {
         this.omitXmlDeclaration = isTrue(Policy.OMIT_XML_DECLARATION);
         this.omitDoctypeDeclaration = isTrue(Policy.OMIT_DOCTYPE_DECLARATION);
         this.entityEncodeIntlCharacters = isTrue(Policy.ENTITY_ENCODE_INTL_CHARS);
-        useXhtml = isTrue(Policy.USE_XHTML);
-        embedTag = getTagByLowercaseName("embed");
+        this.useXhtml = isTrue(Policy.USE_XHTML);
+        this.embedTag = getTagByLowercaseName("embed");
         this.onUnknownTag = getDirective("onUnknownTag");
         this.isEncodeUnknownTag = "encode".equals(onUnknownTag);
         this.preserveComments = isTrue(Policy.PRESERVE_COMMENTS);
@@ -127,7 +126,6 @@ public class InternalPolicy extends Policy {
         return "true".equals(getDirective(anchorsNofollow));
     }
 
-
     public String getOnUnknownTag() {
         return onUnknownTag;
     }
@@ -144,7 +142,7 @@ public class InternalPolicy extends Policy {
      * Returns the maximum input size. If this value is not specified by
      * the policy, the <code>DEFAULT_MAX_INPUT_SIZE</code> is used.
      *
-     * @return the maximium input size.
+     * @return the maximum input size.
      */
     public int determineMaxInputSize() {
         int maxInputSize = Policy.DEFAULT_MAX_INPUT_SIZE;

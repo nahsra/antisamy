@@ -254,7 +254,7 @@ public class Policy {
     }
 
     /**
-     * This retrieves a Policy based on a default location ("resources/antisamy.xml")
+     * Construct a Policy using the default policy file location ("resources/antisamy.xml").
      *
      * @return A populated Policy object based on the XML policy file located in the default location.
      * @throws PolicyException If the file is not found or there is a problem parsing the file.
@@ -264,7 +264,7 @@ public class Policy {
     }
 
     /**
-     * This retrieves a Policy based on the file name passed in
+     * Construct a Policy based on the file whose name is passed in.
      *
      * @param filename The path to the XML policy file.
      * @return A populated Policy object based on the XML policy file located in the location passed in.
@@ -276,9 +276,9 @@ public class Policy {
     }
 
     /**
-     * This retrieves a Policy based on the InputStream object passed in
+     * Construct a Policy from the InputStream object passed in.
      *
-     * @param inputStream An InputStream which contains thhe XML policy information.
+     * @param inputStream An InputStream which contains the XML policy information.
      * @return A populated Policy object based on the XML policy file pointed to by the inputStream parameter.
      * @throws PolicyException If there is a problem parsing the input stream.
      */
@@ -287,11 +287,11 @@ public class Policy {
         // If schema validation is disabled, we elevate this msg to the warn level to match the
         // level of the mandatory warning that will follow. We do the same below.
         if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
-        return new InternalPolicy(null, getSimpleParseContext(getTopLevelElement(inputStream)));
+        return new InternalPolicy(getSimpleParseContext(getTopLevelElement(inputStream)));
     }
 
     /**
-     * This retrieves a Policy based on the File object passed in
+     * Construct a Policy from the File object passed in.
      *
      * @param file A File object which contains the XML policy information.
      * @return A populated Policy object based on the XML policy file pointed to by the File parameter.
@@ -307,10 +307,17 @@ public class Policy {
     }
 
     /**
-     * This retrieves a Policy based on the URL object passed in.
+     * Construct a Policy from the target of the URL passed in.
      * <br><br>
      * NOTE: This is the only factory method that will work with &lt;include&gt; tags
      * in AntiSamy policy files.
+     * <br><br>
+     * For security reasons, the provided URL must point to a local file. Currently only 'file:' and 'jar:'
+     * URL prefixes are allowed. If you want to use a different URL format, and are confident that the URL
+     * points to a safe source, you can open the target of the URL with URL.openStream(), and use the
+     * getInstance(InputStream) constructor instead. For example, Spring has classpath: and Wildfly/Jboss
+     * supports vfs: for accessing local files. Just be aware that this alternate constructor doesn't support
+     * the use of &lt;include&gt; tags, per the NOTE above.
      *
      * @param url A URL object which contains the XML policy information.
      * @return A populated Policy object based on the XML policy file pointed to by the File parameter.
@@ -319,7 +326,7 @@ public class Policy {
     public static Policy getInstance(URL url) throws PolicyException {
         String logMsg = "Attempting to load AntiSamy policy from URL: " + url.toString();
         if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
-        return new InternalPolicy(url, getParseContext(getTopLevelElement(url), url));
+        return new InternalPolicy(getParseContext(getTopLevelElement(url), url));
     }
 
     protected Policy(ParseContext parseContext) throws PolicyException {
@@ -438,7 +445,7 @@ public class Policy {
             thrownException = e;
             throw new PolicyException(e);
         } finally {
-            if (!validateSchema && (thrownException == null)) {
+            if (!validateSchema && thrownException == null) {
                 // We warn when the policy has a valid schema, but schema validation is disabled.
                 logger.warn("XML schema validation is disabled for a valid AntiSamy policy. Please reenable policy validation.");
             }
@@ -542,7 +549,7 @@ public class Policy {
             thrownException = e;
             throw new PolicyException(e);
         } finally {
-            if (!validateSchema && (thrownException == null)) {
+            if (!validateSchema && thrownException == null) {
                 // We warn when the policy has a valid schema, but schema validation is disabled.
                 logger.warn("XML schema validation is disabled for a valid AntiSamy policy. Please reenable policy validation.");
             }
@@ -561,10 +568,7 @@ public class Policy {
         // system id, since we have a base URI.
         if (href != null && baseUrl != null) {
 
-            if (!"file".equals(baseUrl.getProtocol())) {
-                throw new MalformedURLException(
-                    "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
-            }
+            verifyLocalUrl(baseUrl);
 
             URL url;
 
@@ -1007,10 +1011,7 @@ public class Policy {
         // system id, since we have a base URI.
         if (systemId != null && baseUrl != null) {
 
-            if (!"file".equals(baseUrl.getProtocol())) {
-                throw new MalformedURLException(
-                    "Only local files can be accessed with the baseURL. Illegal value supplied was: " + baseUrl);
-            }
+            verifyLocalUrl(baseUrl);
 
             URL url;
 
@@ -1019,7 +1020,7 @@ public class Policy {
                 source = new InputSource(url.openStream());
                 source.setSystemId(systemId);
                 return source;
-            } catch (MalformedURLException | java.io.FileNotFoundException e) {
+            } catch (MalformedURLException | FileNotFoundException e) {
                 try {
                     String absURL = URIUtils.resolveAsString(systemId, baseUrl.toString());
                     url = new URL(absURL);
@@ -1035,6 +1036,24 @@ public class Policy {
 
         // No resolving.
         return null;
+    }
+
+    /**
+     * Verify that the target of the URL is a local file only. Currently, we allow file: and jar: URLs.
+     * The target of the URL is typically an AntiSamy policy file.
+     * @param url The URL to verify.
+     * @throws MalformedURLException If the supplied URL does not reference a local file directly, or one inside
+     * a local JAR file.
+     */
+    private static void verifyLocalUrl(URL url) throws MalformedURLException {
+
+        switch (url.getProtocol()) {
+            case "file":
+            case "jar" : break; // These are OK.
+
+            default: throw new MalformedURLException(
+                "Only local files can be accessed with a policy URL. Illegal value supplied was: " + url);
+        }
     }
 
     private static Element getFirstChild(Element element, String tagName) {

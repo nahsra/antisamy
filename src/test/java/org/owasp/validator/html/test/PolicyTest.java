@@ -29,11 +29,13 @@
 package org.owasp.validator.html.test;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -165,33 +167,33 @@ public class PolicyTest {
 
     // Test various Policy schema validation static initializer settings:
 
-	@Test
-	public void testPolicyStaticInitializerTrue() throws Exception {
-		System.setProperty(Policy.VALIDATIONPROPERTY, "True");
-		reloadSchemaValidation();
-		assertTrue("AntiSamy XSD Validation should be enabled", Policy.getSchemaValidation());
-	}
+    @Test
+    public void testPolicyStaticInitializerTrue() throws Exception {
+        System.setProperty(Policy.VALIDATIONPROPERTY, "True");
+        reloadSchemaValidation();
+        assertTrue("AntiSamy XSD Validation should be enabled", Policy.getSchemaValidation());
+    }
 
-	@Test
-	public void testPolicyStaticInitializerFalse() throws Exception {
-		System.setProperty(Policy.VALIDATIONPROPERTY, "False");
-		reloadSchemaValidation();
-		assertFalse("AntiSamy XSD Validation should be disabled", Policy.getSchemaValidation());
-	}
+    @Test
+    public void testPolicyStaticInitializerFalse() throws Exception {
+        System.setProperty(Policy.VALIDATIONPROPERTY, "False");
+        reloadSchemaValidation();
+        assertFalse("AntiSamy XSD Validation should be disabled", Policy.getSchemaValidation());
+    }
 
-	@Test
-	public void testPolicyStaticInitializerBlank() throws Exception {
-		System.clearProperty(Policy.VALIDATIONPROPERTY);
-		reloadSchemaValidation();
-		assertTrue("AntiSamy XSD Validation should be enabled", Policy.getSchemaValidation());
-	}
+    @Test
+    public void testPolicyStaticInitializerBlank() throws Exception {
+        System.clearProperty(Policy.VALIDATIONPROPERTY);
+        reloadSchemaValidation();
+        assertTrue("AntiSamy XSD Validation should be enabled", Policy.getSchemaValidation());
+    }
 
-	@Test
-	public void testPolicyStaticInitializerJunk() throws Exception {
-		System.setProperty(Policy.VALIDATIONPROPERTY, "junk");
-		reloadSchemaValidation();
-		assertFalse("AntiSamy XSD Validation should be disabled", Policy.getSchemaValidation());
-	}
+    @Test
+    public void testPolicyStaticInitializerJunk() throws Exception {
+        System.setProperty(Policy.VALIDATIONPROPERTY, "junk");
+        reloadSchemaValidation();
+        assertFalse("AntiSamy XSD Validation should be disabled", Policy.getSchemaValidation());
+    }
 
 
     @Test
@@ -317,12 +319,42 @@ public class PolicyTest {
         }
     }
 
-	static void reloadSchemaValidation() throws Exception {
-		// Emulates the static code block used in Policy to set schema validation on/off if
-		// the Policy.VALIDATIONPROPERTY system property is set. If not set, it sets it to the default.
-		Method method = Policy.class.getDeclaredMethod("loadValidateSchemaProperty");
-		method.setAccessible(true);
-		method.invoke(null);
-	}
+    static void reloadSchemaValidation() throws Exception {
+        // Emulates the static code block used in Policy to set schema validation on/off if
+        // the Policy.VALIDATIONPROPERTY system property is set. If not set, it sets it to the default.
+        Method method = Policy.class.getDeclaredMethod("loadValidateSchemaProperty");
+        method.setAccessible(true);
+        method.invoke(null);
+    }
 
+    @Test
+    public void testGithubIssue79() {
+        URL policyUrl;
+
+        // Case 1: Loading policy from a URL beginning with "jar:file:"
+        try {
+            java.net.URLClassLoader child = new java.net.URLClassLoader(
+                    new URL[] {Thread.currentThread().getContextClassLoader().getResource("policy-in-external-library.jar")},
+                    this.getClass().getClassLoader()
+            );
+
+            policyUrl = Class.forName("org.owasp.antisamy.test.Dummy", true, child).getClassLoader().getResource("policyInsideJar.xml");
+            assertThat(policyUrl, notNullValue());
+
+            policy = Policy.getInstance(policyUrl);
+            assertThat(policy, notNullValue());
+        } catch (Exception e) {
+            fail("Policy nor scan should fail:" + e.getMessage());
+        }
+
+        // Case 2: Loading policy from a URL beginning with "jar:https:"
+        policyUrl = null;
+        try {
+            policyUrl = new URL("jar:https://somebadsite.com/foo.xml");
+            policy = Policy.getInstance(policyUrl);
+            fail("URL creation or policy loading should have failed");
+        } catch (Exception e) {
+        }
+        assertNull(policyUrl);
+    }
 }

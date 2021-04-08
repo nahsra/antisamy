@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -58,7 +58,7 @@ import org.owasp.validator.html.util.HTMLEntityEncoder;
 @SuppressFBWarnings(value = "REDOS", justification="Tested the Regex against saferegex and safe-regex and not vulnerable")
 public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 
-    private static enum Ops {
+    private enum Ops {
         CSS, FILTER, REMOVE, TRUNCATE, KEEP, ENCODE
     }
 	private final Stack<Ops> operations = new Stack<Ops>();
@@ -97,7 +97,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     }
 
 	public void characters(XMLString text, Augmentations augs) throws XNIException {
-        //noinspection StatementWithEmptyBody
+
         Ops topOp = peekTop();
         //noinspection StatementWithEmptyBody
         if (topOp ==  Ops.REMOVE) {
@@ -319,14 +319,12 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
                             isValid = true;
                         }
 
-
                         if (!isValid) {
                             isValid = attribute.matchesAllowedExpression(value);
                             if (isValid) {
                                 validattributes.addAttribute(makeSimpleQname(name), "CDATA", value);
                             }
                         }
-
 
                         // if value or regexp matched, attribute is already
 						// copied, but what happens if not
