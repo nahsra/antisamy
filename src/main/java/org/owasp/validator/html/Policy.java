@@ -254,7 +254,7 @@ public class Policy {
     }
 
     /**
-     * This retrieves a Policy based on a default location ("resources/antisamy.xml")
+     * Construct a Policy using the default policy file location ("resources/antisamy.xml").
      *
      * @return A populated Policy object based on the XML policy file located in the default location.
      * @throws PolicyException If the file is not found or there is a problem parsing the file.
@@ -264,7 +264,7 @@ public class Policy {
     }
 
     /**
-     * This retrieves a Policy based on the file name passed in
+     * Construct a Policy based on the file whose name is passed in.
      *
      * @param filename The path to the XML policy file.
      * @return A populated Policy object based on the XML policy file located in the location passed in.
@@ -276,9 +276,9 @@ public class Policy {
     }
 
     /**
-     * This retrieves a Policy based on the InputStream object passed in
+     * Construct a Policy from the InputStream object passed in.
      *
-     * @param inputStream An InputStream which contains thhe XML policy information.
+     * @param inputStream An InputStream which contains the XML policy information.
      * @return A populated Policy object based on the XML policy file pointed to by the inputStream parameter.
      * @throws PolicyException If there is a problem parsing the input stream.
      */
@@ -291,7 +291,7 @@ public class Policy {
     }
 
     /**
-     * This retrieves a Policy based on the File object passed in
+     * Construct a Policy from the File object passed in.
      *
      * @param file A File object which contains the XML policy information.
      * @return A populated Policy object based on the XML policy file pointed to by the File parameter.
@@ -307,10 +307,17 @@ public class Policy {
     }
 
     /**
-     * This retrieves a Policy based on the URL object passed in.
+     * Construct a Policy from the target of the URL passed in.
      * <br><br>
      * NOTE: This is the only factory method that will work with &lt;include&gt; tags
      * in AntiSamy policy files.
+     * <br><br>
+     * For security reasons, the provided URL must point to a local file. Currently only 'file:' and 'jar:'
+     * URL prefixes are allowed. If you want to use a different URL format, and are confident that the URL
+     * points to a safe source, you can open the target of the URL with URL.openStream(), and use the
+     * getInstance(InputStream) constructor instead. For example, Spring has classpath: and Wildfly/Jboss
+     * supports vfs: for accessing local files. Just be aware that this alternate constructor doesn't support
+     * the use of &lt;include&gt; tags, per the NOTE above.
      *
      * @param url A URL object which contains the XML policy information.
      * @return A populated Policy object based on the XML policy file pointed to by the File parameter.
