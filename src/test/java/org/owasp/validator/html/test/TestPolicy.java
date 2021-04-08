@@ -42,8 +42,8 @@ import org.owasp.validator.html.model.Tag;
  */
 public class TestPolicy extends InternalPolicy {
 
-    protected TestPolicy(URL baseUrl, Policy.ParseContext parseContext) throws PolicyException {
-        super(baseUrl, parseContext);
+    protected TestPolicy(Policy.ParseContext parseContext) throws PolicyException {
+        super(parseContext);
     }
 
     protected TestPolicy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules) {
@@ -69,7 +69,7 @@ public class TestPolicy extends InternalPolicy {
     }
 
     public static TestPolicy getInstance(URL url) throws PolicyException {
-        return new TestPolicy(url, getParseContext(getTopLevelElement(url), url));
+        return new TestPolicy(getParseContext(getTopLevelElement(url), url));
     }
 
     public TestPolicy cloneWithDirective(String name, String value) {

@@ -287,7 +287,7 @@ public class Policy {
         // If schema validation is disabled, we elevate this msg to the warn level to match the
         // level of the mandatory warning that will follow. We do the same below.
         if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
-        return new InternalPolicy(null, getSimpleParseContext(getTopLevelElement(inputStream)));
+        return new InternalPolicy(getSimpleParseContext(getTopLevelElement(inputStream)));
     }
 
     /**
@@ -326,7 +326,7 @@ public class Policy {
     public static Policy getInstance(URL url) throws PolicyException {
         String logMsg = "Attempting to load AntiSamy policy from URL: " + url.toString();
         if (validateSchema) logger.info(logMsg); else logger.warn(logMsg);
-        return new InternalPolicy(url, getParseContext(getTopLevelElement(url), url));
+        return new InternalPolicy(getParseContext(getTopLevelElement(url), url));
     }
 
     protected Policy(ParseContext parseContext) throws PolicyException {
@@ -445,7 +445,7 @@ public class Policy {
             thrownException = e;
             throw new PolicyException(e);
         } finally {
-            if (!validateSchema && (thrownException == null)) {
+            if (!validateSchema && thrownException == null) {
                 // We warn when the policy has a valid schema, but schema validation is disabled.
                 logger.warn("XML schema validation is disabled for a valid AntiSamy policy. Please reenable policy validation.");
             }
@@ -549,7 +549,7 @@ public class Policy {
             thrownException = e;
             throw new PolicyException(e);
         } finally {
-            if (!validateSchema && (thrownException == null)) {
+            if (!validateSchema && thrownException == null) {
                 // We warn when the policy has a valid schema, but schema validation is disabled.
                 logger.warn("XML schema validation is disabled for a valid AntiSamy policy. Please reenable policy validation.");
             }
@@ -1020,7 +1020,7 @@ public class Policy {
                 source = new InputSource(url.openStream());
                 source.setSystemId(systemId);
                 return source;
-            } catch (MalformedURLException | java.io.FileNotFoundException e) {
+            } catch (MalformedURLException | FileNotFoundException e) {
                 try {
                     String absURL = URIUtils.resolveAsString(systemId, baseUrl.toString());
                     url = new URL(absURL);
