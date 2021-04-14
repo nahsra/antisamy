@@ -121,7 +121,7 @@ If you have found a bug, then create an issue in the AntiSamy repo: https://gith
 ### Find a Vulnerability?
 If you have found a vulnerability in AntiSamy, first search the issues list (see above) to see if it has already been reported. If it has not, then please contact Dave Wichers (dave.wichers at owasp.org) directly. Please do not report vulnerabilities via GitHub issues as we wish to keep our users secure while a patch is implemented and deployed. If you wish to be acknowledged for finding the vulnerability, then please follow this process.
 
-More detail is available in the file: [SECURITY.md](https://github.com/nahsra/antisamy/blob/master/SECURITY.md).
+More detail is available in the file: [SECURITY.md](https://github.com/nahsra/antisamy/blob/main/SECURITY.md).
 
 ## How to Build
 You can build and test from source pretty easily:
@@ -132,4 +132,4 @@ $ mvn package
 ```
 
 ## License
-Released under the [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) license as specified here: [LICENSE](https://github.com/nahsra/antisamy/blob/master/LICENSE). 
+Released under the [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) license as specified here: [LICENSE](https://github.com/nahsra/antisamy/blob/main/LICENSE).
