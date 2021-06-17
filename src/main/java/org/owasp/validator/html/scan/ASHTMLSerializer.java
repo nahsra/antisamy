@@ -4,6 +4,8 @@ import org.apache.xml.serialize.ElementState;
 import org.apache.xml.serialize.HTMLdtd;
 import org.apache.xml.serialize.OutputFormat;
 import org.owasp.validator.html.InternalPolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -11,6 +13,7 @@ import java.io.Writer;
 @SuppressWarnings("deprecation")
 public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
 
+	private static final Logger logger = LoggerFactory.getLogger(ASHTMLSerializer.class);
 	private boolean encodeAllPossibleEntities;
 
     public ASHTMLSerializer(Writer w, OutputFormat format, InternalPolicy policy) {
@@ -67,4 +70,14 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
 			_printer.flush();
 	}
 
+	@Override
+	protected String escapeURI(String uri) {
+    	String originalURI = uri;
+		try {
+			printEscaped(uri);
+		} catch (IOException e) {
+			logger.error("URI escaping failed for value: " + originalURI);
+		}
+		return "";
+	}
 }
