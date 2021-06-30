@@ -70,6 +70,12 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
 			_printer.flush();
 	}
 
+	/*
+		The override is to use printEscaped() which already escapes entity references
+		 and writes them in the final serialized string. As escapeURI() is called like
+		 "printer.printText(escapeURI(value))", if the URI is returned here it would
+		 be double-printed and that is why the return value is an empty string.
+	 */
 	@Override
 	protected String escapeURI(String uri) {
     	String originalURI = uri;
