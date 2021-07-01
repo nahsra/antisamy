@@ -3,7 +3,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.3</version>
+    <version>1.6.4</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -44,9 +44,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2021-08-04T01:37:00Z</project.build.outputTimestamp>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
-        <version.slf4j>1.7.30</version.slf4j>
-        <version.spotbugs.maven>4.2.2</version.spotbugs.maven>
-        <version.spotbugs>4.2.2</version.spotbugs>
+        <version.slf4j>1.7.31</version.slf4j>
+        <version.spotbugs.maven>4.2.3</version.spotbugs.maven>
+        <version.spotbugs>4.2.3</version.spotbugs>
     </properties>
 
     <profiles>
@@ -174,12 +174,12 @@
                <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-dependency-plugin</artifactId>
-                  <version>3.1.2</version>
+                  <version>3.2.0</version>
                </plugin>
                <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-javadoc-plugin</artifactId>
-                  <version>3.2.0</version>
+                  <version>3.3.0</version>
                   <configuration>
                      <!-- supports reproducibility of generated Javadocs -->
                      <notimestamp>true</notimestamp>
@@ -188,7 +188,7 @@
                <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-release-plugin</artifactId>
-                  <version>3.0.0-M1</version>
+                  <version>3.0.0-M4</version>
                </plugin>
             </plugins>
         </pluginManagement>
@@ -263,7 +263,7 @@
             <plugin> <!-- This plugin is disabled by default. Invoke the release profile (-Prelease) to enable it. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -333,7 +333,7 @@
             <plugin>
                 <groupId>org.cyclonedx</groupId>
                 <artifactId>cyclonedx-maven-plugin</artifactId>
-                <version>2.4.0</version>
+                <version>2.5.1</version>
                 <executions>
                   <execution>
                     <phase>package</phase>
