@@ -125,7 +125,7 @@ public class Policy {
     public static final Pattern ANYTHING_REGEXP = Pattern.compile(".*", Pattern.DOTALL);
 
     private static final String POLICY_SCHEMA_URI = "antisamy.xsd";
-    protected static final String DEFAULT_POLICY_URI = "resources/antisamy.xml";
+    protected static final String DEFAULT_POLICY_URI = "antisamy.xml";
     private static final String DEFAULT_ONINVALID = "removeAttribute";
 
     public static final int DEFAULT_MAX_INPUT_SIZE = 100000;
@@ -254,13 +254,13 @@ public class Policy {
     }
 
     /**
-     * Construct a Policy using the default policy file location ("resources/antisamy.xml").
+     * Construct a Policy using the default policy file location ("antisamy.xml").
      *
      * @return A populated Policy object based on the XML policy file located in the default location.
      * @throws PolicyException If the file is not found or there is a problem parsing the file.
      */
     public static Policy getInstance() throws PolicyException {
-        return getInstance(DEFAULT_POLICY_URI);
+        return getInstance(Policy.class.getClassLoader().getResource(DEFAULT_POLICY_URI));
     }
 
     /**

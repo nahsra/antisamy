@@ -51,7 +51,7 @@ public class TestPolicy extends InternalPolicy {
     }
 
     public static TestPolicy getInstance() throws PolicyException {
-        return getInstance(DEFAULT_POLICY_URI);
+        return getInstance(Policy.class.getClassLoader().getResource(DEFAULT_POLICY_URI));
     }
 
     public static TestPolicy getInstance(String filename) throws PolicyException {
