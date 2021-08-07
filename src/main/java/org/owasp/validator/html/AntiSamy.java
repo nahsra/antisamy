@@ -67,11 +67,6 @@ public class AntiSamy {
 	 * @throws PolicyException When there is a problem reading the policy file.
 	 */
 	public CleanResults scan(String taintedHTML) throws ScanException, PolicyException {
-
-		if (policy == null) {
-			throw new PolicyException("No policy loaded");
-		}
-
 		return this.scan(taintedHTML, this.policy, SAX);
 	}
 
@@ -88,9 +83,6 @@ public class AntiSamy {
 	 */
 	public CleanResults scan(String taintedHTML, int scanType) throws ScanException, PolicyException {
 
-		if (policy == null) {
-			throw new PolicyException("No policy loaded");
-		}
 		return this.scan(taintedHTML, this.policy, scanType);
 	}
 
@@ -106,7 +98,7 @@ public class AntiSamy {
 	 * @throws PolicyException When there is a problem reading the policy file.
 	 */
 	public CleanResults scan(String taintedHTML, Policy policy) throws ScanException, PolicyException {
-		return new AntiSamyDOMScanner(policy).scan(taintedHTML);
+		return this.scan(taintedHTML, policy, DOM);
 	}
 
 	/**
@@ -122,6 +114,9 @@ public class AntiSamy {
 	 * @throws PolicyException When there is a problem reading the policy file.
 	 */
 	public CleanResults scan(String taintedHTML, Policy policy, int scanType) throws ScanException, PolicyException {
+		if (policy == null) {
+			throw new PolicyException("No policy loaded");
+		}
 
 		if (scanType == DOM) {
 			return new AntiSamyDOMScanner(policy).scan(taintedHTML);

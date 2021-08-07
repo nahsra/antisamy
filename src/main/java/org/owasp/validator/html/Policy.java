@@ -329,7 +329,7 @@ public class Policy {
         return new InternalPolicy(getParseContext(getTopLevelElement(url), url));
     }
 
-    protected Policy(ParseContext parseContext) throws PolicyException {
+    protected Policy(ParseContext parseContext) {
         this.allowedEmptyTagsMatcher = new TagMatcher(parseContext.allowedEmptyTags);
         this.requiresClosingTagsMatcher = new TagMatcher(parseContext.requireClosingTags);
         this.commonRegularExpressions = Collections.unmodifiableMap(parseContext.commonRegularExpressions);
@@ -657,7 +657,7 @@ public class Policy {
      * @param allowedEmptyTags         The tags that can be empty
      */
     private static void parseAllowedEmptyTags(Element allowedEmptyTagsListNode,
-                                              List<String> allowedEmptyTags) throws PolicyException {
+                                              List<String> allowedEmptyTags) {
         if (allowedEmptyTagsListNode != null) {
             for (Element literalNode :
                     getGrandChildrenByTagName(allowedEmptyTagsListNode, "literal-list", "literal")) {
@@ -677,7 +677,7 @@ public class Policy {
      * @param requireClosingTags         The list of tags that require closing
      */
     private static void parseRequireClosingTags(Element requireClosingTagsListNode,
-                                                 List<String> requireClosingTags) throws PolicyException {
+                                                 List<String> requireClosingTags) {
         if (requireClosingTagsListNode != null) {
             for (Element literalNode :
                     getGrandChildrenByTagName(requireClosingTagsListNode, "literal-list", "literal")) {
