@@ -30,7 +30,7 @@ public class InternalPolicy extends Policy {
     private final boolean allowDynamicAttributes;
 
 
-    protected InternalPolicy(ParseContext parseContext) throws PolicyException {
+    protected InternalPolicy(ParseContext parseContext) {
         super(parseContext);
         this.maxInputSize = determineMaxInputSize();
         this.isNofollowAnchors = isTrue(Policy.ANCHORS_NOFOLLOW);
