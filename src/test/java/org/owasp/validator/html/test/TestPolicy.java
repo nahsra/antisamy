@@ -73,20 +73,20 @@ public class TestPolicy extends InternalPolicy {
     }
 
     public TestPolicy cloneWithDirective(String name, String value) {
-        Map<String, String> directives = new HashMap<String, String>(this.directives);
+        Map<String, String> directives = new HashMap<>(this.directives);
         directives.put(name, value);
         return new TestPolicy(this, Collections.unmodifiableMap(directives), tagRules);
     }
 
     public TestPolicy addTagRule(Tag tag) {
-        Map<String, Tag> newTagRules = new HashMap<String, Tag>(tagRules);
+        Map<String, Tag> newTagRules = new HashMap<>(tagRules);
         newTagRules.put(tag.getName().toLowerCase(), tag);
         return new TestPolicy(this, this.directives, newTagRules);
 
     }
 
     public TestPolicy mutateTag(Tag tag) {
-        Map<String, Tag> newRUles = new HashMap<String, Tag>(this.tagRules);
+        Map<String, Tag> newRUles = new HashMap<>(this.tagRules);
         newRUles.put( tag.getName().toLowerCase(), tag);
         return new TestPolicy(this, this.directives, newRUles);
     }

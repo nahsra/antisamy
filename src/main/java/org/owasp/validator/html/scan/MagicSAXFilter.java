@@ -61,8 +61,8 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     private enum Ops {
         CSS, FILTER, REMOVE, TRUNCATE, KEEP, ENCODE
     }
-	private final Stack<Ops> operations = new Stack<Ops>();
-	private final List<String> errorMessages = new ArrayList<String>();
+	private final Stack<Ops> operations = new Stack<>();
+	private final List<String> errorMessages = new ArrayList<>();
 	private StringBuffer cssContent = null;
 	private XMLAttributes cssAttributes = null;
 	private CssScanner cssScanner = null;

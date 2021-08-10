@@ -81,7 +81,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
             Pattern.compile("[\\u0000-\\u001F\\uD800-\\uDFFF\\uFFFE-\\uFFFF&&[^\\u0009\\u000A\\u000D]]");
     private static final Pattern conditionalDirectives = Pattern.compile("<?!?\\[\\s*(?:end)?if[^]]*\\]>?");
 
-    private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
+    private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<>();
 
     static class CachedItem {
         private final DOMFragmentParser parser;

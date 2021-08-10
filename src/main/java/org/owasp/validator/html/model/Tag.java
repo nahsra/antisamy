@@ -92,7 +92,7 @@ public class Tag {
 
         StringBuilder regExp = new StringBuilder("<" + ANY_NORMAL_WHITESPACES + name + OPEN_TAG_ATTRIBUTES);
 
-        List<Attribute> values = new ArrayList<Attribute>(allowedAttributes.values());
+        List<Attribute> values = new ArrayList<>(allowedAttributes.values());
         Collections.sort(values, new Comparator<Attribute>() {
             public int compare(Attribute o1, Attribute o2) {
                 return o1.getName().compareTo(o2.getName());

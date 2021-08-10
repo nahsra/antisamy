@@ -43,7 +43,7 @@ import org.w3c.dom.DocumentFragment;
 
 public class CleanResults {
 
-	private List<String> errorMessages = new ArrayList<String>();
+	private List<String> errorMessages = new ArrayList<>();
 	private Callable<String> cleanHTML;
 	private long startOfScan;
 	private long elapsedScan;

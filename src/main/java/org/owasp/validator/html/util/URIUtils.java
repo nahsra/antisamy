@@ -158,7 +158,7 @@ public class URIUtils {
 		//-- Note: using StringTokenizer and Stacks
 		//-- is not very efficient, this may need
 		//-- some optimizing
-		Stack<String> tokens = new Stack<String>();
+		Stack<String> tokens = new Stack<>();
 		StringTokenizer st = new StringTokenizer(absoluteURL, URL_PATH_SEP_STR, true);
 		String last = null;
 		while (st.hasMoreTokens()) {

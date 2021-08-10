@@ -53,7 +53,7 @@ public class Attribute  {
         this.name = name;
         this.allowedRegExps = allowedRegexps.toArray(new Pattern[ allowedRegexps.size()]);
         this.allowedValues = Collections.unmodifiableList( allowedValues);
-        Set<String> allowedValuesLower = new HashSet<String>();
+        Set<String> allowedValuesLower = new HashSet<>();
         for (String allowedValue : allowedValues) {
             allowedValuesLower.add( allowedValue.toLowerCase());
         }

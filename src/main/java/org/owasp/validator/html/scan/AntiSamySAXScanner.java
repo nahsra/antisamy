@@ -53,7 +53,7 @@ import org.xml.sax.SAXNotSupportedException;
 
 public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
     
-    private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
+    private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<>();
 
     private static final TransformerFactory sTransformerFactory = TransformerFactory.newInstance();
 
