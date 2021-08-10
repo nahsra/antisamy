@@ -117,7 +117,7 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
                 return trim(tainted, out.toString());
             }
         };
-        return new CleanResults(results.getStartOfScan(), cleanCallable, (DocumentFragment)null, results.getErrorMessages());
+        return new CleanResults(results.getStartOfScan(), cleanCallable, null, results.getErrorMessages());
     }
 
     /**
@@ -166,7 +166,7 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
             errorMessages.clear();
             errorMessages.addAll(cachedItem.magicSAXFilter.getErrorMessages());
             cachedItems.add( cachedItem);
-            return new CleanResults(startOfScan, (String)null, (DocumentFragment)null, errorMessages);
+            return new CleanResults(startOfScan, (String) null, null, errorMessages);
 
         } catch (Exception e) {
             throw new ScanException(e);

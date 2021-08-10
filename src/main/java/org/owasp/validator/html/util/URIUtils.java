@@ -185,7 +185,7 @@ public class URIUtils {
 			if (i > 0) {
 				buffer.append(HREF_PATH_SEP);
 			}
-			buffer.append(tokens.elementAt(i).toString());
+			buffer.append(tokens.elementAt(i));
 		}
 		return buffer.toString();
 	} //-- normalize
