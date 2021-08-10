@@ -18,7 +18,7 @@ public class TagTest {
 
     @Test
     public void testSimpleRegularExpression() throws Exception {
-        Map<String, Attribute> attrs = new HashMap<>();
+        Map<String, Attribute> attrs = new HashMap<String, Attribute>();
         attrs.put("a1", attribute1);
         Tag tag = new Tag("foo", attrs, "fud");
         assertEquals("<(\\s)*foo(\\s)*(foo(\\s)*=(\\s)*\"(v1|abc)\"(\\s)*)*(\\s)*>", tag.getRegularExpression());
@@ -27,7 +27,7 @@ public class TagTest {
 
     @Test
     public void testGetRegularExpression() throws Exception {
-        Map<String, Attribute> attrs = new HashMap<>();
+        Map<String, Attribute> attrs = new HashMap<String, Attribute>();
         attrs.put("a1", attribute1);
         attrs.put("a2", attribute2);
         Tag tag = new Tag("foo", attrs, "fud");

@@ -46,14 +46,13 @@ import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.util.ErrorMessageUtil;
-import org.w3c.dom.DocumentFragment;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
 public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
     
-    private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<>();
+    private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
 
     private static final TransformerFactory sTransformerFactory = TransformerFactory.newInstance();
 

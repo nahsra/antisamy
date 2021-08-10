@@ -43,7 +43,7 @@ import org.owasp.validator.html.util.ErrorMessageUtil;
 public abstract class AbstractAntiSamyScanner {
 
     protected final InternalPolicy policy;
-    protected final List<String> errorMessages = new ArrayList<>();
+    protected final List<String> errorMessages = new ArrayList<String>();
 
     protected static final ResourceBundle messages = getResourceBundle();
     protected final Locale locale = Locale.getDefault();

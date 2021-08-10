@@ -110,7 +110,7 @@ public class CssScanner {
     public CleanResults scanStyleSheet(String taintedCss, int sizeLimit) throws ScanException {
 
         long startOfScan = System.currentTimeMillis();
-        List<String> errorMessages = new ArrayList<>();
+        List<String> errorMessages = new ArrayList<String>();
 
         /* Check to see if the text starts with (\s)*<![CDATA[
          * and end with ]]>(\s)*.
@@ -125,7 +125,7 @@ public class CssScanner {
 
         // Create a queue of all style sheets that need to be validated to
         // account for any sheets that may be imported by the current CSS
-        LinkedList<URI> stylesheets = new LinkedList<>();
+        LinkedList<URI> stylesheets = new LinkedList<URI>();
 
         CssHandler handler = new CssHandler(policy, stylesheets, errorMessages, messages);
 
@@ -181,11 +181,11 @@ public class CssScanner {
 
         long startOfScan = System.currentTimeMillis();
 
-        List<String> errorMessages = new ArrayList<>();
+        List<String> errorMessages = new ArrayList<String>();
 
         // Create a queue of all style sheets that need to be validated to
         // account for any sheets that may be imported by the current CSS
-        LinkedList<URI> stylesheets = new LinkedList<>();
+        LinkedList<URI> stylesheets = new LinkedList<URI>();
 
         CssHandler handler = new CssHandler(policy, stylesheets, errorMessages, tagName, messages);
 

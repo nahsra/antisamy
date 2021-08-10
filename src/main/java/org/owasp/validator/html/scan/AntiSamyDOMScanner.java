@@ -81,7 +81,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
             Pattern.compile("[\\u0000-\\u001F\\uD800-\\uDFFF\\uFFFE-\\uFFFF&&[^\\u0009\\u000A\\u000D]]");
     private static final Pattern conditionalDirectives = Pattern.compile("<?!?\\[\\s*(?:end)?if[^]]*\\]>?");
 
-    private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<>();
+    private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
 
     static class CachedItem {
         private final DOMFragmentParser parser;
@@ -306,9 +306,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
     private boolean isMasqueradingParam(Tag tagRule, Tag embedTag, String tagNameLowerCase){
         if (tagRule == null && isValidateParamAsEmbed && "param".equals(tagNameLowerCase)) {
-            if (embedTag != null && embedTag.isAction( Policy.ACTION_VALIDATE)) {
-                return true;
-            }
+            return embedTag != null && embedTag.isAction(Policy.ACTION_VALIDATE);
         }
         return false;
     }

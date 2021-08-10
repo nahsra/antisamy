@@ -158,7 +158,7 @@ public class URIUtils {
 		//-- Note: using StringTokenizer and Stacks
 		//-- is not very efficient, this may need
 		//-- some optimizing
-		Stack<String> tokens = new Stack<>();
+		Stack<String> tokens = new Stack<String>();
 		StringTokenizer st = new StringTokenizer(absoluteURL, URL_PATH_SEP_STR, true);
 		String last = null;
 		while (st.hasMoreTokens()) {
@@ -201,19 +201,13 @@ public class URIUtils {
 		if (filename == null) {
 			return FILE_PROTOCOL_PREFIX;
 		}
-		int size = filename.length() + FILE_PROTOCOL_PREFIX.length();
-		StringBuffer sb = new StringBuffer(size);
+		StringBuffer sb = new StringBuffer(filename.length() + FILE_PROTOCOL_PREFIX.length());
 		sb.append(FILE_PROTOCOL_PREFIX);
-		char[] chars = filename.toCharArray();
-		for (int i = 0; i < chars.length; i++) {
-			char ch = chars[i];
-			switch (ch) {
-				case '\\':
-					sb.append(HREF_PATH_SEP);
-					break;
-				default:
-					sb.append(ch);
-					break;
+		for (char ch : filename.toCharArray()) {
+			if (ch == '\\') {
+				sb.append(HREF_PATH_SEP);
+			} else {
+				sb.append(ch);
 			}
 		}
 		return sb.toString();

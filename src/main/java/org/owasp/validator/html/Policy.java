@@ -199,16 +199,16 @@ public class Policy {
     }
 
     protected static class ParseContext {
-        Map<String, AntiSamyPattern> commonRegularExpressions = new HashMap<>();
-        Map<String, Attribute> commonAttributes = new HashMap<>();
-        Map<String, Tag> tagRules = new HashMap<>();
-        Map<String, Property> cssRules = new HashMap<>();
-        Map<String, String> directives = new HashMap<>();
-        Map<String, Attribute> globalAttributes = new HashMap<>();
-        Map<String, Attribute> dynamicAttributes = new HashMap<>();
+        Map<String, AntiSamyPattern> commonRegularExpressions = new HashMap<String, AntiSamyPattern>();
+        Map<String, Attribute> commonAttributes = new HashMap<String, Attribute>();
+        Map<String, Tag> tagRules = new HashMap<String, Tag>();
+        Map<String, Property> cssRules = new HashMap<String, Property>();
+        Map<String, String> directives = new HashMap<String, String>();
+        Map<String, Attribute> globalAttributes = new HashMap<String, Attribute>();
+        Map<String, Attribute> dynamicAttributes = new HashMap<String, Attribute>();
 
-        List<String> allowedEmptyTags = new ArrayList<>();
-        List<String> requireClosingTags = new ArrayList<>();
+        List<String> allowedEmptyTags = new ArrayList<String>();
+        List<String> requireClosingTags = new ArrayList<String>();
 
         public void resetParamsWhereLastConfigWins() {
             allowedEmptyTags.clear();
@@ -631,7 +631,7 @@ public class Policy {
      * @return A clone of the policy with the updated directive
      */
     public Policy cloneWithDirective(String name, String value) {
-        Map<String, String> directives = new HashMap<>(this.directives);
+        Map<String, String> directives = new HashMap<String, String>(this.directives);
         directives.put(name, value);
         return new InternalPolicy(this, Collections.unmodifiableMap(directives), tagRules);
     }
@@ -770,7 +770,7 @@ public class Policy {
     }
 
     private static List<String> getAllowedLiterals(Element ele) {
-        List<String> allowedValues = new ArrayList<>();
+        List<String> allowedValues = new ArrayList<String>();
         for (Element literalNode : getGrandChildrenByTagName(ele, "literal-list", "literal")) {
             String value = getAttributeValue(literalNode, "value");
 
@@ -784,7 +784,7 @@ public class Policy {
     }
 
     private static List<Pattern> getAllowedRegexps(Map<String, AntiSamyPattern> commonRegularExpressions1, Element ele) {
-        List<Pattern> allowedRegExp = new ArrayList<>();
+        List<Pattern> allowedRegExp = new ArrayList<Pattern>();
         for (Element regExpNode : getGrandChildrenByTagName(ele, "regexp-list", "regexp")) {
             String regExpName = getAttributeValue(regExpNode, "name");
             String value = getAttributeValue(regExpNode, "value");
@@ -798,7 +798,7 @@ public class Policy {
 
     private static List<Pattern> getAllowedRegexps2(Map<String, AntiSamyPattern> commonRegularExpressions1,
                                                     Element attributeNode, String tagName) throws PolicyException {
-        List<Pattern> allowedRegexps = new ArrayList<>();
+        List<Pattern> allowedRegexps = new ArrayList<Pattern>();
         for (Element regExpNode : getGrandChildrenByTagName(attributeNode, "regexp-list", "regexp")) {
             String regExpName = getAttributeValue(regExpNode, "name");
             String value = getAttributeValue(regExpNode, "value");
@@ -827,7 +827,7 @@ public class Policy {
     private static List<Pattern> getAllowedRegexp3(Map<String, AntiSamyPattern> commonRegularExpressions1,
             Element ele, String name) throws PolicyException {
 
-        List<Pattern> allowedRegExp = new ArrayList<>();
+        List<Pattern> allowedRegExp = new ArrayList<Pattern>();
         for (Element regExpNode : getGrandChildrenByTagName(ele, "regexp-list", "regexp")) {
             String regExpName = getAttributeValue(regExpNode, "name");
             String value = getAttributeValue(regExpNode, "value");
@@ -865,7 +865,7 @@ public class Policy {
     private static Map<String, Attribute> getTagAttributes(Map<String, Attribute> commonAttributes1, Map<String,
        AntiSamyPattern> commonRegularExpressions1, NodeList attributeList, String tagName) throws PolicyException {
 
-        Map<String,Attribute> tagAttributes = new HashMap<>();
+        Map<String,Attribute> tagAttributes = new HashMap<String, Attribute>();
         for (int j = 0; j < attributeList.getLength(); j++) {
             Element attributeNode = (Element) attributeList.item(j);
 
@@ -912,12 +912,12 @@ public class Policy {
 
             List<Pattern> allowedRegexp3 = getAllowedRegexp3(commonRegularExpressions1, ele, name);
 
-            List<String> allowedValue = new ArrayList<>();
+            List<String> allowedValue = new ArrayList<String>();
             for (Element literalNode : getGrandChildrenByTagName(ele, "literal-list", "literal")) {
                 allowedValue.add(getAttributeValue(literalNode, "value"));
             }
 
-            List<String> shortHandRefs = new ArrayList<>();
+            List<String> shortHandRefs = new ArrayList<String>();
             for (Element shorthandNode : getGrandChildrenByTagName(ele, "shorthand-list", "shorthand")) {
                 shortHandRefs.add(getAttributeValue(shorthandNode, "name"));
             }

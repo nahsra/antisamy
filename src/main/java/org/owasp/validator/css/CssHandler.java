@@ -174,7 +174,7 @@ public class CssHandler implements DocumentHandler {
 	 * @return the error messages generated during parsing
 	 */
 	public Collection<String> getErrorMessages() {
-		return new ArrayList<>(errorMessages);
+		return new ArrayList<String>(errorMessages);
 	}
 
 	/*

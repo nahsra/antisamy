@@ -32,7 +32,7 @@ import java.util.Set;
  * @author Kristian Rosenvold
  */
 public class TagMatcher {
-    private final Set<String> allowedLowercase = new HashSet<>();
+    private final Set<String> allowedLowercase = new HashSet<String>();
 
     public TagMatcher(Iterable<String> allowedValues) {
         for (String item : allowedValues) {
