@@ -1502,5 +1502,12 @@ static final String test33 = "<html>\n"
         assertThat(as.scan("<p><a href=\"javascript&#00058x=1,%61%6c%65%72%74%28%22%62%6f%6f%6d%22%29\">xss</a></p>", revised, AntiSamy.SAX).getCleanHTML(),
                 containsString("javascript&amp;#00058"));
     }
+
+    @Test
+    public void testGithubIssue99() throws ScanException, PolicyException {
+        // Test that the IANA subtags is not lost
+        assertThat(as.scan("<p lang=\"en-GB\">This paragraph is defined as British English.</p>", policy, AntiSamy.DOM).getCleanHTML(), containsString("lang=\"en-GB\""));
+        assertThat(as.scan("<p lang=\"en-GB\">This paragraph is defined as British English.</p>", policy, AntiSamy.SAX).getCleanHTML(), containsString("lang=\"en-GB\""));
+    }
 }
 
