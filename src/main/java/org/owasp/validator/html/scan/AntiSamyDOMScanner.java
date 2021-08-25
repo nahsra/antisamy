@@ -556,7 +556,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                             promoteChildren(ele);
                             addError(ErrorMessageUtil.ERROR_ATTRIBUTE_CAUSE_FILTER,
                               new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
-
+                            return true;
                         } else if ("encodeTag".equals(onInvalidAction)) {
 
                             /*
@@ -567,7 +567,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                             encodeAndPromoteChildren(ele);
                             addError(ErrorMessageUtil.ERROR_ATTRIBUTE_CAUSE_ENCODE,
                               new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
-
+                            return true;
                         } else {
 
                             /*
@@ -578,11 +578,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                             currentAttributeIndex--;
                             addError(ErrorMessageUtil.ERROR_ATTRIBUTE_INVALID,
                               new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
-
-                            if ("removeTag".equals(onInvalidAction) || "filterTag".equals(onInvalidAction)) {
-                                return true;
-                                // remove/filter the tag
-                            }
+                            
                         }
                     }
 
