@@ -1509,5 +1509,23 @@ static final String test33 = "<html>\n"
         assertThat(as.scan("<p lang=\"en-GB\">This paragraph is defined as British English.</p>", policy, AntiSamy.DOM).getCleanHTML(), containsString("lang=\"en-GB\""));
         assertThat(as.scan("<p lang=\"en-GB\">This paragraph is defined as British English.</p>", policy, AntiSamy.SAX).getCleanHTML(), containsString("lang=\"en-GB\""));
     }
+
+    @Test
+    public void testGithubIssue101() throws ScanException, PolicyException {
+        // Test that margin attribute is not removed when value has too much significant figures.
+        // Current behavior is that decimals like 0.0001 are internally translated to 1.0E-4, this
+        // is reflected on regex validation and actual output. The inconsistency is due to Batik CSS.
+        assertThat(as.scan("<p style=\"margin: 0.0001pt;\">Some text.</p>", policy, AntiSamy.DOM).getCleanHTML(), containsString("margin"));
+        assertThat(as.scan("<p style=\"margin: 0.0001pt;\">Some text.</p>", policy, AntiSamy.SAX).getCleanHTML(), containsString("margin"));
+        assertThat(as.scan("<p style=\"margin: 10000000pt;\">Some text.</p>", policy, AntiSamy.DOM).getCleanHTML(), containsString("margin"));
+        assertThat(as.scan("<p style=\"margin: 10000000pt;\">Some text.</p>", policy, AntiSamy.SAX).getCleanHTML(), containsString("margin"));
+        assertThat(as.scan("<p style=\"margin: 1.0E-4pt;\">Some text.</p>", policy, AntiSamy.DOM).getCleanHTML(), containsString("margin"));
+        assertThat(as.scan("<p style=\"margin: 1.0E-4pt;\">Some text.</p>", policy, AntiSamy.SAX).getCleanHTML(), containsString("margin"));
+        // When using exponential directly the "e" or "E" is internally considered as the start of
+        // the dimension/unit type. This creates inconsistencies that make the regex validation fail,
+        // also in cases like 1e4pt where "e" is considered as dimension instead of "pt".
+        assertThat(as.scan("<p style=\"margin: 1.0E+4pt;\">Some text.</p>", policy, AntiSamy.DOM).getCleanHTML(), not(containsString("margin")));
+        assertThat(as.scan("<p style=\"margin: 1.0E+4pt;\">Some text.</p>", policy, AntiSamy.SAX).getCleanHTML(), not(containsString("margin")));
+    }
 }
 

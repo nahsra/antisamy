@@ -102,8 +102,8 @@ http://www.w3.org/TR/html401/struct/global.html
 		<regexp name="angle" value="(-|\+)?([0-9]+(\.[0-9]+)?)(deg|grads|rad)"/>
 		<regexp name="time" value="([0-9]+(\.[0-9]+)?)(ms|s)"/>
 		<regexp name="frequency" value="([0-9]+(\.[0-9]+)?)(hz|khz)"/>
-		<regexp name="length" value="((-|\+)?0|(-|\+)?([0-9]+(\.[0-9]+)?)(em|ex|px|in|cm|mm|pt|pc))"/>
-		<regexp name="positiveLength" value="((\+)?0|(\+)?([0-9]+(\.[0-9]+)?)(em|ex|px|in|cm|mm|pt|pc))"/>
+		<regexp name="length" value="((-|\+)?0|(-|\+)?([0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?)(em|ex|px|in|cm|mm|pt|pc))"/>
+		<regexp name="positiveLength" value="((\+)?0|(\+)?([0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?)(em|ex|px|in|cm|mm|pt|pc))"/>
 		<regexp name="percentage" value="(-|\+)?([0-9]+(\.[0-9]+)?)%"/>
 		<regexp name="positivePercentage" value="(\+)?([0-9]+(\.[0-9]+)?)%"/>
 
