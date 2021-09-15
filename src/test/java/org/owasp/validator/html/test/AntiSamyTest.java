@@ -1527,5 +1527,26 @@ static final String test33 = "<html>\n"
         assertThat(as.scan("<p style=\"margin: 1.0E+4pt;\">Some text.</p>", policy, AntiSamy.DOM).getCleanHTML(), not(containsString("margin")));
         assertThat(as.scan("<p style=\"margin: 1.0E+4pt;\">Some text.</p>", policy, AntiSamy.SAX).getCleanHTML(), not(containsString("margin")));
     }
+
+    @Test
+    public void testCSSUnits() throws ScanException, PolicyException {
+        String input = "<div style=\"width:50vw;height:50vh;padding:1rpc;\">\n" +
+                "\t<p style=\"font-size:1.5ex;padding-left:1rem;padding-top:16px;\">Some text.</p>\n" +
+                "</div>";
+        CleanResults cr = as.scan(input, policy, AntiSamy.DOM);
+        assertThat(cr.getCleanHTML(), containsString("ex"));
+        assertThat(cr.getCleanHTML(), containsString("px"));
+        assertThat(cr.getCleanHTML(), containsString("rem"));
+        assertThat(cr.getCleanHTML(), containsString("vw"));
+        assertThat(cr.getCleanHTML(), containsString("vh"));
+        assertThat(cr.getCleanHTML(), not(containsString("rpc")));
+        cr = as.scan(input, policy, AntiSamy.SAX);
+        assertThat(cr.getCleanHTML(), containsString("ex"));
+        assertThat(cr.getCleanHTML(), containsString("px"));
+        assertThat(cr.getCleanHTML(), containsString("rem"));
+        assertThat(cr.getCleanHTML(), containsString("vw"));
+        assertThat(cr.getCleanHTML(), containsString("vh"));
+        assertThat(cr.getCleanHTML(), not(containsString("rpc")));
+    }
 }
 
