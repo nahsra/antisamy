@@ -1211,8 +1211,15 @@ public class AntiSamyTest {
         CleanResults cr = as.scan(good, policy, AntiSamy.SAX);
         String s = cr.getCleanHTML();
         assertEquals(goodExpected, s);
+        cr = as.scan(good, policy, AntiSamy.DOM);
+        s = cr.getCleanHTML();
+        assertEquals(goodExpected, s);
+
         // test bad attribute "dat-"
         cr = as.scan(bad, policy, AntiSamy.SAX);
+        s = cr.getCleanHTML();
+        assertEquals(badExpected, s);
+        cr = as.scan(bad, policy, AntiSamy.DOM);
         s = cr.getCleanHTML();
         assertEquals(badExpected, s);
     }

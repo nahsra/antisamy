@@ -493,6 +493,10 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
              */
             if (attr == null) {
                 attr = policy.getGlobalAttributeByName(name);
+                if (attr == null && policy.isAllowDynamicAttributes()) {
+                    // not a global attribute, perhaps it is a dynamic attribute, if allowed
+                    attr = policy.getDynamicAttributeByName(name);
+                }
             }
 
             /*
