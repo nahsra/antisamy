@@ -1555,5 +1555,22 @@ static final String test33 = "<html>\n"
         assertThat(cr.getCleanHTML(), containsString("vh"));
         assertThat(cr.getCleanHTML(), not(containsString("rpc")));
     }
+
+    @Test
+    public void testGithubIssue108() throws ScanException, PolicyException {
+        // Test that imported style sheets can be parsed
+        final String input = "<html>\n" +
+                "\t<head>\n" +
+                "\t\t<style type='text/css'>\n" +
+                "\t\t\t@import url(https://owasp.org/www--site-theme/assets/css/styles.css);\n" +
+                "\t\t\th1 {font: 15pt \"Arial\"; color: blue;}\n" +
+                "\t\t</style>\n" +
+                "\t</head>\n" +
+                "\t<body><div><h1>Title</h1></div></body>\n" +
+                "</html>";
+        Policy revised = policy.cloneWithDirective(Policy.EMBED_STYLESHEETS,"true");
+        assertThat(as.scan(input, revised, AntiSamy.DOM).getCleanHTML(), not(containsString("<![CDATA[/* */]]>")));
+        assertThat(as.scan(input, revised, AntiSamy.SAX).getCleanHTML(), not(containsString("<![CDATA[/* */]]>")));
+    }
 }
 

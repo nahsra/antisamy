@@ -40,7 +40,6 @@ import org.apache.xerces.xni.XNIException;
 import org.apache.xerces.xni.parser.XMLDocumentFilter;
 import org.cyberneko.html.filters.DefaultFilter;
 import org.owasp.validator.css.CssScanner;
-import org.owasp.validator.css.ExternalCssScanner;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
@@ -75,7 +74,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     // From policy
     private boolean preserveComments;
     private int maxInputSize;
-    private boolean externalCssScanner;
+    private boolean shouldParseImportedStyles;
 
     public MagicSAXFilter(ResourceBundle messages) {
 		this.messages = messages;
@@ -87,7 +86,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
         isValidateParamAsEmbed = policy.isValidateParamAsEmbed();
         preserveComments = policy.isPreserveComments();
         maxInputSize = policy.getMaxInputSize();
-        externalCssScanner = policy.isEmbedStyleSheets();
+		shouldParseImportedStyles = policy.isEmbedStyleSheets();
         operations.clear();
         errorMessages.clear();
         cssContent = null;
@@ -212,7 +211,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 
 	private CssScanner makeCssScanner() {
 		if (cssScanner == null) {
-            cssScanner = externalCssScanner ? new ExternalCssScanner(policy, messages) : new CssScanner(policy, messages);
+            cssScanner = new CssScanner(policy, messages, shouldParseImportedStyles);
 		}
 		return cssScanner;
 	}
