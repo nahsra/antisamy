@@ -1557,7 +1557,7 @@ static final String test33 = "<html>\n"
     }
 
     @Test
-   public void testXSSInsideSelectOptionStyle() throws ScanException, PolicyException {
+    public void testXSSInsideSelectOptionStyle() throws ScanException, PolicyException {
         // Tests for CVE-2021-42575, XSS nested into <select>+<option>+<style>
 
         // Safe case, to test legit style
