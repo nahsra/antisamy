@@ -1567,5 +1567,22 @@ static final String test33 = "<html>\n"
         assertThat(as.scan("<select><option><style><script>alert(1)</script></style></option></select>", policy, AntiSamy.DOM).getCleanHTML(), not(containsString("<script>")));
         assertThat(as.scan("<select><option><style><script>alert(1)</script></style></option></select>", policy, AntiSamy.SAX).getCleanHTML(), not(containsString("<script>")));
     }
+
+    @Test
+    public void testGithubIssue108() throws ScanException, PolicyException {
+        // Test that imported style sheets can be parsed
+        final String input = "<html>\n" +
+                "\t<head>\n" +
+                "\t\t<style type='text/css'>\n" +
+                "\t\t\t@import url(https://owasp.org/www--site-theme/assets/css/styles.css);\n" +
+                "\t\t\th1 {font: 15pt \"Arial\"; color: blue;}\n" +
+                "\t\t</style>\n" +
+                "\t</head>\n" +
+                "\t<body><div><h1>Title</h1></div></body>\n" +
+                "</html>";
+        Policy revised = policy.cloneWithDirective(Policy.EMBED_STYLESHEETS,"true");
+        assertThat(as.scan(input, revised, AntiSamy.DOM).getCleanHTML(), not(containsString("<![CDATA[/* */]]>")));
+        assertThat(as.scan(input, revised, AntiSamy.SAX).getCleanHTML(), not(containsString("<![CDATA[/* */]]>")));
+    }
 }
 

@@ -29,7 +29,6 @@ import org.apache.batik.css.parser.ParseException;
 import org.apache.xerces.dom.DocumentImpl;
 import org.cyberneko.html.parsers.DOMFragmentParser;
 import org.owasp.validator.css.CssScanner;
-import org.owasp.validator.css.ExternalCssScanner;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
@@ -396,13 +395,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         /*
          * Invoke the css parser on this element.
          */
-        CssScanner styleScanner;
-
-        if (policy.isEmbedStyleSheets()) {
-            styleScanner = new ExternalCssScanner(policy, messages);
-        } else {
-            styleScanner = new CssScanner(policy, messages);
-        }
+        CssScanner styleScanner = new CssScanner(policy, messages, policy.isEmbedStyleSheets());
 
         try {
             Node firstChild = ele.getFirstChild();
@@ -508,7 +501,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                 /*
                  * Invoke the CSS parser on this element.
                  */
-                CssScanner styleScanner = new CssScanner(policy, messages);
+                CssScanner styleScanner = new CssScanner(policy, messages, false);
 
                 try {
                     CleanResults cr = styleScanner.scanInlineStyle(value, tagName, policy.getMaxInputSize());
