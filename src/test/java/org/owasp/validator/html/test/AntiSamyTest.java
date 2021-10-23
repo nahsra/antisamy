@@ -39,6 +39,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import org.hamcrest.text.MatchesPattern;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -1569,20 +1570,24 @@ static final String test33 = "<html>\n"
     }
 
     @Test
-    public void testGithubIssue108() throws ScanException, PolicyException {
-        // Test that imported style sheets can be parsed
-        final String input = "<html>\n" +
-                "\t<head>\n" +
-                "\t\t<style type='text/css'>\n" +
-                "\t\t\t@import url(https://owasp.org/www--site-theme/assets/css/styles.css);\n" +
-                "\t\t\th1 {font: 15pt \"Arial\"; color: blue;}\n" +
-                "\t\t</style>\n" +
-                "\t</head>\n" +
-                "\t<body><div><h1>Title</h1></div></body>\n" +
-                "</html>";
-        Policy revised = policy.cloneWithDirective(Policy.EMBED_STYLESHEETS,"true");
+    public void testImportedStylesParsing() throws ScanException, PolicyException {
+        // Test that imported style sheets can be parsed and order is correct
+        final String input = "<style type='text/css'>\n" +
+                "\t@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/classic.css);\n" +
+                "\t@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/providers.css);\n" +
+                "\t.very-specific-antisamy {font: 15pt \"Arial\"; color: blue;}\n" +
+                "</style>";
+        Policy revised = policy.cloneWithDirective(Policy.EMBED_STYLESHEETS,"true").cloneWithDirective(Policy.FORMAT_OUTPUT,"false");
+        // Styles are imported
         assertThat(as.scan(input, revised, AntiSamy.DOM).getCleanHTML(), not(containsString("<![CDATA[/* */]]>")));
         assertThat(as.scan(input, revised, AntiSamy.SAX).getCleanHTML(), not(containsString("<![CDATA[/* */]]>")));
+        // Order is correct:
+        //  First import: grid_1 class
+        //  Second import: janrain-provider150-sprit class
+        //  Original styles: very-specific-antisamy class
+        final Pattern p = Pattern.compile(".*?\\.grid_1.*?\\.janrain-provider150-sprit.*?\\.very-specific-antisamy.*?", Pattern.DOTALL);
+        assertThat(as.scan(input, revised, AntiSamy.DOM).getCleanHTML(), MatchesPattern.matchesPattern(p));
+        assertThat(as.scan(input, revised, AntiSamy.SAX).getCleanHTML(), MatchesPattern.matchesPattern(p));
     }
 }
 
