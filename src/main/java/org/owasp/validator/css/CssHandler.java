@@ -170,6 +170,13 @@ public class CssHandler implements DocumentHandler {
 	}
 
 	/**
+	 * Empties the stylesheet buffer.
+	 */
+	public void emptyStyleSheet() {
+		styleSheet.delete(0, styleSheet.length());
+	}
+
+	/**
 	 * Returns the error messages generated during parsing.
 	 * @return the error messages generated during parsing
 	 */

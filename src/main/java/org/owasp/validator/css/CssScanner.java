@@ -164,9 +164,7 @@ public class CssScanner {
 	        throw new ScanException(e);
         }
 
-        parseImportedStylesheets(stylesheets, errorMessages, sizeLimit);
-
-        String cleaned = handler.getCleanStylesheet();
+        String cleaned = getCleanStylesheetWithImports(sizeLimit, errorMessages, stylesheets, handler);
 
         if ( isCdata && !policy.isUseXhtml()) {
             cleaned = "<![CDATA[[" + cleaned + "]]>";
@@ -220,9 +218,21 @@ public class CssScanner {
             throw new ScanException(ioe);
         }
 
-        parseImportedStylesheets(stylesheets, errorMessages, sizeLimit);
+        String cleaned = getCleanStylesheetWithImports(sizeLimit, errorMessages, stylesheets, handler);
 
-        return new CleanResults(startOfScan, handler.getCleanStylesheet(), null, errorMessages);
+        return new CleanResults(startOfScan, cleaned, null, errorMessages);
+    }
+
+    private String getCleanStylesheetWithImports(int sizeLimit, List<String> errorMessages, LinkedList<URI> stylesheets,
+                                                 CssHandler handler) throws ScanException {
+        String cleaned = handler.getCleanStylesheet();
+        if (shouldParseImportedStyles) {
+            handler.emptyStyleSheet();
+            parseImportedStylesheets(stylesheets, errorMessages, sizeLimit);
+            // If there are styles to import they must be added to the beginning
+            cleaned = handler.getCleanStylesheet() + cleaned;
+        }
+        return cleaned;
     }
 
     /**
@@ -230,7 +240,6 @@ public class CssScanner {
      * URIs, this method parses through those stylesheets and validates them
      *
      * @param stylesheets the <code>LinkedList</code> of stylesheet URIs to parse
-     * @param handler the <code>CssHandler</code> to use for parsing
      * @param errorMessages the list of error messages to append to
      * @param sizeLimit the limit on the total size in bites of any imported stylesheets
      * @throws ScanException if an error occurs during scanning
@@ -240,7 +249,7 @@ public class CssScanner {
         // if stylesheets were imported by the inline style declaration,
         // continue parsing the nested styles. Note this only happens
         // if CSS importing was enabled in the policy file
-        if (shouldParseImportedStyles && !stylesheets.isEmpty()) {
+        if (!stylesheets.isEmpty()) {
             int importedStylesheets = 0;
 
             // Ensure that we have appropriate timeout values so we don't
