@@ -57,9 +57,13 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
     private static final TransformerFactory sTransformerFactory = TransformerFactory.newInstance();
 
     static {
-        // Disable external entities, etc.
-        sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        try {
+            // Disable external entities, etc.
+            sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        } catch (IllegalArgumentException e) {
+            // This exception will be thrown if the XML parser does not support JAXP 1.5 features
+        }
     }
 
     static class CachedItem {
