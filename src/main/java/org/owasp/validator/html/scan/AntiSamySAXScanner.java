@@ -46,20 +46,29 @@ import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.util.ErrorMessageUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
 public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
     
+    private static final Logger logger = LoggerFactory.getLogger(AntiSamySAXScanner.class);
     private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
-
     private static final TransformerFactory sTransformerFactory = TransformerFactory.newInstance();
 
     static {
-        // Disable external entities, etc.
-        sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        try {
+            // Disable external entities, etc.
+            sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        } catch (IllegalArgumentException e) {
+            // This exception will be thrown if the XML parser does not support JAXP 1.5 features
+            logger.warn("XML parser does not support JAXP 1.5 properties.");
+        }
     }
 
     static class CachedItem {
