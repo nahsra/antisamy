@@ -44,9 +44,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2021-08-04T01:37:00Z</project.build.outputTimestamp>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
-        <version.spotbugs>4.3.0</version.spotbugs>
         <version.slf4j>1.7.32</version.slf4j>
         <version.spotbugs.maven>4.5.2.0</version.spotbugs.maven>
+        <version.spotbugs>4.5.2</version.spotbugs>
     </properties>
 
     <profiles>
