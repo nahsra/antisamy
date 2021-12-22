@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+    - dependencies
+    ignore:
+    - dependency-name: xml-apis:xml-apis
+      versions:
+      - "> 1.4.01"
+    - dependency-name: commons-io:commons-io
+      versions:
+      - "> 2.6"
