@@ -81,6 +81,11 @@
                     <groupId>commons-codec</groupId>
                     <artifactId>commons-codec</artifactId>
                 </exclusion>
+                <!-- exclude obsolete commons-logging in favor of jcl-over-slf4j to ensure logs all pipe through slf4j-api -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
                 <exclusion>
                    <groupId>org.apache.httpcomponents</groupId>
                    <artifactId>httpcore</artifactId>
@@ -107,6 +112,11 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>${version.slf4j}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
             <version>${version.slf4j}</version>
         </dependency>
         <!-- without this import you get: SLF4J: Defaulting to no-operation (NOP) logger implementation -->
@@ -186,6 +196,7 @@
                   <version>3.2.0</version>
                     <configuration>
                         <usedDependencies>
+                            <dependency>org.slf4j:jcl-over-slf4j</dependency>
                             <dependency>org.slf4j:slf4j-simple</dependency>
                         </usedDependencies>
                     </configuration>
