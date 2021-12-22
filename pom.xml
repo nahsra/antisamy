@@ -44,6 +44,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2021-09-16T16:16:00Z</project.build.outputTimestamp>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
+        <version.io>2.6</version.io>
         <version.slf4j>1.7.32</version.slf4j>
         <version.spotbugs.maven>4.5.2.0</version.spotbugs.maven>
         <version.spotbugs>4.5.2</version.spotbugs>
@@ -102,12 +103,22 @@
             <artifactId>batik-css</artifactId>
             <version>1.14</version>
             <exclusions>
+                <!-- exclude this old version of commons-io as newer can be used -->
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
                 <!-- exclude this as batik-css has a dependency that uses an older commons-logging and we want to eliminate the convergence mismatch -->
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${version.io}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -196,6 +207,7 @@
                   <version>3.2.0</version>
                     <configuration>
                         <usedDependencies>
+                            <dependency>commons-io:commons-io</dependency>
                             <dependency>org.slf4j:jcl-over-slf4j</dependency>
                             <dependency>org.slf4j:slf4j-simple</dependency>
                         </usedDependencies>
