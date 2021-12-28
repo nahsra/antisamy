@@ -103,6 +103,10 @@ public class CssScanner {
      *                the policy to follow when scanning
      * @param messages
      *                the error message bundle to pull from
+     * @param shouldParseImportedStyes
+     *                 Flag to indicate if styles within @import directives should be imported and
+     *                 parsed in the resulting style sheet. This boolean determines if URLs should be
+     *                 recognized when parsing styles (i.e., to fetch them or ignore them).
      */
     public CssScanner(InternalPolicy policy, ResourceBundle messages, boolean shouldParseImportedStyles) {
     	this.policy = policy;
