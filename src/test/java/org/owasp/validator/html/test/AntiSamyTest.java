@@ -1579,15 +1579,26 @@ static final String test33 = "<html>\n"
                 "</style>";
         Policy revised = policy.cloneWithDirective(Policy.EMBED_STYLESHEETS,"true").cloneWithDirective(Policy.FORMAT_OUTPUT,"false");
         // Styles are imported
-        assertThat(as.scan(input, revised, AntiSamy.DOM).getCleanHTML(), not(containsString("<![CDATA[/* */]]>")));
-        assertThat(as.scan(input, revised, AntiSamy.SAX).getCleanHTML(), not(containsString("<![CDATA[/* */]]>")));
+        String cleanHtmlDOM = as.scan(input, revised, AntiSamy.DOM).getCleanHTML();
+        String cleanHtmlSAX = as.scan(input, revised, AntiSamy.SAX).getCleanHTML();
+        assertThat(cleanHtmlDOM, not(containsString("<![CDATA[/* */]]>")));
+        assertThat(cleanHtmlSAX, not(containsString("<![CDATA[/* */]]>")));
         // Order is correct:
         //  First import: grid_1 class
         //  Second import: janrain-provider150-sprit class
         //  Original styles: very-specific-antisamy class
         final Pattern p = Pattern.compile(".*?\\.grid_1.*?\\.janrain-provider150-sprit.*?\\.very-specific-antisamy.*?", Pattern.DOTALL);
-        assertThat(as.scan(input, revised, AntiSamy.DOM).getCleanHTML(), MatchesPattern.matchesPattern(p));
-        assertThat(as.scan(input, revised, AntiSamy.SAX).getCleanHTML(), MatchesPattern.matchesPattern(p));
+        assertThat(cleanHtmlDOM, MatchesPattern.matchesPattern(p));
+        assertThat(cleanHtmlSAX, MatchesPattern.matchesPattern(p));
+
+        Policy revised2 = policy.cloneWithDirective(Policy.EMBED_STYLESHEETS,"false").cloneWithDirective(Policy.FORMAT_OUTPUT,"false");
+        // Styles are not imported
+        cleanHtmlDOM = as.scan(input, revised2, AntiSamy.DOM).getCleanHTML();
+        cleanHtmlSAX = as.scan(input, revised2, AntiSamy.SAX).getCleanHTML();
+        assertThat(cleanHtmlDOM, not(containsString(".grid_1")));
+        assertThat(cleanHtmlSAX, not(containsString(".grid_1")));
+        assertThat(cleanHtmlDOM, not(containsString(".janrain-provider150-sprit")));
+        assertThat(cleanHtmlSAX, not(containsString(".janrain-provider150-sprit")));
     }
 }
 
