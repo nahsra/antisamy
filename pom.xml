@@ -325,7 +325,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.9.1</version>
+                <version>3.10.0</version>
             </plugin>
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
@@ -369,6 +369,24 @@
                   </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+               <!-- Necessary on pmd 3.15.0 only due to leak of old asm, remove this after next pmd plugin release.
+                    Delete this entire build plugin block in 3.16+ as maven-pmd-plugin is only needed in the reporting block.  -->
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-pmd-plugin</artifactId>
+               <version>3.15.0</version>
+               <dependencies>
+                   <!-- Without this, 3.15.0+ causes lots of warning like: [WARNING] Could not find class org.owasp.validator.html.util.ErrorMessageUtil,
+               due to: java.lang.IncompatibleClassChangeError: class net.sourceforge.pmd.lang.java.typeresolution.visitors.PMDASMVisitor
+               has interface org.objectweb.asm.ClassVisitor as super class.
+               However, these warnings don't adversely affect the PMD results, so we are keeping this upgrade. -->
+                   <dependency>
+                       <groupId>org.ow2.asm</groupId>
+                       <artifactId>asm</artifactId>
+                       <version>9.2</version>
+                   </dependency>
+               </dependencies>
+            </plugin>
         </plugins>
     </build>
     <reporting>
@@ -393,10 +411,6 @@
            <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-pmd-plugin</artifactId>
-               <!-- Upgrading to 3.15.0+ causes lots of warning like: [WARNING] Could not find class org.owasp.validator.html.util.ErrorMessageUtil,
-               due to: java.lang.IncompatibleClassChangeError: class net.sourceforge.pmd.lang.java.typeresolution.visitors.PMDASMVisitor
-               has interface org.objectweb.asm.ClassVisitor as super class.
-               However, these warnings don't adversely affect the PMD results, so we are keeping this upgrade. -->
                <version>3.15.0</version>
                <configuration>
                    <targetJdk>1.7</targetJdk>
