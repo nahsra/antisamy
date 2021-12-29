@@ -98,6 +98,18 @@ public class CssScanner {
 
     /**
      * Constructs a scanner based on the given policy.
+     *
+     * @param policy
+     *                the policy to follow when scanning
+     * @param messages
+     *                the error message bundle to pull from
+     */
+    public CssScanner(InternalPolicy policy, ResourceBundle messages) {
+        this(policy, messages, false);
+    }
+
+    /**
+     * Constructs a scanner based on the given policy.
      * 
      * @param policy
      *                the policy to follow when scanning
@@ -146,11 +158,7 @@ public class CssScanner {
             taintedCss = m.group(1);
         }
 
-        // Create a queue of all style sheets that need to be validated to
-        // account for any sheets that may be imported by the current CSS
-        LinkedList<URI> stylesheets = new LinkedList<URI>();
-
-        CssHandler handler = new CssHandler(policy, stylesheets, errorMessages, messages);
+        CssHandler handler = new CssHandler(policy, errorMessages, messages);
 
         // parse the stylesheet
         parser.setDocumentHandler(handler);
@@ -168,7 +176,7 @@ public class CssScanner {
 	        throw new ScanException(e);
         }
 
-        String cleaned = getCleanStylesheetWithImports(sizeLimit, errorMessages, stylesheets, handler);
+        String cleaned = getCleanStylesheetWithImports(sizeLimit, errorMessages, handler);
 
         if ( isCdata && !policy.isUseXhtml()) {
             cleaned = "<![CDATA[[" + cleaned + "]]>";
@@ -204,11 +212,7 @@ public class CssScanner {
 
         List<String> errorMessages = new ArrayList<String>();
 
-        // Create a queue of all style sheets that need to be validated to
-        // account for any sheets that may be imported by the current CSS
-        LinkedList<URI> stylesheets = new LinkedList<URI>();
-
-        CssHandler handler = new CssHandler(policy, stylesheets, errorMessages, tagName, messages);
+        CssHandler handler = new CssHandler(policy, errorMessages, tagName, messages);
 
         parser.setDocumentHandler(handler);
 
@@ -222,17 +226,17 @@ public class CssScanner {
             throw new ScanException(ioe);
         }
 
-        String cleaned = getCleanStylesheetWithImports(sizeLimit, errorMessages, stylesheets, handler);
+        String cleaned = getCleanStylesheetWithImports(sizeLimit, errorMessages, handler);
 
         return new CleanResults(startOfScan, cleaned, null, errorMessages);
     }
 
-    private String getCleanStylesheetWithImports(int sizeLimit, List<String> errorMessages, LinkedList<URI> stylesheets,
-                                                 CssHandler handler) throws ScanException {
+    private String getCleanStylesheetWithImports(int sizeLimit, List<String> errorMessages, CssHandler handler)
+            throws ScanException {
         String cleaned = handler.getCleanStylesheet();
         if (shouldParseImportedStyles) {
             handler.emptyStyleSheet();
-            parseImportedStylesheets(stylesheets, errorMessages, sizeLimit);
+            parseImportedStylesheets(handler.getImportedStylesheetsURIList(), errorMessages, sizeLimit);
             // If there are styles to import they must be added to the beginning
             cleaned = handler.getCleanStylesheet() + cleaned;
         }
