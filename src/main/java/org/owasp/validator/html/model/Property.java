@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -41,9 +41,9 @@ import java.util.regex.Pattern;
 public class Property {
 	private final String name;
 
-    private final List<String> allowedValues;
-
 	private final List<Pattern> allowedRegExp;
+
+    private final List<String> allowedValues;
 
 	private final List<String> shorthandRefs;
 

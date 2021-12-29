@@ -407,7 +407,8 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 	}
 
 	public List<String> getErrorMessages() {
-		return errorMessages;
+		// Return a copy of the errorMessages so caller can't change internal copy.
+		return new ArrayList<String>(errorMessages);
 	}
 
 }
