@@ -305,9 +305,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
     private boolean isMasqueradingParam(Tag tagRule, Tag embedTag, String tagNameLowerCase){
         if (tagRule == null && isValidateParamAsEmbed && "param".equals(tagNameLowerCase)) {
-            if (embedTag != null && embedTag.isAction( Policy.ACTION_VALIDATE)) {
-                return true;
-            }
+            return embedTag != null && embedTag.isAction(Policy.ACTION_VALIDATE);
         }
         return false;
     }
@@ -555,7 +553,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                             promoteChildren(ele);
                             addError(ErrorMessageUtil.ERROR_ATTRIBUTE_CAUSE_FILTER,
                               new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
-
+                            return true;
                         } else if ("encodeTag".equals(onInvalidAction)) {
 
                             /*
@@ -566,7 +564,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                             encodeAndPromoteChildren(ele);
                             addError(ErrorMessageUtil.ERROR_ATTRIBUTE_CAUSE_ENCODE,
                               new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
-
+                            return true;
                         } else {
 
                             /*
@@ -577,11 +575,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                             currentAttributeIndex--;
                             addError(ErrorMessageUtil.ERROR_ATTRIBUTE_INVALID,
                               new Object[]{tagName, HTMLEntityEncoder.htmlEntityEncode(name), HTMLEntityEncoder.htmlEntityEncode(value)});
-
-                            if ("removeTag".equals(onInvalidAction) || "filterTag".equals(onInvalidAction)) {
-                                return true;
-                                // remove/filter the tag
-                            }
+                            
                         }
                     }
 

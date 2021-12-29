@@ -46,7 +46,6 @@ import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.util.ErrorMessageUtil;
-import org.w3c.dom.DocumentFragment;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
@@ -117,7 +116,7 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
                 return trim(tainted, out.toString());
             }
         };
-        return new CleanResults(results.getStartOfScan(), cleanCallable, (DocumentFragment)null, results.getErrorMessages());
+        return new CleanResults(results.getStartOfScan(), cleanCallable, null, results.getErrorMessages());
     }
 
     /**
@@ -166,7 +165,7 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
             errorMessages.clear();
             errorMessages.addAll(cachedItem.magicSAXFilter.getErrorMessages());
             cachedItems.add( cachedItem);
-            return new CleanResults(startOfScan, (String)null, (DocumentFragment)null, errorMessages);
+            return new CleanResults(startOfScan, (String) null, null, errorMessages);
 
         } catch (Exception e) {
             throw new ScanException(e);

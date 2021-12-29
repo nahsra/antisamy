@@ -78,11 +78,10 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
 	 */
 	@Override
 	protected String escapeURI(String uri) {
-    	String originalURI = uri;
 		try {
 			printEscaped(uri);
 		} catch (IOException e) {
-			logger.error("URI escaping failed for value: " + originalURI);
+			logger.error("URI escaping failed for value: " + uri);
 		}
 		return "";
 	}
