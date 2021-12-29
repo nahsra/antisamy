@@ -23,8 +23,6 @@
  */
 package org.owasp.validator.html.scan;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import org.apache.batik.css.parser.ParseException;
 import org.apache.xerces.dom.DocumentImpl;
 import org.cyberneko.html.parsers.DOMFragmentParser;
@@ -69,7 +67,6 @@ import java.util.regex.Pattern;
  * 
  * @author Arshan Dabirsiaghi
  */
-@SuppressFBWarnings(value = "REDOS", justification="Tested the Regex against saferegex and safe-regex and not vulnerable")
 public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
     private Document document = new DocumentImpl();

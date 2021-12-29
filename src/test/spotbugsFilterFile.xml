@@ -50,5 +50,14 @@
     <Bug pattern="EI_EXPOSE_REP2" />
   </Match>
 
+  <!-- We tested the Regex used by these two classes against saferegex and safe-regex and the regex they use is not vulnerable. -->
+  <Match>
+    <Or>
+      <Class name="org.owasp.validator.html.scan.AntiSamyDOMScanner" />
+      <Class name="org.owasp.validator.html.scan.MagicSAXFilter" />
+    </Or>
+    <Bug pattern="REDOS" />
+  </Match>
+
 </FindBugsFilter>
 

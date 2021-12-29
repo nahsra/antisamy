@@ -24,8 +24,6 @@
 
 package org.owasp.validator.html.scan;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -54,7 +52,6 @@ import org.owasp.validator.html.util.HTMLEntityEncoder;
  * filter is SAX-based which means it is much more memory-efficient and also a
  * bit faster than the DOM-based implementation.
  */
-@SuppressFBWarnings(value = "REDOS", justification="Tested the Regex against saferegex and safe-regex and not vulnerable")
 public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 
     private enum Ops {

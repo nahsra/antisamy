@@ -42,7 +42,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2021-09-16T16:16:00Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2021-12-29T12:13:00Z</project.build.outputTimestamp>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <version.slf4j>1.7.32</version.slf4j>
         <version.spotbugs.maven>4.5.2.0</version.spotbugs.maven>
@@ -233,6 +233,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
+                <!-- Note that this plugin version and the specified dependency require Java 8-->
                 <version>3.0.0</version>
                 <dependencies>
                     <dependency>
