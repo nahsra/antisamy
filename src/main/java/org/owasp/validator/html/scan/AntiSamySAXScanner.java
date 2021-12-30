@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -46,20 +46,39 @@ import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.util.ErrorMessageUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
 public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
     
+    private static final Logger logger = LoggerFactory.getLogger(AntiSamySAXScanner.class);
     private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
 
-    private static final TransformerFactory sTransformerFactory = TransformerFactory.newInstance();
+    private static final TransformerFactory sTransformerFactory =
+        TransformerFactory.newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null );
 
     static {
-        // Disable external entities, etc.
-        sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        try {
+            // Disable external entities, etc.
+            sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        } catch (IllegalArgumentException e) {
+            // This exception can be thrown if the SAX parser does not support these JAXP 1.5 features. This
+            // actually could occur before when we let the TransformerFactory create whatever instance it
+            // decided to create (for example, if xalan:2.7.2 was on the classpath, which doesn't support
+            // these JAXP features).
+            // However, this should never happen anymore because we force the use of the internal
+            // JDK provided Xalan SAX parser, which DOES support these features. AND, even if a future
+            // version doesn't support them, we are only parsing internally produced AntiSamy policy files
+            // here, so there really is no risk anyway.
+            // But, if it does happen, we just ignore it, and log the error message if logging is configured.
+            logger.warn("XML parser does not support one or more of JAXP 1.5 properties.", e);
+        }
     }
 
     static class CachedItem {

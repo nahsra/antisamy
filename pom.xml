@@ -44,6 +44,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2021-12-29T12:13:00Z</project.build.outputTimestamp>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
+        <!--  The latest commons-io is 2.11.0, but requires Java 8 starting with 2.7 -->
         <version.io>2.6</version.io>
         <version.slf4j>1.7.32</version.slf4j>
         <version.spotbugs.maven>4.5.2.0</version.spotbugs.maven>
