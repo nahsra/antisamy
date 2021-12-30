@@ -279,7 +279,7 @@
                                     <message>Dependencies shouldn't require Java 8+.</message>
                                 </enforceBytecodeVersion>
                                 <requireMavenVersion>
-                                    <version>3.2.5</version>
+                                    <version>3.3.9</version>
                                 </requireMavenVersion>
                             </rules>
                             <fail>true</fail>
@@ -381,6 +381,39 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.7</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals><goal>prepare-agent</goal></goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals><goal>report</goal></goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-check</id>
+                        <phase>test</phase>
+                        <goals><goal>check</goal></goals>
+                        <configuration>
+                           <haltOnFailure>false</haltOnFailure>
+                           <rules><rule>
+                              <element>CLASS</element>
+                              <limits><limit>
+                                  <counter>METHOD</counter>
+                                  <value>MISSEDCOUNT</value>
+                                  <maximum>0</maximum>
+                              </limit></limits>
+                           </rule></rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>${version.spotbugs.maven}</version>
@@ -425,7 +458,19 @@
                    <reports>
                      <report>dependency-updates-report</report>
                      <report>plugin-updates-report</report>
+                     <report>property-updates-report</report>
                    </reports>
+                 </reportSet>
+               </reportSets>
+           </plugin>
+           <plugin>
+               <!-- This causes the Jacoco report generated during test to be added to the Project
+                    Reports section of the 'site' report. -->
+               <groupId>org.jacoco</groupId>
+               <artifactId>jacoco-maven-plugin</artifactId>
+               <reportSets>
+                 <reportSet>
+                   <reports><report>report</report></reports>
                  </reportSet>
                </reportSets>
            </plugin>
@@ -436,12 +481,16 @@
            <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-pmd-plugin</artifactId>
-               <version>3.15.0</version>
                <configuration>
                    <targetJdk>1.7</targetJdk>
                    <sourceEncoding>utf-8</sourceEncoding>
                    <!-- excludeFromFailureFile>exclude-pmd.properties</excludeFromFailureFile -->
                </configuration>
+           </plugin>
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-jxr-plugin</artifactId>
+               <version>3.1.1</version>
            </plugin>
            <plugin>
                <groupId>org.apache.maven.plugins</groupId>
