@@ -44,6 +44,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2021-12-29T12:13:00Z</project.build.outputTimestamp>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
+        <version.io>2.6</version.io>
         <version.slf4j>1.7.32</version.slf4j>
         <version.spotbugs.maven>4.5.2.0</version.spotbugs.maven>
         <version.spotbugs>4.5.2</version.spotbugs>
@@ -81,6 +82,11 @@
                     <groupId>commons-codec</groupId>
                     <artifactId>commons-codec</artifactId>
                 </exclusion>
+                <!-- exclude obsolete commons-logging in favor of jcl-over-slf4j to ensure logs all pipe through slf4j-api -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
                 <exclusion>
                    <groupId>org.apache.httpcomponents</groupId>
                    <artifactId>httpcore</artifactId>
@@ -97,6 +103,11 @@
             <artifactId>batik-css</artifactId>
             <version>1.14</version>
             <exclusions>
+                <!-- exclude this old version of commons-io as newer can be used -->
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
                 <!-- exclude this as batik-css has a dependency that uses an older commons-logging and we want to eliminate the convergence mismatch -->
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -105,8 +116,18 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${version.io}</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>${version.slf4j}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
             <version>${version.slf4j}</version>
         </dependency>
         <!-- without this import you get: SLF4J: Defaulting to no-operation (NOP) logger implementation -->
@@ -114,6 +135,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>${version.slf4j}</version>
+            <scope>test</scope>
         </dependency>
         <!-- While Java 7+ includes Xerces in the JRE, it apparently doesn't provide all the features we use
              that are in the 3rd party version. So we import it directly. -->
@@ -154,18 +176,18 @@
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-          <groupId>org.hamcrest</groupId>
-          <artifactId>hamcrest</artifactId>
-          <version>2.2</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.hamcrest</groupId>
-          <artifactId>hamcrest-core</artifactId>
-          <version>2.2</version>
-          <scope>test</scope>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -185,8 +207,9 @@
                   <version>3.2.0</version>
                     <configuration>
                         <usedDependencies>
+                            <dependency>commons-io:commons-io</dependency>
+                            <dependency>org.slf4j:jcl-over-slf4j</dependency>
                             <dependency>org.slf4j:slf4j-simple</dependency>
-                            <dependency>org.hamcrest:hamcrest-core</dependency>
                         </usedDependencies>
                     </configuration>
                </plugin>
@@ -454,4 +477,3 @@
         </plugins>
     </reporting>
 </project>
-

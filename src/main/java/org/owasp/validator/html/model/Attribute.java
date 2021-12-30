@@ -110,7 +110,7 @@ public class Attribute  {
             */
             Iterator<String> allowedValues = this.allowedValues.iterator();
             while (allowedValues.hasNext()) {
-                String allowedValue = (String) allowedValues.next();
+                String allowedValue = allowedValues.next();
 
                 regExp.append(Tag.escapeRegularExpressionCharacters(allowedValue));
 
@@ -122,9 +122,9 @@ public class Attribute  {
             /*
             * Add the regular expressions for this attribute value to the mother regular expression.
             */
-            Iterator<Pattern> allowedRegExps = Arrays.asList((Pattern[]) this.allowedRegExps).iterator();
+            Iterator<Pattern> allowedRegExps = Arrays.asList(this.allowedRegExps).iterator();
             while (allowedRegExps.hasNext()) {
-                Pattern allowedRegExp = (Pattern) allowedRegExps.next();
+                Pattern allowedRegExp = allowedRegExps.next();
                 regExp.append(allowedRegExp.pattern());
 
                 if (allowedRegExps.hasNext()) {

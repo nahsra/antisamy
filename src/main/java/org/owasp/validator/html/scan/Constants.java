@@ -54,13 +54,11 @@ public class Constants {
         attrs.put(paramNameAttr.getName().toLowerCase(), paramNameAttr);
         attrs.put(paramValueAttr.getName().toLowerCase(), paramValueAttr);
         BASIC_PARAM_TAG_RULE = new Tag("param", attrs, Policy.ACTION_VALIDATE);
-
-        List<String> allowedEmptyTagsList = new ArrayList<String>();
-        allowedEmptyTagsList.addAll(Arrays.asList(allowedEmptyTags));
+        
+        List<String> allowedEmptyTagsList = new ArrayList<String>(Arrays.asList(allowedEmptyTags));
         defaultAllowedEmptyTags = Collections.unmodifiableList(allowedEmptyTagsList);
 
-        List<String> requiresClosingTagsList = new ArrayList<String>();
-        requiresClosingTagsList.addAll(Arrays.asList(requiresClosingTags));
+        List<String> requiresClosingTagsList = new ArrayList<String>(Arrays.asList(requiresClosingTags));
         defaultRequireClosingTags = Collections.unmodifiableList(requiresClosingTagsList);
     }
     
