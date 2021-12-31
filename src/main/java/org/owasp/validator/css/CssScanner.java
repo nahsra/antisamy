@@ -94,10 +94,11 @@ public class CssScanner {
      */
     private final boolean shouldParseImportedStyles;
 
-    private static final Pattern p = Pattern.compile(CDATA, Pattern.DOTALL);
+    private static final Pattern cdataMatchPattern = Pattern.compile(CDATA, Pattern.DOTALL);
 
     /**
-     * Constructs a scanner based on the given policy.
+     * Constructs a scanner based on the given policy. This version of the constructor defaults
+     * shouldParseImportedStyles to false, look at the other constructor for a description of that parameter.
      *
      * @param policy
      *                the policy to follow when scanning
@@ -151,7 +152,7 @@ public class CssScanner {
          * and end with ]]>(\s)*.
          */
 
-        Matcher m = p.matcher(taintedCss);
+        Matcher m = cdataMatchPattern.matcher(taintedCss);
         boolean isCdata = m.matches();
 
         if ( isCdata ) {
