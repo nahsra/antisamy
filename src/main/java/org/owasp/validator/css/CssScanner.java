@@ -98,7 +98,7 @@ public class CssScanner {
 
     /**
      * Constructs a scanner based on the given policy. This version of the constructor defaults
-     * shouldParseImportedStyles to false, look at the other constructor for a description of that parameter.
+     * shouldParseImportedStyles to false. Look at the other constructor for a description of that parameter.
      *
      * @param policy
      *                the policy to follow when scanning
@@ -213,7 +213,7 @@ public class CssScanner {
 
         List<String> errorMessages = new ArrayList<String>();
 
-        CssHandler handler = new CssHandler(policy, errorMessages, tagName, messages);
+        CssHandler handler = new CssHandler(policy, errorMessages, messages, tagName);
 
         parser.setDocumentHandler(handler);
 
