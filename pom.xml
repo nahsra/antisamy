@@ -130,6 +130,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
             <version>${version.slf4j}</version>
+            <scope>test</scope>
         </dependency>
         <!-- without this import you get: SLF4J: Defaulting to no-operation (NOP) logger implementation -->
         <dependency>
