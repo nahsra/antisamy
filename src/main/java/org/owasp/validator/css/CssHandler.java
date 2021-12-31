@@ -126,16 +126,35 @@ public class CssHandler implements DocumentHandler {
 	 *            the List of error messages to use if there are errors
 	 * @param messages
 	 *            the error message bundle to pull from
+	 *
+	 * @deprecated embeddedStyleSheets parameter is removed in the newer version of this constructor
+	 * as the handler has its own internal list that can be accessed through a method.
 	 */
+	@Deprecated
 	public CssHandler(Policy policy, LinkedList<URI> embeddedStyleSheets,
-		List<String> errorMessages, ResourceBundle messages) {
+					  List<String> errorMessages, ResourceBundle messages) {
 		this(policy, embeddedStyleSheets, errorMessages, null, messages);
+	}
+
+	/**
+	 * Constructs a handler for stylesheets using the given policy and queue for
+	 * imported stylesheets.
+	 *
+	 * @param policy
+	 *            the policy to use
+	 * @param errorMessages
+	 *            the List of error messages to use if there are errors
+	 * @param messages
+	 *            the error message bundle to pull from
+	 */
+	public CssHandler(Policy policy, List<String> errorMessages, ResourceBundle messages) {
+		this(policy, errorMessages, null, messages);
 	}
 
 	/**
 	 * Constructs a handler for inline style declarations using the given policy
 	 * and queue for imported stylesheets.
-	 * 
+	 *
 	 * @param policy
 	 *            the policy to use
 	 * @param embeddedStyleSheets
@@ -146,15 +165,47 @@ public class CssHandler implements DocumentHandler {
 	 *            the associated tag name with this inline style
 	 * @param messages
 	 *            the error message bundle to pull from
+	 *
+	 * @deprecated embeddedStyleSheets parameter is removed in the newer version of this constructor
+	 * as the handler has its own internal list that can be accessed through a method.
 	 */
+	@Deprecated
 	public CssHandler(Policy policy, LinkedList<URI> embeddedStyleSheets,
-			List<String> errorMessages, String tagName, ResourceBundle messages) {
+					  List<String> errorMessages, String tagName, ResourceBundle messages) {
 		assert policy instanceof InternalPolicy : policy.getClass();
 		this.policy = (InternalPolicy) policy;
 		this.errorMessages = errorMessages;
 		this.messages = messages;
 		this.validator = new CssValidator(policy);
-		this.importedStyleSheets = embeddedStyleSheets;
+		// Create a queue of all style sheets that need to be validated to
+		// account for any sheets that may be imported by the current CSS
+		this.importedStyleSheets =  embeddedStyleSheets;
+		this.tagName = tagName;
+		this.isInline = (tagName != null);
+	}
+
+	/**
+	 * Constructs a handler for inline style declarations using the given policy
+	 * and queue for imported stylesheets.
+	 * 
+	 * @param policy
+	 *            the policy to use
+	 * @param errorMessages
+	 *            the List of error messages to use if there are errors
+	 * @param tagName
+	 *            the associated tag name with this inline style
+	 * @param messages
+	 *            the error message bundle to pull from
+	 */
+	public CssHandler(Policy policy, List<String> errorMessages, String tagName, ResourceBundle messages) {
+		assert policy instanceof InternalPolicy : policy.getClass();
+		this.policy = (InternalPolicy) policy;
+		this.errorMessages = errorMessages;
+		this.messages = messages;
+		this.validator = new CssValidator(policy);
+		// Create a queue of all style sheets that need to be validated to
+		// account for any sheets that may be imported by the current CSS
+		this.importedStyleSheets =  new LinkedList<URI>();
 		this.tagName = tagName;
 		this.isInline = (tagName != null);
 	}
@@ -167,6 +218,15 @@ public class CssHandler implements DocumentHandler {
 	public String getCleanStylesheet() {
 		// Always ensure results contain most recent generation of stylesheet
 		return styleSheet.toString();
+	}
+
+	/**
+	 * Returns a list of imported stylesheets from the main parsed stylesheet.
+	 *
+	 * @return the import stylesheet URI list.
+	 */
+	public LinkedList<URI> getImportedStylesheetsURIList() {
+		return importedStyleSheets;
 	}
 
 	/**
