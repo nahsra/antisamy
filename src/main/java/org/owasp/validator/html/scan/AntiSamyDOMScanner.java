@@ -35,6 +35,8 @@ import org.owasp.validator.html.model.Attribute;
 import org.owasp.validator.html.model.Tag;
 import org.owasp.validator.html.util.ErrorMessageUtil;
 import org.owasp.validator.html.util.HTMLEntityEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Comment;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -68,7 +70,6 @@ import java.util.regex.Pattern;
  * @author Arshan Dabirsiaghi
  */
 public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
-
     private Document document = new DocumentImpl();
     private DocumentFragment dom = document.createDocumentFragment();
     private CleanResults results = null;
@@ -78,6 +79,8 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     private static final Pattern conditionalDirectives = Pattern.compile("<?!?\\[\\s*(?:end)?if[^]]*\\]>?");
 
     private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
+
+    private static final Logger logger = LoggerFactory.getLogger(AntiSamyDOMScanner.class);
 
     static class CachedItem {
         private final DOMFragmentParser parser;
@@ -378,6 +381,10 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                 if (targetAttribute != null && targetAttribute.getNodeValue().equalsIgnoreCase("_blank")) {
                     addNoopenerAndNoreferrer = true;
                 }
+            }
+            else {
+                logger.warn("The directive \"" + Policy.ANCHORS_NOOPENER_NOREFERRER +
+                        "\" is not enabled by default. It is recommended to enable it to prevent reverse tabnabbing attacks.");
             }
 
             Node relAttribute = ele.getAttributes().getNamedItem("rel");

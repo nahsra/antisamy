@@ -120,7 +120,7 @@ import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
 
 public class Policy {
 
-    private static final Logger logger = LoggerFactory.getLogger(Policy.class);
+    protected static final Logger logger = LoggerFactory.getLogger(Policy.class);
 
     public static final Pattern ANYTHING_REGEXP = Pattern.compile(".*", Pattern.DOTALL);
 
@@ -339,6 +339,8 @@ public class Policy {
         this.directives = Collections.unmodifiableMap(parseContext.directives);
         this.globalAttributes = Collections.unmodifiableMap(parseContext.globalAttributes);
         this.dynamicAttributes = Collections.unmodifiableMap(parseContext.dynamicAttributes);
+
+
     }
 
     protected Policy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules) {
