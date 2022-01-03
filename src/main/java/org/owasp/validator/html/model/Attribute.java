@@ -143,6 +143,35 @@ public class Attribute  {
             }
         }
         return regExp.toString();
+    }
 
+    public static String mergeRelValuesInAnchor(boolean addNofollow, boolean addNoopenerAndNoreferrer, String currentRelValue) {
+        String newRelValue = "";
+        if (currentRelValue == null || currentRelValue.isEmpty()) {
+            if (addNofollow) newRelValue = "nofollow";
+            if (addNoopenerAndNoreferrer) newRelValue += " noopener noreferrer";
+        }
+        else {
+            ArrayList<String> relTokens = new ArrayList<>();
+            newRelValue = currentRelValue;
+            for (String value: currentRelValue.split(" ")) {
+                relTokens.add(value.toLowerCase());
+            }
+
+            if (addNofollow && !relTokens.contains("nofollow")) {
+                newRelValue += " nofollow";
+            }
+
+            if (addNoopenerAndNoreferrer) {
+                if (!relTokens.contains("noopener")){
+                    newRelValue += " noopener";
+                }
+                if (!relTokens.contains("noreferrer")){
+                    newRelValue += " noreferrer";
+                }
+            }
+        }
+
+        return newRelValue.trim();
     }
 }

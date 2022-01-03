@@ -14,6 +14,7 @@ import java.util.Map;
 public class InternalPolicy extends Policy {
     private final int maxInputSize;
     private final boolean isNofollowAnchors;
+    private final boolean isNoopenerAndNoreferrerAnchors;
     private final boolean isValidateParamAsEmbed;
     private final boolean formatOutput;
     private final boolean preserveSpace;
@@ -34,6 +35,7 @@ public class InternalPolicy extends Policy {
         super(parseContext);
         this.maxInputSize = determineMaxInputSize();
         this.isNofollowAnchors = isTrue(Policy.ANCHORS_NOFOLLOW);
+        this.isNoopenerAndNoreferrerAnchors = isTrue(Policy.ANCHORS_NOOPENER_NOREFERRER);
         this.isValidateParamAsEmbed = isTrue(Policy.VALIDATE_PARAM_AS_EMBED);
         this.formatOutput = isTrue(Policy.FORMAT_OUTPUT);
         this.preserveSpace = isTrue(Policy.PRESERVE_SPACE);
@@ -54,6 +56,7 @@ public class InternalPolicy extends Policy {
         super(old, directives, tagRules);
         this.maxInputSize = determineMaxInputSize();
         this.isNofollowAnchors = isTrue(Policy.ANCHORS_NOFOLLOW);
+        this.isNoopenerAndNoreferrerAnchors = isTrue(Policy.ANCHORS_NOOPENER_NOREFERRER);
         this.isValidateParamAsEmbed = isTrue(Policy.VALIDATE_PARAM_AS_EMBED);
         this.formatOutput = isTrue(Policy.FORMAT_OUTPUT);
         this.preserveSpace = isTrue(Policy.PRESERVE_SPACE);
@@ -96,6 +99,10 @@ public class InternalPolicy extends Policy {
 
     public boolean isNofollowAnchors() {
         return isNofollowAnchors;
+    }
+
+    public boolean isNoopenerAndNoreferrerAnchors() {
+        return isNoopenerAndNoreferrerAnchors;
     }
 
     public boolean isValidateParamAsEmbed() {
