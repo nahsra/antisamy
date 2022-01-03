@@ -50,8 +50,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

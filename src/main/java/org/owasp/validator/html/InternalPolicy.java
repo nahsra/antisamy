@@ -76,7 +76,7 @@ public class InternalPolicy extends Policy {
         this.styleTag = getTagByLowercaseName("style");
         this.embedStyleSheets = isTrue(Policy.EMBED_STYLESHEETS);
         this.allowDynamicAttributes = isTrue(Policy.ALLOW_DYNAMIC_ATTRIBUTES);
-        
+
         if (!isNoopenerAndNoreferrerAnchors) {
             logger.warn("The directive \"" + Policy.ANCHORS_NOOPENER_NOREFERRER +
                     "\" is not enabled by default. It is recommended to enable it to prevent reverse tabnabbing attacks.");
