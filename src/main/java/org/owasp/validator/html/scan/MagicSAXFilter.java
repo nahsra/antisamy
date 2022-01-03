@@ -376,7 +376,15 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 							}
 						}
 
-						String relValue = Attribute.mergeRelValuesInAnchor(addNofollow, addNoopenerAndNoreferrer, attributes.getValue("rel"));
+						String currentRelValue = attributes.getValue("rel");
+						if (currentRelValue != null) {
+							Attribute attribute = tag.getAttributeByName("rel");
+							if (attribute != null &&
+									!(attribute.containsAllowedValue(currentRelValue) || attribute.matchesAllowedExpression(currentRelValue))) {
+								currentRelValue = "";
+							}
+						}
+						String relValue = Attribute.mergeRelValuesInAnchor(addNofollow, addNoopenerAndNoreferrer, currentRelValue);
 						if (!relValue.isEmpty()){
 							validattributes.addAttribute(makeSimpleQname("rel"), "CDATA", relValue);
 						}
