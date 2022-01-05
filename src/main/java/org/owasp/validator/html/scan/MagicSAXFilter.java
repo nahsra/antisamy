@@ -46,8 +46,6 @@ import org.owasp.validator.html.model.Attribute;
 import org.owasp.validator.html.model.Tag;
 import org.owasp.validator.html.util.ErrorMessageUtil;
 import org.owasp.validator.html.util.HTMLEntityEncoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of an HTML-filter that adheres to an AntiSamy policy. This
@@ -75,8 +73,6 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     private boolean preserveComments;
     private int maxInputSize;
     private boolean shouldParseImportedStyles;
-
-	private static final Logger logger = LoggerFactory.getLogger(MagicSAXFilter.class);
 
     public MagicSAXFilter(ResourceBundle messages) {
 		this.messages = messages;
@@ -378,10 +374,6 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 							if (targetValue != null && targetValue.equalsIgnoreCase("_blank")) {
 								addNoopenerAndNoreferrer = true;
 							}
-						}
-						else {
-							logger.warn("The directive \"" + Policy.ANCHORS_NOOPENER_NOREFERRER +
-									"\" is not enabled by default. It is recommended to enable it to prevent reverse tabnabbing attacks.");
 						}
 
 						String currentRelValue = attributes.getValue("rel");
