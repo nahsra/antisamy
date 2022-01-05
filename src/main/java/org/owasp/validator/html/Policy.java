@@ -339,8 +339,6 @@ public class Policy {
         this.directives = Collections.unmodifiableMap(parseContext.directives);
         this.globalAttributes = Collections.unmodifiableMap(parseContext.globalAttributes);
         this.dynamicAttributes = Collections.unmodifiableMap(parseContext.dynamicAttributes);
-
-
     }
 
     protected Policy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules) {

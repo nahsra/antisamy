@@ -145,6 +145,17 @@ public class Attribute  {
         return regExp.toString();
     }
 
+    /**
+     * This method takes the current <code>rel</code> attribute values and, depending on which ones to add,
+     * appends the corresponding values if they are not already present. It is meant to be used with anchor tags.
+     *
+     * @param addNofollow Specifies if <code>"nofollow"</code> value should be added in case it is not present.
+     * @param addNoopenerAndNoreferrer Specifies if <code>"noopener noreferrer"</code> value should be added in case
+     *                                 it is not present.
+     * @param currentRelValue Current <code>rel</code> attribute value, it will be merged with the values specified
+     *                        from the previous parameters.
+     * @return The new <code>rel</code> attribute value to replace in an anchor tag.
+     */
     public static String mergeRelValuesInAnchor(boolean addNofollow, boolean addNoopenerAndNoreferrer, String currentRelValue) {
         String newRelValue = "";
         if (currentRelValue == null || currentRelValue.isEmpty()) {
