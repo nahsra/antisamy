@@ -161,8 +161,7 @@ public class Attribute  {
         if (currentRelValue == null || currentRelValue.isEmpty()) {
             if (addNofollow) newRelValue = "nofollow";
             if (addNoopenerAndNoreferrer) newRelValue += " noopener noreferrer";
-        }
-        else {
+        } else {
             ArrayList<String> relTokens = new ArrayList<>();
             newRelValue = currentRelValue;
             for (String value: currentRelValue.split(" ")) {
