@@ -66,6 +66,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 	private ResourceBundle messages;
 
 	private boolean isNofollowAnchors;
+	private boolean isNoopenerAndNoreferrerAnchors;
 	private boolean isValidateParamAsEmbed;
 	private boolean inCdata = false;
     // From policy
@@ -80,10 +81,11 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     public void reset(InternalPolicy instance){
         this.policy = instance;
         isNofollowAnchors = policy.isNofollowAnchors();
+        isNoopenerAndNoreferrerAnchors = policy.isNoopenerAndNoreferrerAnchors();
         isValidateParamAsEmbed = policy.isValidateParamAsEmbed();
         preserveComments = policy.isPreserveComments();
         maxInputSize = policy.getMaxInputSize();
-		shouldParseImportedStyles = policy.isEmbedStyleSheets();
+        shouldParseImportedStyles = policy.isEmbedStyleSheets();
         operations.clear();
         errorMessages.clear();
         cssContent = null;
@@ -363,8 +365,29 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 					this.operations.push(Ops.FILTER);
 				} else {
 
-					if (isNofollowAnchors && "a".equals(element.localpart)) {
-						validattributes.addAttribute(makeSimpleQname("rel"), "CDATA", "nofollow");
+					if ("a".equals(element.localpart)) {
+						boolean addNofollow = isNofollowAnchors;
+						boolean addNoopenerAndNoreferrer = false;
+
+						if (isNoopenerAndNoreferrerAnchors) {
+							String targetValue = attributes.getValue("target");
+							if (targetValue != null && targetValue.equalsIgnoreCase("_blank")) {
+								addNoopenerAndNoreferrer = true;
+							}
+						}
+
+						String currentRelValue = attributes.getValue("rel");
+						if (currentRelValue != null) {
+							Attribute attribute = tag.getAttributeByName("rel");
+							if (attribute != null &&
+									!(attribute.containsAllowedValue(currentRelValue) || attribute.matchesAllowedExpression(currentRelValue))) {
+								currentRelValue = "";
+							}
+						}
+						String relValue = Attribute.mergeRelValuesInAnchor(addNofollow, addNoopenerAndNoreferrer, currentRelValue);
+						if (!relValue.isEmpty()){
+							validattributes.addAttribute(makeSimpleQname("rel"), "CDATA", relValue);
+						}
 					}
 
 					if (masqueradingParam) {

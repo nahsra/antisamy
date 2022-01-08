@@ -120,7 +120,7 @@ import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
 
 public class Policy {
 
-    private static final Logger logger = LoggerFactory.getLogger(Policy.class);
+    protected static final Logger logger = LoggerFactory.getLogger(Policy.class);
 
     public static final Pattern ANYTHING_REGEXP = Pattern.compile(".*", Pattern.DOTALL);
 
@@ -138,6 +138,7 @@ public class Policy {
     public static final String EMBED_STYLESHEETS = "embedStyleSheets";
     public static final String CONNECTION_TIMEOUT = "connectionTimeout";
     public static final String ANCHORS_NOFOLLOW = "nofollowAnchors";
+    public static final String ANCHORS_NOOPENER_NOREFERRER = "noopenerAndNoreferrerAnchors";
     public static final String VALIDATE_PARAM_AS_EMBED = "validateParamAsEmbed";
     public static final String PRESERVE_SPACE = "preserveSpace";
     public static final String PRESERVE_COMMENTS = "preserveComments";

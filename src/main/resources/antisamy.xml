@@ -18,6 +18,7 @@ http://www.w3.org/TR/html401/struct/global.html
 		<directive name="formatOutput" value="true"/>
 		<directive name="nofollowAnchors" value="true" />
 		<directive name="validateParamAsEmbed" value="true" />
+		<directive name="noopenerAndNoreferrerAnchors" value="false" />
 		
 		<!--
 		remember, this won't work for relative URIs - AntiSamy doesn't
@@ -795,9 +796,9 @@ http://www.w3.org/TR/html401/struct/global.html
 				</regexp-list>
 			</attribute>
 			<attribute name="rel">
-				<literal-list>
-					<literal value="nofollow"/>
-				</literal-list>
+				<regexp-list>
+					<regexp value="(\s*(nofollow|noopener|noreferrer)(\s(nofollow|noopener|noreferrer))*\s*)?"/>
+				</regexp-list>
 			</attribute>
 			<attribute name="name"/>
 			

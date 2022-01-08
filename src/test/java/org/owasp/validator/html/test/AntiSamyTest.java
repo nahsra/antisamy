@@ -33,6 +33,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.both;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -49,8 +50,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1599,6 +1603,47 @@ static final String test33 = "<html>\n"
         assertThat(cleanHtmlSAX, not(containsString(".grid_1")));
         assertThat(cleanHtmlDOM, not(containsString(".janrain-provider150-sprit")));
         assertThat(cleanHtmlSAX, not(containsString(".janrain-provider150-sprit")));
+    }
+
+    @Test
+    public void testNoopenerAndNoreferrer() throws ScanException, PolicyException {
+        Map<String, Attribute> map = new HashMap<>();
+        map.put("target", new Attribute("a", Collections.<Pattern>emptyList(), Arrays.asList( "_blank", "_self" ), "",""));
+        map.put("rel", new Attribute("a", Collections.<Pattern>emptyList(), Arrays.asList( "nofollow", "noopener", "noreferrer"), "",""));
+        Tag tag = new Tag("a", map, Policy.ACTION_VALIDATE);
+        Policy basePolicy = policy.mutateTag(tag);
+        Policy revised = basePolicy.cloneWithDirective(Policy.ANCHORS_NOFOLLOW,"true").cloneWithDirective(Policy.ANCHORS_NOOPENER_NOREFERRER,"true");
+        // No target="_blank", so only nofollow can be added.
+        assertThat(as.scan("<a>Link text</a>", revised, AntiSamy.DOM).getCleanHTML(), both(containsString("nofollow")).and(not(containsString("noopener noreferrer"))));
+        assertThat(as.scan("<a>Link text</a>", revised, AntiSamy.SAX).getCleanHTML(), both(containsString("nofollow")).and(not(containsString("noopener noreferrer"))));
+        // target="_blank", can have both.
+        assertThat(as.scan("<a target=\"_blank\">Link text</a>", revised, AntiSamy.DOM).getCleanHTML(), containsString("nofollow noopener noreferrer"));
+        assertThat(as.scan("<a target=\"_blank\">Link text</a>", revised, AntiSamy.SAX).getCleanHTML(), containsString("nofollow noopener noreferrer"));
+
+        Policy revised2 = basePolicy.cloneWithDirective(Policy.ANCHORS_NOFOLLOW,"false").cloneWithDirective(Policy.ANCHORS_NOOPENER_NOREFERRER,"true");
+        // No target="_blank", no rel added.
+        assertThat(as.scan("<a>Link text</a>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("rel=")));
+        assertThat(as.scan("<a>Link text</a>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("rel=")));
+        // target="_blank", everything present.
+        assertThat(as.scan("<a target='_blank' rel='nofollow'>Link text</a>", revised2, AntiSamy.DOM).getCleanHTML(), containsString("nofollow noopener noreferrer"));
+        assertThat(as.scan("<a target='_blank' rel='nofollow'>Link text</a>", revised2, AntiSamy.SAX).getCleanHTML(), containsString("nofollow noopener noreferrer"));
+        // target="_self", no rel added.
+        assertThat(as.scan("<a target='_self'>Link text</a>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("rel=")));
+        assertThat(as.scan("<a target='_self'>Link text</a>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("rel=")));
+        // target="_self", only nofollow present.
+        assertThat(as.scan("<a target='_self' rel='nofollow'>Link text</a>", revised2, AntiSamy.DOM).getCleanHTML(), both(containsString("nofollow")).and(not(containsString("noopener noreferrer"))));
+        assertThat(as.scan("<a target='_self' rel='nofollow'>Link text</a>", revised2, AntiSamy.SAX).getCleanHTML(), both(containsString("nofollow")).and(not(containsString("noopener noreferrer"))));
+        // noopener is not repeated
+        assertThat(as.scan("<a target='_blank' rel='noopener'>Link text</a>", revised2, AntiSamy.DOM).getCleanHTML().split("noopener").length, is(2));
+        assertThat(as.scan("<a target='_blank' rel='noopener'>Link text</a>", revised2, AntiSamy.SAX).getCleanHTML().split("noopener").length, is(2));
+
+        Policy revised3 = basePolicy.cloneWithDirective(Policy.ANCHORS_NOFOLLOW,"false").cloneWithDirective(Policy.ANCHORS_NOOPENER_NOREFERRER,"false");
+        // No rel added
+        assertThat(as.scan("<a>Link text</a>", revised3, AntiSamy.DOM).getCleanHTML(), not(containsString("rel=")));
+        assertThat(as.scan("<a>Link text</a>", revised3, AntiSamy.SAX).getCleanHTML(), not(containsString("rel=")));
+        // noopener is not repeated
+        assertThat(as.scan("<a target='_blank' rel='noopener'>Link text</a>", revised3, AntiSamy.DOM).getCleanHTML().split("noopener").length, is(2));
+        assertThat(as.scan("<a target='_blank' rel='noopener'>Link text</a>", revised3, AntiSamy.SAX).getCleanHTML().split("noopener").length, is(2));
     }
 }
 

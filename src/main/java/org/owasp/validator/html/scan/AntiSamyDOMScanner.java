@@ -68,7 +68,6 @@ import java.util.regex.Pattern;
  * @author Arshan Dabirsiaghi
  */
 public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
-
     private Document document = new DocumentImpl();
     private DocumentFragment dom = document.createDocumentFragment();
     private CleanResults results = null;
@@ -128,6 +127,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         }
 
         isNofollowAnchors = policy.isNofollowAnchors();
+        isNoopenerAndNoreferrerAnchors = policy.isNoopenerAndNoreferrerAnchors();
         isValidateParamAsEmbed = policy.isValidateParamAsEmbed();
 
         long startOfScan = System.currentTimeMillis();
@@ -368,8 +368,22 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
         if (processAttributes(ele, tagName, tag, currentStackDepth)) return; // can't process any more if we
 
-        if (isNofollowAnchors && "a".equals(tagNameLowerCase)) {
-            ele.setAttribute("rel", "nofollow");
+        if ("a".equals(tagNameLowerCase)) {
+            boolean addNofollow = isNofollowAnchors;
+            boolean addNoopenerAndNoreferrer = false;
+
+            if (isNoopenerAndNoreferrerAnchors) {
+                Node targetAttribute = ele.getAttributes().getNamedItem("target");
+                if (targetAttribute != null && targetAttribute.getNodeValue().equalsIgnoreCase("_blank")) {
+                    addNoopenerAndNoreferrer = true;
+                }
+            }
+
+            Node relAttribute = ele.getAttributes().getNamedItem("rel");
+            String relValue = Attribute.mergeRelValuesInAnchor(addNofollow, addNoopenerAndNoreferrer, relAttribute == null ? "" : relAttribute.getNodeValue());
+            if (!relValue.isEmpty()){
+                ele.setAttribute("rel", relValue.trim());
+            }
         }
 
         processChildren(eleChildNodes, currentStackDepth);
