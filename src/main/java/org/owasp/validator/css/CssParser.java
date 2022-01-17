@@ -38,8 +38,8 @@ public class CssParser extends org.apache.batik.css.parser.Parser {
     /**
      * This implementation is a workaround to solve leading dash errors on property names.
      * @see <code>https://issues.apache.org/jira/browse/BATIK-1112</code>
-     * @param inSheet
-     * @throws CSSException
+     * @param inSheet Specifies if the style to parse is inside a sheet or the sheet itself.
+     * @throws CSSException Thrown if there are parsing errors in CSS
      */
     protected void parseStyleDeclaration(final boolean inSheet) throws CSSException {
         boolean leadingDash = false;
