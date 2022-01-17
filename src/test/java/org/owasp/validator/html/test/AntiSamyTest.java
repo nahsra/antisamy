@@ -66,6 +66,7 @@ import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.model.Attribute;
+import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.model.Tag;
 
 /**
@@ -1644,6 +1645,22 @@ static final String test33 = "<html>\n"
         // noopener is not repeated
         assertThat(as.scan("<a target='_blank' rel='noopener'>Link text</a>", revised3, AntiSamy.DOM).getCleanHTML().split("noopener").length, is(2));
         assertThat(as.scan("<a target='_blank' rel='noopener'>Link text</a>", revised3, AntiSamy.SAX).getCleanHTML().split("noopener").length, is(2));
+    }
+
+    @Test
+    public void testLeadingDashOnPropertyName() throws ScanException, PolicyException {
+        // Test that property names with leading dash are supported, reported on issue #125.
+        final String input = "<style type='text/css'>\n" +
+                "\t.very-specific-antisamy { -moz-border-radius: inherit ; -webkit-border-radius: 25px 10px 5px 10px;}\n" +
+                "</style>";
+        // Define new properties for the policy
+        Pattern customPattern = Pattern.compile("\\d+(\\.\\d+)?px( \\d+(\\.\\d+)?px){0,3}", Pattern.DOTALL);
+        Property leadingDashProperty1 = new Property("-webkit-border-radius", Arrays.asList(customPattern), Collections.<String>emptyList(),Collections.<String>emptyList(),"","");
+        Property leadingDashProperty2 = new Property("-moz-border-radius", Collections.<Pattern>emptyList(), Arrays.asList("inherit"),Collections.<String>emptyList(),"","");
+        Policy revised = policy.addCssProperty(leadingDashProperty1).addCssProperty(leadingDashProperty2);
+        // Test properties
+        assertThat(as.scan(input, revised, AntiSamy.DOM).getCleanHTML(), both(containsString("-webkit-border-radius")).and(containsString("-moz-border-radius")));
+        assertThat(as.scan(input, revised, AntiSamy.SAX).getCleanHTML(), both(containsString("-webkit-border-radius")).and(containsString("-moz-border-radius")));
     }
 }
 
