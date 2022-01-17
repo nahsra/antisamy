@@ -77,7 +77,7 @@ public class CssScanner {
     /**
      * The parser to be used in any scanning
      */
-    private final Parser parser = new Parser();
+    private final Parser parser = new CssParser();
 
     /**
      * The policy file to be used in any scanning
