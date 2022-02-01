@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -25,6 +25,7 @@
 package org.owasp.validator.html;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -38,51 +39,73 @@ import org.w3c.dom.DocumentFragment;
  * validation-related errors existed, and what was done about them.
  * 
  * @author Arshan Dabirsiaghi
- * 
  */
 
 public class CleanResults {
 
-	private List<String> errorMessages = new ArrayList<String>();
+	private List<String> errorMessages;
 	private Callable<String> cleanHTML;
 	private long startOfScan;
 	private long elapsedScan;
 
+	/*
+	 * A DOM object version of the clean HTML String. May be null even if clean HTML is set.
+	 */
 	private DocumentFragment cleanXMLDocumentFragment;
 
 	/*
 	 * For extension.
 	 */
 	public CleanResults() {
-
+		this.errorMessages = new ArrayList<String>();
 	}
 
+	/**
+	 * Create a clean set of results.
+	 * @param startOfScan - The time when the scan started.
+	 * @param cleanHTML - The resulting clean HTML produced per the AntiSamy policy.
+	 * @param XMLDocumentFragment - The XML Document fragment version of the clean HTML produced during the sanitzation process.
+	 * @param errorMessages - Messages describing any errors that occurred during sanitization.
+	 */
 	public CleanResults(long startOfScan, final String cleanHTML,
 			DocumentFragment XMLDocumentFragment, List<String> errorMessages) {
-		this.startOfScan = startOfScan;
-		this.elapsedScan = System.currentTimeMillis() - startOfScan;
-		this.cleanXMLDocumentFragment = XMLDocumentFragment;
-		this.cleanHTML = new Callable<String>() {
-            public String call() throws Exception {
-                return cleanHTML;
-            }
-        };
-		this.errorMessages = errorMessages;
+
+		this(startOfScan,
+			new Callable<String>() {
+	            public String call() throws Exception {
+	                return cleanHTML;
+	            }
+	        },
+			XMLDocumentFragment,
+			errorMessages);
 	}
 
+	/**
+	 * Create a clean set of results.
+	 * @param startOfScan - The time when the scan started.
+	 * @param cleanHTML - The resulting clean HTML produced per the AntiSamy policy.
+	 * @param XMLDocumentFragment - The XML Document fragment version of the clean HTML produced during the sanitization process.
+	 * @param errorMessages - Messages describing any errors that occurred during sanitization.
+	 */
     public CleanResults(long startOfScan, Callable<String> cleanHTML,
                         DocumentFragment XMLDocumentFragment, List<String> errorMessages) {
+		this.startOfScan = startOfScan;
         this.elapsedScan = System.currentTimeMillis() - startOfScan;
         this.cleanXMLDocumentFragment = XMLDocumentFragment;
         this.cleanHTML = cleanHTML;
-        this.errorMessages = errorMessages;
+		this.errorMessages = Collections.unmodifiableList(errorMessages);
     }
 
+	/**
+	 * Return the DOM version of the clean HTML.
+	 * return The XML Document fragment version of the clean HTML produced during the sanitization process.
+	 *        This may be null, even if the clean HTML String is not null.
+	 */
 	public DocumentFragment getCleanXMLDocumentFragment() {
 		return cleanXMLDocumentFragment;
 	}
 
-    /**
+	/**
 	 * Return the filtered HTML as a String.
 	 * 
 	 * @return A String object which contains the serialized, safe HTML.
@@ -96,7 +119,9 @@ public class CleanResults {
     }
 
 	/**
-	 * Return a list of error messages -- but an empty list returned does not mean there was no attack present, due to the serialization and deserialization process automatically cleaning up some attacks. See the README for more discussion.
+	 * Return a list of error messages -- but an empty list returned does not mean there was no attack
+	 * present, due to the serialization and deserialization process automatically cleaning up some
+	 * attacks. See the README for more discussion.
 	 * 
 	 * @return An ArrayList object which contain the error messages after a
 	 *         scan.
@@ -112,7 +137,7 @@ public class CleanResults {
 	 *         the beginning and end of the scan in seconds.
 	 */
 	public double getScanTime() {
-		return (elapsedScan) / 1000D;
+		return elapsedScan / 1000D;
 	}
 
 	/**
@@ -127,7 +152,7 @@ public class CleanResults {
 	/**
 	 * Get the time the scan started.
 	 * 
-	 * @return time that scan started in ms
+	 * @return time that scan started in milliseconds since epoch.
 	 */
 	public long getStartOfScan()
 	{

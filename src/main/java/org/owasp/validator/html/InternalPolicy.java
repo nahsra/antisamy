@@ -1,5 +1,6 @@
 package org.owasp.validator.html;
 
+import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.model.Tag;
 
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Map;
 public class InternalPolicy extends Policy {
     private final int maxInputSize;
     private final boolean isNofollowAnchors;
+    private final boolean isNoopenerAndNoreferrerAnchors;
     private final boolean isValidateParamAsEmbed;
     private final boolean formatOutput;
     private final boolean preserveSpace;
@@ -34,6 +36,7 @@ public class InternalPolicy extends Policy {
         super(parseContext);
         this.maxInputSize = determineMaxInputSize();
         this.isNofollowAnchors = isTrue(Policy.ANCHORS_NOFOLLOW);
+        this.isNoopenerAndNoreferrerAnchors = isTrue(Policy.ANCHORS_NOOPENER_NOREFERRER);
         this.isValidateParamAsEmbed = isTrue(Policy.VALIDATE_PARAM_AS_EMBED);
         this.formatOutput = isTrue(Policy.FORMAT_OUTPUT);
         this.preserveSpace = isTrue(Policy.PRESERVE_SPACE);
@@ -48,12 +51,18 @@ public class InternalPolicy extends Policy {
         this.styleTag = getTagByLowercaseName("style");
         this.embedStyleSheets = isTrue(Policy.EMBED_STYLESHEETS);
         this.allowDynamicAttributes = isTrue(Policy.ALLOW_DYNAMIC_ATTRIBUTES);
+
+        if (!isNoopenerAndNoreferrerAnchors) {
+            logger.warn("The directive \"" + Policy.ANCHORS_NOOPENER_NOREFERRER +
+                    "\" is not enabled by default. It is recommended to enable it to prevent reverse tabnabbing attacks.");
+        }
     }
 
-    protected InternalPolicy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules) {
-        super(old, directives, tagRules);
+    protected InternalPolicy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules, Map<String, Property> cssRules) {
+        super(old, directives, tagRules, cssRules);
         this.maxInputSize = determineMaxInputSize();
         this.isNofollowAnchors = isTrue(Policy.ANCHORS_NOFOLLOW);
+        this.isNoopenerAndNoreferrerAnchors = isTrue(Policy.ANCHORS_NOOPENER_NOREFERRER);
         this.isValidateParamAsEmbed = isTrue(Policy.VALIDATE_PARAM_AS_EMBED);
         this.formatOutput = isTrue(Policy.FORMAT_OUTPUT);
         this.preserveSpace = isTrue(Policy.PRESERVE_SPACE);
@@ -68,6 +77,11 @@ public class InternalPolicy extends Policy {
         this.styleTag = getTagByLowercaseName("style");
         this.embedStyleSheets = isTrue(Policy.EMBED_STYLESHEETS);
         this.allowDynamicAttributes = isTrue(Policy.ALLOW_DYNAMIC_ATTRIBUTES);
+
+        if (!isNoopenerAndNoreferrerAnchors) {
+            logger.warn("The directive \"" + Policy.ANCHORS_NOOPENER_NOREFERRER +
+                    "\" is not enabled by default. It is recommended to enable it to prevent reverse tabnabbing attacks.");
+        }
     }
 
     public Tag getEmbedTag() {
@@ -96,6 +110,10 @@ public class InternalPolicy extends Policy {
 
     public boolean isNofollowAnchors() {
         return isNofollowAnchors;
+    }
+
+    public boolean isNoopenerAndNoreferrerAnchors() {
+        return isNoopenerAndNoreferrerAnchors;
     }
 
     public boolean isValidateParamAsEmbed() {

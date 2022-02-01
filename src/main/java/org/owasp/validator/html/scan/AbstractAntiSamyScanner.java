@@ -49,6 +49,7 @@ public abstract class AbstractAntiSamyScanner {
     protected final Locale locale = Locale.getDefault();
 
     protected boolean isNofollowAnchors = false;
+    protected boolean isNoopenerAndNoreferrerAnchors = false;
     protected boolean isValidateParamAsEmbed = false;
 
     public abstract CleanResults scan(String html) throws ScanException;

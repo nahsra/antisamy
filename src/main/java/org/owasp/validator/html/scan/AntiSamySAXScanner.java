@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2020, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -51,12 +51,27 @@ import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
 public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
-    
+
     private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
 
-    private static final TransformerFactory sTransformerFactory = TransformerFactory.newInstance();
+    private static final TransformerFactory sTransformerFactory;
 
     static {
+        // Per issue #103, an IllegalArgumentException could be thrown below if the SAX parser does not
+        // support these JAXP 1.5 features. This did actually occur in certain environments where we let
+        // the TransformerFactory create whatever instance it decided to create. For example, if
+        // xalan:2.7.2 was on the classpath, which doesn't support these JAXP features.
+        // However, this should never happen anymore because, by default, we now force the use of the
+        // JDK provided Xalan SAX parser, which DOES support these features. However, if someone REALLY
+        // wants to use a different implementation, they can set the new property "antisamy.transformerfactory.impl"
+        // to whatever they prefer to use, but that class must implement the two attributes we set.
+
+        String TRANSFORMER_FACTORY_IMPL = System.getProperty("antisamy.transformerfactory.impl",
+                "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
+
+        sTransformerFactory =
+                TransformerFactory.newInstance(TRANSFORMER_FACTORY_IMPL, null );
+
         // Disable external entities, etc.
         sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
         sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");

@@ -33,12 +33,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.both;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import org.hamcrest.text.MatchesPattern;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,8 +50,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,6 +66,7 @@ import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.model.Attribute;
+import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.model.Tag;
 
 /**
@@ -1211,8 +1217,15 @@ public class AntiSamyTest {
         CleanResults cr = as.scan(good, policy, AntiSamy.SAX);
         String s = cr.getCleanHTML();
         assertEquals(goodExpected, s);
+        cr = as.scan(good, policy, AntiSamy.DOM);
+        s = cr.getCleanHTML();
+        assertEquals(goodExpected, s);
+
         // test bad attribute "dat-"
         cr = as.scan(bad, policy, AntiSamy.SAX);
+        s = cr.getCleanHTML();
+        assertEquals(badExpected, s);
+        cr = as.scan(bad, policy, AntiSamy.DOM);
         s = cr.getCleanHTML();
         assertEquals(badExpected, s);
     }
@@ -1508,6 +1521,146 @@ static final String test33 = "<html>\n"
         // Test that the IANA subtags is not lost
         assertThat(as.scan("<p lang=\"en-GB\">This paragraph is defined as British English.</p>", policy, AntiSamy.DOM).getCleanHTML(), containsString("lang=\"en-GB\""));
         assertThat(as.scan("<p lang=\"en-GB\">This paragraph is defined as British English.</p>", policy, AntiSamy.SAX).getCleanHTML(), containsString("lang=\"en-GB\""));
+    }
+
+    @Test
+    public void testGithubIssue101() throws ScanException, PolicyException {
+        // Test that margin attribute is not removed when value has too much significant figures.
+        // Current behavior is that decimals like 0.0001 are internally translated to 1.0E-4, this
+        // is reflected on regex validation and actual output. The inconsistency is due to Batik CSS.
+        assertThat(as.scan("<p style=\"margin: 0.0001pt;\">Some text.</p>", policy, AntiSamy.DOM).getCleanHTML(), containsString("margin"));
+        assertThat(as.scan("<p style=\"margin: 0.0001pt;\">Some text.</p>", policy, AntiSamy.SAX).getCleanHTML(), containsString("margin"));
+        assertThat(as.scan("<p style=\"margin: 10000000pt;\">Some text.</p>", policy, AntiSamy.DOM).getCleanHTML(), containsString("margin"));
+        assertThat(as.scan("<p style=\"margin: 10000000pt;\">Some text.</p>", policy, AntiSamy.SAX).getCleanHTML(), containsString("margin"));
+        assertThat(as.scan("<p style=\"margin: 1.0E-4pt;\">Some text.</p>", policy, AntiSamy.DOM).getCleanHTML(), containsString("margin"));
+        assertThat(as.scan("<p style=\"margin: 1.0E-4pt;\">Some text.</p>", policy, AntiSamy.SAX).getCleanHTML(), containsString("margin"));
+        // When using exponential directly the "e" or "E" is internally considered as the start of
+        // the dimension/unit type. This creates inconsistencies that make the regex validation fail,
+        // also in cases like 1e4pt where "e" is considered as dimension instead of "pt".
+        assertThat(as.scan("<p style=\"margin: 1.0E+4pt;\">Some text.</p>", policy, AntiSamy.DOM).getCleanHTML(), not(containsString("margin")));
+        assertThat(as.scan("<p style=\"margin: 1.0E+4pt;\">Some text.</p>", policy, AntiSamy.SAX).getCleanHTML(), not(containsString("margin")));
+    }
+
+    @Test
+    public void testCSSUnits() throws ScanException, PolicyException {
+        String input = "<div style=\"width:50vw;height:50vh;padding:1rpc;\">\n" +
+                "\t<p style=\"font-size:1.5ex;padding-left:1rem;padding-top:16px;\">Some text.</p>\n" +
+                "</div>";
+        CleanResults cr = as.scan(input, policy, AntiSamy.DOM);
+        assertThat(cr.getCleanHTML(), containsString("ex"));
+        assertThat(cr.getCleanHTML(), containsString("px"));
+        assertThat(cr.getCleanHTML(), containsString("rem"));
+        assertThat(cr.getCleanHTML(), containsString("vw"));
+        assertThat(cr.getCleanHTML(), containsString("vh"));
+        assertThat(cr.getCleanHTML(), not(containsString("rpc")));
+        cr = as.scan(input, policy, AntiSamy.SAX);
+        assertThat(cr.getCleanHTML(), containsString("ex"));
+        assertThat(cr.getCleanHTML(), containsString("px"));
+        assertThat(cr.getCleanHTML(), containsString("rem"));
+        assertThat(cr.getCleanHTML(), containsString("vw"));
+        assertThat(cr.getCleanHTML(), containsString("vh"));
+        assertThat(cr.getCleanHTML(), not(containsString("rpc")));
+    }
+
+    @Test
+    public void testXSSInsideSelectOptionStyle() throws ScanException, PolicyException {
+        // Tests for CVE-2021-42575, XSS nested into <select>+<option>+<style>
+
+        // Safe case, to test legit style
+        assertThat(as.scan("<select><option><style>h1{color:black;}</style></option></select>", policy, AntiSamy.DOM).getCleanHTML(), containsString("black"));
+        assertThat(as.scan("<select><option><style>h1{color:black;}</style></option></select>", policy, AntiSamy.SAX).getCleanHTML(), containsString("black"));
+        // Unsafe case
+        assertThat(as.scan("<select><option><style><script>alert(1)</script></style></option></select>", policy, AntiSamy.DOM).getCleanHTML(), not(containsString("<script>")));
+        assertThat(as.scan("<select><option><style><script>alert(1)</script></style></option></select>", policy, AntiSamy.SAX).getCleanHTML(), not(containsString("<script>")));
+    }
+
+    @Test
+    public void testImportedStylesParsing() throws ScanException, PolicyException {
+        // Test that imported style sheets can be parsed and order is correct
+        final String input = "<style type='text/css'>\n" +
+                "\t@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/classic.css);\n" +
+                "\t@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/providers.css);\n" +
+                "\t.very-specific-antisamy {font: 15pt \"Arial\"; color: blue;}\n" +
+                "</style>";
+        Policy revised = policy.cloneWithDirective(Policy.EMBED_STYLESHEETS,"true").cloneWithDirective(Policy.FORMAT_OUTPUT,"false");
+        // Styles are imported
+        String cleanHtmlDOM = as.scan(input, revised, AntiSamy.DOM).getCleanHTML();
+        String cleanHtmlSAX = as.scan(input, revised, AntiSamy.SAX).getCleanHTML();
+        assertThat(cleanHtmlDOM, not(containsString("<![CDATA[/* */]]>")));
+        assertThat(cleanHtmlSAX, not(containsString("<![CDATA[/* */]]>")));
+        // Order is correct:
+        //  First import: grid_1 class
+        //  Second import: janrain-provider150-sprit class
+        //  Original styles: very-specific-antisamy class
+        final Pattern p = Pattern.compile(".*?\\.grid_1.*?\\.janrain-provider150-sprit.*?\\.very-specific-antisamy.*?", Pattern.DOTALL);
+        assertThat(cleanHtmlDOM, MatchesPattern.matchesPattern(p));
+        assertThat(cleanHtmlSAX, MatchesPattern.matchesPattern(p));
+
+        Policy revised2 = policy.cloneWithDirective(Policy.EMBED_STYLESHEETS,"false").cloneWithDirective(Policy.FORMAT_OUTPUT,"false");
+        // Styles are not imported
+        cleanHtmlDOM = as.scan(input, revised2, AntiSamy.DOM).getCleanHTML();
+        cleanHtmlSAX = as.scan(input, revised2, AntiSamy.SAX).getCleanHTML();
+        assertThat(cleanHtmlDOM, not(containsString(".grid_1")));
+        assertThat(cleanHtmlSAX, not(containsString(".grid_1")));
+        assertThat(cleanHtmlDOM, not(containsString(".janrain-provider150-sprit")));
+        assertThat(cleanHtmlSAX, not(containsString(".janrain-provider150-sprit")));
+    }
+
+    @Test
+    public void testNoopenerAndNoreferrer() throws ScanException, PolicyException {
+        Map<String, Attribute> map = new HashMap<>();
+        map.put("target", new Attribute("a", Collections.<Pattern>emptyList(), Arrays.asList( "_blank", "_self" ), "",""));
+        map.put("rel", new Attribute("a", Collections.<Pattern>emptyList(), Arrays.asList( "nofollow", "noopener", "noreferrer"), "",""));
+        Tag tag = new Tag("a", map, Policy.ACTION_VALIDATE);
+        Policy basePolicy = policy.mutateTag(tag);
+        Policy revised = basePolicy.cloneWithDirective(Policy.ANCHORS_NOFOLLOW,"true").cloneWithDirective(Policy.ANCHORS_NOOPENER_NOREFERRER,"true");
+        // No target="_blank", so only nofollow can be added.
+        assertThat(as.scan("<a>Link text</a>", revised, AntiSamy.DOM).getCleanHTML(), both(containsString("nofollow")).and(not(containsString("noopener noreferrer"))));
+        assertThat(as.scan("<a>Link text</a>", revised, AntiSamy.SAX).getCleanHTML(), both(containsString("nofollow")).and(not(containsString("noopener noreferrer"))));
+        // target="_blank", can have both.
+        assertThat(as.scan("<a target=\"_blank\">Link text</a>", revised, AntiSamy.DOM).getCleanHTML(), containsString("nofollow noopener noreferrer"));
+        assertThat(as.scan("<a target=\"_blank\">Link text</a>", revised, AntiSamy.SAX).getCleanHTML(), containsString("nofollow noopener noreferrer"));
+
+        Policy revised2 = basePolicy.cloneWithDirective(Policy.ANCHORS_NOFOLLOW,"false").cloneWithDirective(Policy.ANCHORS_NOOPENER_NOREFERRER,"true");
+        // No target="_blank", no rel added.
+        assertThat(as.scan("<a>Link text</a>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("rel=")));
+        assertThat(as.scan("<a>Link text</a>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("rel=")));
+        // target="_blank", everything present.
+        assertThat(as.scan("<a target='_blank' rel='nofollow'>Link text</a>", revised2, AntiSamy.DOM).getCleanHTML(), containsString("nofollow noopener noreferrer"));
+        assertThat(as.scan("<a target='_blank' rel='nofollow'>Link text</a>", revised2, AntiSamy.SAX).getCleanHTML(), containsString("nofollow noopener noreferrer"));
+        // target="_self", no rel added.
+        assertThat(as.scan("<a target='_self'>Link text</a>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("rel=")));
+        assertThat(as.scan("<a target='_self'>Link text</a>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("rel=")));
+        // target="_self", only nofollow present.
+        assertThat(as.scan("<a target='_self' rel='nofollow'>Link text</a>", revised2, AntiSamy.DOM).getCleanHTML(), both(containsString("nofollow")).and(not(containsString("noopener noreferrer"))));
+        assertThat(as.scan("<a target='_self' rel='nofollow'>Link text</a>", revised2, AntiSamy.SAX).getCleanHTML(), both(containsString("nofollow")).and(not(containsString("noopener noreferrer"))));
+        // noopener is not repeated
+        assertThat(as.scan("<a target='_blank' rel='noopener'>Link text</a>", revised2, AntiSamy.DOM).getCleanHTML().split("noopener").length, is(2));
+        assertThat(as.scan("<a target='_blank' rel='noopener'>Link text</a>", revised2, AntiSamy.SAX).getCleanHTML().split("noopener").length, is(2));
+
+        Policy revised3 = basePolicy.cloneWithDirective(Policy.ANCHORS_NOFOLLOW,"false").cloneWithDirective(Policy.ANCHORS_NOOPENER_NOREFERRER,"false");
+        // No rel added
+        assertThat(as.scan("<a>Link text</a>", revised3, AntiSamy.DOM).getCleanHTML(), not(containsString("rel=")));
+        assertThat(as.scan("<a>Link text</a>", revised3, AntiSamy.SAX).getCleanHTML(), not(containsString("rel=")));
+        // noopener is not repeated
+        assertThat(as.scan("<a target='_blank' rel='noopener'>Link text</a>", revised3, AntiSamy.DOM).getCleanHTML().split("noopener").length, is(2));
+        assertThat(as.scan("<a target='_blank' rel='noopener'>Link text</a>", revised3, AntiSamy.SAX).getCleanHTML().split("noopener").length, is(2));
+    }
+
+    @Test
+    public void testLeadingDashOnPropertyName() throws ScanException, PolicyException {
+        // Test that property names with leading dash are supported, reported on issue #125.
+        final String input = "<style type='text/css'>\n" +
+                "\t.very-specific-antisamy { -moz-border-radius: inherit ; -webkit-border-radius: 25px 10px 5px 10px;}\n" +
+                "</style>";
+        // Define new properties for the policy
+        Pattern customPattern = Pattern.compile("\\d+(\\.\\d+)?px( \\d+(\\.\\d+)?px){0,3}", Pattern.DOTALL);
+        Property leadingDashProperty1 = new Property("-webkit-border-radius", Arrays.asList(customPattern), Collections.<String>emptyList(),Collections.<String>emptyList(),"","");
+        Property leadingDashProperty2 = new Property("-moz-border-radius", Collections.<Pattern>emptyList(), Arrays.asList("inherit"),Collections.<String>emptyList(),"","");
+        Policy revised = policy.addCssProperty(leadingDashProperty1).addCssProperty(leadingDashProperty2);
+        // Test properties
+        assertThat(as.scan(input, revised, AntiSamy.DOM).getCleanHTML(), both(containsString("-webkit-border-radius")).and(containsString("-moz-border-radius")));
+        assertThat(as.scan(input, revised, AntiSamy.SAX).getCleanHTML(), both(containsString("-webkit-border-radius")).and(containsString("-moz-border-radius")));
     }
 }
 

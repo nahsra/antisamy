@@ -120,7 +120,7 @@ import static org.owasp.validator.html.util.XMLUtil.getAttributeValue;
 
 public class Policy {
 
-    private static final Logger logger = LoggerFactory.getLogger(Policy.class);
+    protected static final Logger logger = LoggerFactory.getLogger(Policy.class);
 
     public static final Pattern ANYTHING_REGEXP = Pattern.compile(".*", Pattern.DOTALL);
 
@@ -138,6 +138,7 @@ public class Policy {
     public static final String EMBED_STYLESHEETS = "embedStyleSheets";
     public static final String CONNECTION_TIMEOUT = "connectionTimeout";
     public static final String ANCHORS_NOFOLLOW = "nofollowAnchors";
+    public static final String ANCHORS_NOOPENER_NOREFERRER = "noopenerAndNoreferrerAnchors";
     public static final String VALIDATE_PARAM_AS_EMBED = "validateParamAsEmbed";
     public static final String PRESERVE_SPACE = "preserveSpace";
     public static final String PRESERVE_COMMENTS = "preserveComments";
@@ -155,7 +156,7 @@ public class Policy {
 
     private final Map<String, AntiSamyPattern> commonRegularExpressions;
     protected final Map<String, Tag> tagRules;
-    private final Map<String, Property> cssRules;
+    protected final Map<String, Property> cssRules;
     protected final Map<String, String> directives;
     private final Map<String, Attribute> globalAttributes;
     private final Map<String, Attribute> dynamicAttributes;
@@ -340,12 +341,12 @@ public class Policy {
         this.dynamicAttributes = Collections.unmodifiableMap(parseContext.dynamicAttributes);
     }
 
-    protected Policy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules) {
+    protected Policy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules, Map<String, Property> cssRules) {
         this.allowedEmptyTagsMatcher = old.allowedEmptyTagsMatcher;
         this.requiresClosingTagsMatcher = old.requiresClosingTagsMatcher;
         this.commonRegularExpressions = old.commonRegularExpressions;
         this.tagRules = tagRules;
-        this.cssRules = old.cssRules;
+        this.cssRules = cssRules;
         this.directives = directives;
         this.globalAttributes = old.globalAttributes;
         this.dynamicAttributes = old.dynamicAttributes;
@@ -633,7 +634,7 @@ public class Policy {
     public Policy cloneWithDirective(String name, String value) {
         Map<String, String> directives = new HashMap<String, String>(this.directives);
         directives.put(name, value);
-        return new InternalPolicy(this, Collections.unmodifiableMap(directives), tagRules);
+        return new InternalPolicy(this, Collections.unmodifiableMap(directives), tagRules, cssRules);
     }
 
     /**

@@ -24,8 +24,6 @@
 
 package org.owasp.validator.html.scan;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -40,7 +38,6 @@ import org.apache.xerces.xni.XNIException;
 import org.apache.xerces.xni.parser.XMLDocumentFilter;
 import org.cyberneko.html.filters.DefaultFilter;
 import org.owasp.validator.css.CssScanner;
-import org.owasp.validator.css.ExternalCssScanner;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
@@ -55,7 +52,6 @@ import org.owasp.validator.html.util.HTMLEntityEncoder;
  * filter is SAX-based which means it is much more memory-efficient and also a
  * bit faster than the DOM-based implementation.
  */
-@SuppressFBWarnings(value = "REDOS", justification="Tested the Regex against saferegex and safe-regex and not vulnerable")
 public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 
     private enum Ops {
@@ -70,12 +66,13 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 	private ResourceBundle messages;
 
 	private boolean isNofollowAnchors;
+	private boolean isNoopenerAndNoreferrerAnchors;
 	private boolean isValidateParamAsEmbed;
 	private boolean inCdata = false;
     // From policy
     private boolean preserveComments;
     private int maxInputSize;
-    private boolean externalCssScanner;
+    private boolean shouldParseImportedStyles;
 
     public MagicSAXFilter(ResourceBundle messages) {
 		this.messages = messages;
@@ -84,10 +81,11 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     public void reset(InternalPolicy instance){
         this.policy = instance;
         isNofollowAnchors = policy.isNofollowAnchors();
+        isNoopenerAndNoreferrerAnchors = policy.isNoopenerAndNoreferrerAnchors();
         isValidateParamAsEmbed = policy.isValidateParamAsEmbed();
         preserveComments = policy.isPreserveComments();
         maxInputSize = policy.getMaxInputSize();
-        externalCssScanner = policy.isEmbedStyleSheets();
+        shouldParseImportedStyles = policy.isEmbedStyleSheets();
         operations.clear();
         errorMessages.clear();
         cssContent = null;
@@ -212,7 +210,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 
 	private CssScanner makeCssScanner() {
 		if (cssScanner == null) {
-            cssScanner = externalCssScanner ? new ExternalCssScanner(policy, messages) : new CssScanner(policy, messages);
+            cssScanner = new CssScanner(policy, messages, shouldParseImportedStyles);
 		}
 		return cssScanner;
 	}
@@ -367,8 +365,29 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 					this.operations.push(Ops.FILTER);
 				} else {
 
-					if (isNofollowAnchors && "a".equals(element.localpart)) {
-						validattributes.addAttribute(makeSimpleQname("rel"), "CDATA", "nofollow");
+					if ("a".equals(element.localpart)) {
+						boolean addNofollow = isNofollowAnchors;
+						boolean addNoopenerAndNoreferrer = false;
+
+						if (isNoopenerAndNoreferrerAnchors) {
+							String targetValue = attributes.getValue("target");
+							if (targetValue != null && targetValue.equalsIgnoreCase("_blank")) {
+								addNoopenerAndNoreferrer = true;
+							}
+						}
+
+						String currentRelValue = attributes.getValue("rel");
+						if (currentRelValue != null) {
+							Attribute attribute = tag.getAttributeByName("rel");
+							if (attribute != null &&
+									!(attribute.containsAllowedValue(currentRelValue) || attribute.matchesAllowedExpression(currentRelValue))) {
+								currentRelValue = "";
+							}
+						}
+						String relValue = Attribute.mergeRelValuesInAnchor(addNofollow, addNoopenerAndNoreferrer, currentRelValue);
+						if (!relValue.isEmpty()){
+							validattributes.addAttribute(makeSimpleQname("rel"), "CDATA", relValue);
+						}
 					}
 
 					if (masqueradingParam) {
@@ -408,7 +427,8 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 	}
 
 	public List<String> getErrorMessages() {
-		return errorMessages;
+		// Return a copy of the errorMessages so caller can't change internal copy.
+		return new ArrayList<String>(errorMessages);
 	}
 
 }

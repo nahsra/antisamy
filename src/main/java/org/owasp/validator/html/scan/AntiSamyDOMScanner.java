@@ -23,13 +23,10 @@
  */
 package org.owasp.validator.html.scan;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import org.apache.batik.css.parser.ParseException;
 import org.apache.xerces.dom.DocumentImpl;
 import org.cyberneko.html.parsers.DOMFragmentParser;
 import org.owasp.validator.css.CssScanner;
-import org.owasp.validator.css.ExternalCssScanner;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
@@ -70,9 +67,7 @@ import java.util.regex.Pattern;
  * 
  * @author Arshan Dabirsiaghi
  */
-@SuppressFBWarnings(value = "REDOS", justification="Tested the Regex against saferegex and safe-regex and not vulnerable")
 public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
-
     private Document document = new DocumentImpl();
     private DocumentFragment dom = document.createDocumentFragment();
     private CleanResults results = null;
@@ -132,6 +127,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         }
 
         isNofollowAnchors = policy.isNofollowAnchors();
+        isNoopenerAndNoreferrerAnchors = policy.isNoopenerAndNoreferrerAnchors();
         isValidateParamAsEmbed = policy.isValidateParamAsEmbed();
 
         long startOfScan = System.currentTimeMillis();
@@ -372,8 +368,22 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
         if (processAttributes(ele, tagName, tag, currentStackDepth)) return; // can't process any more if we
 
-        if (isNofollowAnchors && "a".equals(tagNameLowerCase)) {
-            ele.setAttribute("rel", "nofollow");
+        if ("a".equals(tagNameLowerCase)) {
+            boolean addNofollow = isNofollowAnchors;
+            boolean addNoopenerAndNoreferrer = false;
+
+            if (isNoopenerAndNoreferrerAnchors) {
+                Node targetAttribute = ele.getAttributes().getNamedItem("target");
+                if (targetAttribute != null && targetAttribute.getNodeValue().equalsIgnoreCase("_blank")) {
+                    addNoopenerAndNoreferrer = true;
+                }
+            }
+
+            Node relAttribute = ele.getAttributes().getNamedItem("rel");
+            String relValue = Attribute.mergeRelValuesInAnchor(addNofollow, addNoopenerAndNoreferrer, relAttribute == null ? "" : relAttribute.getNodeValue());
+            if (!relValue.isEmpty()){
+                ele.setAttribute("rel", relValue.trim());
+            }
         }
 
         processChildren(eleChildNodes, currentStackDepth);
@@ -394,13 +404,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         /*
          * Invoke the css parser on this element.
          */
-        CssScanner styleScanner;
-
-        if (policy.isEmbedStyleSheets()) {
-            styleScanner = new ExternalCssScanner(policy, messages);
-        } else {
-            styleScanner = new CssScanner(policy, messages);
-        }
+        CssScanner styleScanner = new CssScanner(policy, messages, policy.isEmbedStyleSheets());
 
         try {
             Node firstChild = ele.getFirstChild();
@@ -491,6 +495,10 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
              */
             if (attr == null) {
                 attr = policy.getGlobalAttributeByName(name);
+                if (attr == null && policy.isAllowDynamicAttributes()) {
+                    // not a global attribute, perhaps it is a dynamic attribute, if allowed
+                    attr = policy.getDynamicAttributeByName(name);
+                }
             }
 
             /*
@@ -502,7 +510,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                 /*
                  * Invoke the CSS parser on this element.
                  */
-                CssScanner styleScanner = new CssScanner(policy, messages);
+                CssScanner styleScanner = new CssScanner(policy, messages, false);
 
                 try {
                     CleanResults cr = styleScanner.scanInlineStyle(value, tagName, policy.getMaxInputSize());

@@ -4,5 +4,6 @@ target/
 .DS_Store
 .classpath
 .java-version
+.idea
 
 antisamy.iml

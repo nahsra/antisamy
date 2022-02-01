@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF=8"?>
+<FindBugsFilter>
+
+  <!-- The constructor's adoption of a reference to the ResourceBundle parameter to the constructor does
+       not expose an internal representation by storing an externally mutable object because ResourceBundles
+       are not mutable. They can only be changed during construction. -->
+  <Match>
+    <Class name="org.owasp.validator.css.CssScanner" />
+    <!-- The method name of a constructor is <init>. Then you have to HTML encode the <> to make those characters valid in the Method name. -->
+    <Method name="&lt;init&gt;" params="org.owasp.validator.html.InternalPolicy,java.util.ResourceBundle,boolean" />
+    <Bug pattern="EI_EXPOSE_REP2" />
+  </Match>
+
+  <!-- This method accepts a String that points to a file. As such, it 'could' "read a file whose location might be specified by user input".
+       However, the file would have to be a valid AntiSamy policy file, and the AntiSamy library user would also have to allow user input to 
+       effect the policy file location, which is extremely unlikely.  -->
+  <Match>
+    <Class name="org.owasp.validator.html.Policy" />
+    <Method name="getInstance" params="java.lang.String" returns="org.owasp.validator.html.Policy" />
+    <Bug pattern="PATH_TRAVERSAL_IN" />
+  </Match>
+
+  <!-- This method does NOT expose an internal representation by returning an externally mutable 
+       object, because the List returned is of type: Collections.unmodifiableList(). -->
+  <Match>
+    <Class name="org.owasp.validator.html.CleanResults" />
+    <Method name="getErrorMessages" returns="java.util.List" />
+    <Bug pattern="EI_EXPOSE_REP" />
+  </Match>
+
+  <!-- These three methods do NOT expose an internal representation by returning an externally mutable 
+       object, because the List returned is of type: Collections.unmodifiableList(). -->
+  <Match>
+    <Class name="org.owasp.validator.html.model.Property" />
+    <Or>
+      <Method name="getAllowedRegExp" returns="java.util.List" />
+      <Method name="getAllowedValues" returns="java.util.List" />
+      <Method name="getShorthandRefs" returns="java.util.List" />
+    </Or>
+    <Bug pattern="EI_EXPOSE_REP" />
+  </Match>
+
+  <!-- The constructor's adoption of a reference to the ResourceBundle parameter to the constructor does 
+       not expose an internal representation by storing an externally mutable object because ResourceBundles 
+       are not mutable. They can only be changed during construction. -->
+  <Match>
+    <Class name="org.owasp.validator.html.scan.MagicSAXFilter" />
+    <!-- The method name of a constructor is <init>. Then you have to HTML encode the <> to make those characters valid in the Method name. -->
+    <Method name="&lt;init&gt;" params="java.util.ResourceBundle" />
+    <Bug pattern="EI_EXPOSE_REP2" />
+  </Match>
+
+  <!-- We tested the Regex used by these two classes against saferegex and safe-regex and the regex they use is not vulnerable. -->
+  <Match>
+    <Or>
+      <Class name="org.owasp.validator.html.scan.AntiSamyDOMScanner" />
+      <Class name="org.owasp.validator.html.scan.MagicSAXFilter" />
+    </Or>
+    <Bug pattern="REDOS" />
+  </Match>
+
+</FindBugsFilter>
+

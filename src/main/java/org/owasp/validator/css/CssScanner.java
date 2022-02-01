@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -28,9 +28,12 @@
  */
 package org.owasp.validator.css;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,9 +43,18 @@ import java.util.regex.Pattern;
 
 import org.apache.batik.css.parser.ParseException;
 import org.apache.batik.css.parser.Parser;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.InternalPolicy;
+import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
+import org.owasp.validator.html.util.ErrorMessageUtil;
+import org.owasp.validator.html.util.HTMLEntityEncoder;
 import org.w3c.css.sac.InputSource;
 
 /**
@@ -65,18 +77,37 @@ public class CssScanner {
     /**
      * The parser to be used in any scanning
      */
-    protected final Parser parser = new Parser();
+    private final Parser parser = new CssParser();
 
     /**
      * The policy file to be used in any scanning
      */
-    protected final InternalPolicy policy;
+    private final InternalPolicy policy;
 
     /**
      * The message bundled to pull error messages from.
      */
-    protected final ResourceBundle messages;
-    private static final Pattern p = Pattern.compile(CDATA, Pattern.DOTALL);
+    private final ResourceBundle messages;
+
+    /**
+     * The message bundled to pull error messages from.
+     */
+    private final boolean shouldParseImportedStyles;
+
+    private static final Pattern cdataMatchPattern = Pattern.compile(CDATA, Pattern.DOTALL);
+
+    /**
+     * Constructs a scanner based on the given policy. This version of the constructor defaults
+     * shouldParseImportedStyles to false. Look at the other constructor for a description of that parameter.
+     *
+     * @param policy
+     *                the policy to follow when scanning
+     * @param messages
+     *                the error message bundle to pull from
+     */
+    public CssScanner(InternalPolicy policy, ResourceBundle messages) {
+        this(policy, messages, false);
+    }
 
     /**
      * Constructs a scanner based on the given policy.
@@ -85,10 +116,15 @@ public class CssScanner {
      *                the policy to follow when scanning
      * @param messages
      *                the error message bundle to pull from
+     * @param shouldParseImportedStyles
+     *                Flag to indicate if styles within @import directives should be imported and
+     *                parsed in the resulting style sheet. This boolean determines if URLs should be
+     *                recognized when parsing styles (i.e., to fetch them or ignore them).
      */
-    public CssScanner(InternalPolicy policy, ResourceBundle messages) {
+    public CssScanner(InternalPolicy policy, ResourceBundle messages, boolean shouldParseImportedStyles) {
     	this.policy = policy;
     	this.messages = messages;
+    	this.shouldParseImportedStyles = shouldParseImportedStyles;
     }
 
     /**
@@ -116,18 +152,14 @@ public class CssScanner {
          * and end with ]]>(\s)*.
          */
 
-        Matcher m = p.matcher(taintedCss);
+        Matcher m = cdataMatchPattern.matcher(taintedCss);
         boolean isCdata = m.matches();
 
         if ( isCdata ) {
             taintedCss = m.group(1);
         }
 
-        // Create a queue of all style sheets that need to be validated to
-        // account for any sheets that may be imported by the current CSS
-        LinkedList<URI> stylesheets = new LinkedList<URI>();
-
-        CssHandler handler = new CssHandler(policy, stylesheets, errorMessages, messages);
+        CssHandler handler = new CssHandler(policy, errorMessages, messages);
 
         // parse the stylesheet
         parser.setDocumentHandler(handler);
@@ -145,9 +177,7 @@ public class CssScanner {
 	        throw new ScanException(e);
         }
 
-        parseImportedStylesheets(stylesheets, handler, errorMessages, sizeLimit);
-
-        String cleaned = handler.getCleanStylesheet();
+        String cleaned = getCleanStylesheetWithImports(sizeLimit, errorMessages, handler);
 
         if ( isCdata && !policy.isUseXhtml()) {
             cleaned = "<![CDATA[[" + cleaned + "]]>";
@@ -183,11 +213,7 @@ public class CssScanner {
 
         List<String> errorMessages = new ArrayList<String>();
 
-        // Create a queue of all style sheets that need to be validated to
-        // account for any sheets that may be imported by the current CSS
-        LinkedList<URI> stylesheets = new LinkedList<URI>();
-
-        CssHandler handler = new CssHandler(policy, stylesheets, errorMessages, tagName, messages);
+        CssHandler handler = new CssHandler(policy, errorMessages, messages, tagName);
 
         parser.setDocumentHandler(handler);
 
@@ -201,31 +227,121 @@ public class CssScanner {
             throw new ScanException(ioe);
         }
 
-        parseImportedStylesheets(stylesheets, handler, errorMessages, sizeLimit);
+        String cleaned = getCleanStylesheetWithImports(sizeLimit, errorMessages, handler);
 
-        return new CleanResults(startOfScan, handler.getCleanStylesheet(), null, errorMessages);
+        return new CleanResults(startOfScan, cleaned, null, errorMessages);
     }
-    
+
+    private String getCleanStylesheetWithImports(int sizeLimit, List<String> errorMessages, CssHandler handler)
+            throws ScanException {
+        String cleaned = handler.getCleanStylesheet();
+        if (shouldParseImportedStyles) {
+            handler.emptyStyleSheet();
+            parseImportedStylesheets(handler.getImportedStylesheetsURIList(), errorMessages, sizeLimit);
+            // If there are styles to import they must be added to the beginning
+            cleaned = handler.getCleanStylesheet() + cleaned;
+        }
+        return cleaned;
+    }
+
     /**
-	 * Parses through a <code>LinkedList</code> of imported stylesheet
-	 * URIs, this method parses through those stylesheets and validates them
-	 * 
-	 * @param stylesheets
-	 *                the <code>LinkedList</code> of stylesheet URIs to
-	 *                parse
-	 * @param handler
-	 *                the <code>CssHandler</code> to use for parsing
-	 * @param errorMessages
-	 *                the list of error messages to append to
-	 * @param sizeLimit
-	 *                the limit on the total size in bites of any imported
-	 *                stylesheets
-	 * @throws ScanException
-	 *                 if an error occurs during scanning
-	 */
-	protected void parseImportedStylesheets(LinkedList<URI> stylesheets, CssHandler handler,
-			List<String> errorMessages, int sizeLimit) throws ScanException {
-		// Implemented in ExternalCssScanner.java
-	}
+     * Parses through a <code>LinkedList</code> of imported stylesheet
+     * URIs, this method parses through those stylesheets and validates them
+     *
+     * @param stylesheets the <code>LinkedList</code> of stylesheet URIs to parse
+     * @param errorMessages the list of error messages to append to
+     * @param sizeLimit the limit on the total size in bites of any imported stylesheets
+     * @throws ScanException if an error occurs during scanning
+     */
+    private void parseImportedStylesheets(LinkedList<URI> stylesheets, List<String> errorMessages, int sizeLimit)
+            throws ScanException {
+        // if stylesheets were imported by the inline style declaration,
+        // continue parsing the nested styles. Note this only happens
+        // if CSS importing was enabled in the policy file
+        if (!stylesheets.isEmpty()) {
+            int importedStylesheets = 0;
+
+            // Ensure that we have appropriate timeout values so we don't
+            // get DoSed waiting for returns
+            int timeout = DEFAULT_TIMEOUT;
+            try {
+                timeout = Integer.parseInt(policy.getDirective(Policy.CONNECTION_TIMEOUT));
+            } catch (NumberFormatException nfe) {
+            }
+
+            RequestConfig requestConfig = RequestConfig.custom()
+                    .setSocketTimeout(timeout)
+                    .setConnectTimeout(timeout)
+                    .setConnectionRequestTimeout(timeout)
+                    .build();
+
+            HttpClient httpClient = HttpClientBuilder.create().
+                    disableAutomaticRetries().
+                    disableConnectionState().
+                    disableCookieManagement().
+                    setDefaultRequestConfig(requestConfig).
+                    build();
+
+            int allowedImports = Policy.DEFAULT_MAX_STYLESHEET_IMPORTS;
+            try {
+                allowedImports = Integer.parseInt(policy.getDirective("maxStyleSheetImports"));
+            } catch (NumberFormatException nfe) {
+            }
+
+            while (!stylesheets.isEmpty()) {
+
+                URI stylesheetUri = stylesheets.removeFirst();
+
+                if (++importedStylesheets > allowedImports) {
+                    errorMessages.add(ErrorMessageUtil.getMessage(
+                            messages,
+                            ErrorMessageUtil.ERROR_CSS_IMPORT_EXCEEDED,
+                            new Object[] {
+                                    HTMLEntityEncoder.htmlEntityEncode(stylesheetUri.toString()),
+                                    String.valueOf(allowedImports) }));
+                    continue;
+                }
+
+                HttpGet stylesheetRequest = new HttpGet(stylesheetUri);
+
+                byte[] stylesheet = null;
+                try {
+                    // pull down stylesheet, observing size limit
+                    HttpResponse response = httpClient.execute(stylesheetRequest);
+                    stylesheet = EntityUtils.toByteArray(response.getEntity());
+                    if (stylesheet != null && stylesheet.length > sizeLimit) {
+                        errorMessages.add(ErrorMessageUtil.getMessage(
+                                messages,
+                                ErrorMessageUtil.ERROR_CSS_IMPORT_INPUT_SIZE,
+                                new Object[] {
+                                        HTMLEntityEncoder.htmlEntityEncode(stylesheetUri.toString()),
+                                        String.valueOf(policy.getMaxInputSize()) }));
+                        stylesheet = null;
+                    }
+                } catch (IOException ioe) {
+                    errorMessages.add(ErrorMessageUtil.getMessage(
+                            messages,
+                            ErrorMessageUtil.ERROR_CSS_IMPORT_FAILURE,
+                            new Object[] { HTMLEntityEncoder.htmlEntityEncode(stylesheetUri.toString()) }));
+                } finally {
+                    stylesheetRequest.releaseConnection();
+                }
+
+                if (stylesheet != null) {
+                    // decrease the size limit based on the
+                    sizeLimit -= stylesheet.length;
+
+                    try {
+                        InputSource nextStyleSheet = new InputSource(
+                                new InputStreamReader(new ByteArrayInputStream(stylesheet), Charset.forName("UTF8")));
+                        parser.parseStyleSheet(nextStyleSheet);
+
+                    } catch (IOException ioe) {
+                        throw new ScanException(ioe);
+                    }
+                }
+            } // end while
+        } // end if
+    } // end parseImportedStylesheets()
 	
 }

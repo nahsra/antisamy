@@ -123,38 +123,83 @@ public class CssHandler implements DocumentHandler {
 	 * @param embeddedStyleSheets
 	 *            the queue of stylesheets imported
 	 * @param errorMessages
-	 *            the List of error messages to use if there are errors
+	 *            the List of error messages to add error messages too if there are errors
+	 * @param messages
+	 *            the error message bundle to pull from
+	 *
+	 * @deprecated The embeddedStyleSheets List parameter is removed in the newer version of
+	 * this constructor as the handler has its own internal list that can be accessed through
+	 * the getImportedStylesheetsURIList() method.
+	 */
+	@Deprecated
+	public CssHandler(Policy policy, LinkedList<URI> embeddedStyleSheets,
+					  List<String> errorMessages, ResourceBundle messages) {
+		this(policy, embeddedStyleSheets, errorMessages, null, messages);
+	}
+
+	/**
+	 * Constructs a handler for stylesheets using the given policy. The List of embedded stylesheets
+	 * produced by this constructor is now available via the getImportedStylesheetsURIList() method.
+	 * This constructor to be used when there is no tag name associated with this inline style.
+	 *
+	 * @param policy
+	 *            the policy to use
+	 * @param errorMessages
+	 *            the List of error messages to add error messages too if there are errors
 	 * @param messages
 	 *            the error message bundle to pull from
 	 */
-	public CssHandler(Policy policy, LinkedList<URI> embeddedStyleSheets,
-		List<String> errorMessages, ResourceBundle messages) {
-		this(policy, embeddedStyleSheets, errorMessages, null, messages);
+	public CssHandler(Policy policy, List<String> errorMessages, ResourceBundle messages) {
+		this(policy, null, errorMessages, null, messages);
+	}
+
+	/**
+	 * Constructs a handler for stylesheets using the given policy. The List of embedded stylesheets
+	 * produced by this constructor is now available via the getImportedStylesheetsURIList() method.
+	 *
+	 * @param policy
+	 *            the policy to use
+	 * @param errorMessages
+	 *            the List of error messages to add error messages too if there are errors
+	 * @param messages
+	 *            the error message bundle to pull from
+	 * @param tagName
+	 *            the tag name associated with this inline style
+	 */
+	public CssHandler(Policy policy, List<String> errorMessages, ResourceBundle messages, String tagName) {
+		this(policy, null, new ArrayList<String>(), tagName, messages);
 	}
 
 	/**
 	 * Constructs a handler for inline style declarations using the given policy
 	 * and queue for imported stylesheets.
-	 * 
+	 *
 	 * @param policy
 	 *            the policy to use
 	 * @param embeddedStyleSheets
 	 *            the queue of stylesheets imported
 	 * @param errorMessages
-	 *            the List of error messages to use if there are errors
+	 *            the List of error messages to add error messages too if there are errors
 	 * @param tagName
-	 *            the associated tag name with this inline style
+	 *            the tag name associated with this inline style
 	 * @param messages
 	 *            the error message bundle to pull from
+	 *
+	 * @deprecated The embeddedStyleSheets List parameter is removed in the newer version of
+	 * this constructor as the handler has its own internal list that can be accessed through
+	 * the getImportedStylesheetsURIList() method.
 	 */
+	@Deprecated
 	public CssHandler(Policy policy, LinkedList<URI> embeddedStyleSheets,
-			List<String> errorMessages, String tagName, ResourceBundle messages) {
+					  List<String> errorMessages, String tagName, ResourceBundle messages) {
 		assert policy instanceof InternalPolicy : policy.getClass();
 		this.policy = (InternalPolicy) policy;
 		this.errorMessages = errorMessages;
 		this.messages = messages;
 		this.validator = new CssValidator(policy);
-		this.importedStyleSheets = embeddedStyleSheets;
+		// Create a queue of all style sheets that need to be validated to
+		// account for any sheets that may be imported by the current CSS
+		this.importedStyleSheets = (embeddedStyleSheets != null ? embeddedStyleSheets : new LinkedList<URI>());
 		this.tagName = tagName;
 		this.isInline = (tagName != null);
 	}
@@ -167,6 +212,22 @@ public class CssHandler implements DocumentHandler {
 	public String getCleanStylesheet() {
 		// Always ensure results contain most recent generation of stylesheet
 		return styleSheet.toString();
+	}
+
+	/**
+	 * Returns a list of imported stylesheets from the main parsed stylesheet.
+	 *
+	 * @return the import stylesheet URI list.
+	 */
+	public LinkedList<URI> getImportedStylesheetsURIList() {
+		return importedStyleSheets;
+	}
+
+	/**
+	 * Empties the stylesheet buffer.
+	 */
+	public void emptyStyleSheet() {
+		styleSheet.delete(0, styleSheet.length());
 	}
 
 	/**
