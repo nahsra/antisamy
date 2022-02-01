@@ -1,5 +1,6 @@
 package org.owasp.validator.html;
 
+import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.model.Tag;
 
 import java.util.Map;
@@ -57,8 +58,8 @@ public class InternalPolicy extends Policy {
         }
     }
 
-    protected InternalPolicy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules) {
-        super(old, directives, tagRules);
+    protected InternalPolicy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules, Map<String, Property> cssRules) {
+        super(old, directives, tagRules, cssRules);
         this.maxInputSize = determineMaxInputSize();
         this.isNofollowAnchors = isTrue(Policy.ANCHORS_NOFOLLOW);
         this.isNoopenerAndNoreferrerAnchors = isTrue(Policy.ANCHORS_NOOPENER_NOREFERRER);

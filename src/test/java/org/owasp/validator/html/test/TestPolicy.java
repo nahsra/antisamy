@@ -35,6 +35,7 @@ import java.util.Map;
 import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
+import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.model.Tag;
 
 /**
@@ -46,8 +47,8 @@ public class TestPolicy extends InternalPolicy {
         super(parseContext);
     }
 
-    protected TestPolicy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules) {
-        super(old, directives, tagRules);
+    protected TestPolicy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules, Map<String, Property> cssRules) {
+        super(old, directives, tagRules, cssRules);
     }
 
     public static TestPolicy getInstance() throws PolicyException {
@@ -75,20 +76,24 @@ public class TestPolicy extends InternalPolicy {
     public TestPolicy cloneWithDirective(String name, String value) {
         Map<String, String> directives = new HashMap<String, String>(this.directives);
         directives.put(name, value);
-        return new TestPolicy(this, Collections.unmodifiableMap(directives), tagRules);
+        return new TestPolicy(this, Collections.unmodifiableMap(directives), tagRules, cssRules);
     }
 
     public TestPolicy addTagRule(Tag tag) {
         Map<String, Tag> newTagRules = new HashMap<String, Tag>(tagRules);
         newTagRules.put(tag.getName().toLowerCase(), tag);
-        return new TestPolicy(this, this.directives, newTagRules);
-
+        return new TestPolicy(this, this.directives, newTagRules, cssRules);
     }
 
     public TestPolicy mutateTag(Tag tag) {
-        Map<String, Tag> newRUles = new HashMap<String, Tag>(this.tagRules);
-        newRUles.put( tag.getName().toLowerCase(), tag);
-        return new TestPolicy(this, this.directives, newRUles);
+        Map<String, Tag> newRules = new HashMap<String, Tag>(this.tagRules);
+        newRules.put( tag.getName().toLowerCase(), tag);
+        return new TestPolicy(this, this.directives, newRules, cssRules);
     }
 
+    public TestPolicy addCssProperty(Property property) {
+        Map<String, Property> newCssRules = new HashMap<String, Property>(cssRules);
+        newCssRules.put(property.getName().toLowerCase(), property);
+        return new TestPolicy(this, this.directives, tagRules, newCssRules);
+    }
 }
