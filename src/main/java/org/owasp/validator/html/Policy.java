@@ -144,6 +144,8 @@ public class Policy {
     public static final String PRESERVE_COMMENTS = "preserveComments";
     public static final String ENTITY_ENCODE_INTL_CHARS = "entityEncodeIntlChars";
     public static final String ALLOW_DYNAMIC_ATTRIBUTES = "allowDynamicAttributes";
+    public static final String MAX_INPUT_SIZE = "maxInputSize";
+    public static final String MAX_STYLESHEET_IMPORTS = "maxStyleSheetImports";
 
     public static final String EXTERNAL_GENERAL_ENTITIES = "http://xml.org/sax/features/external-general-entities";
     public static final String EXTERNAL_PARAM_ENTITIES = "http://xml.org/sax/features/external-parameter-entities";
