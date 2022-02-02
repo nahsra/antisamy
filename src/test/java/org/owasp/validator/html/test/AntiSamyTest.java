@@ -44,11 +44,13 @@ import org.hamcrest.text.MatchesPattern;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1661,6 +1663,30 @@ static final String test33 = "<html>\n"
         // Test properties
         assertThat(as.scan(input, revised, AntiSamy.DOM).getCleanHTML(), both(containsString("-webkit-border-radius")).and(containsString("-moz-border-radius")));
         assertThat(as.scan(input, revised, AntiSamy.SAX).getCleanHTML(), both(containsString("-webkit-border-radius")).and(containsString("-moz-border-radius")));
+    }
+
+    @Test
+    public void testScansWithDifferentPolicyLoading() throws ScanException, PolicyException, URISyntaxException {
+        final String input = "<span>text</span>";
+        // Preload policy, do not specify scan type.
+        AntiSamy asInstance = new AntiSamy(policy);
+        assertThat(asInstance.scan(input).getCleanHTML(), is(input));
+        // Pass policy, assume DOM scan type.
+        assertThat(asInstance.scan(input, policy).getCleanHTML(), is(input));
+        // Pass policy as File.
+        File policyFile = new File(getClass().getResource("/antisamy.xml").toURI());
+        assertThat(asInstance.scan(input, policyFile).getCleanHTML(), is(input));
+        // Pass policy filename.
+        String path = getClass().getResource("/antisamy.xml").getPath();
+        path = System.getProperty("file.separator").equals("\\") && path.startsWith("/") ? path.substring(1) : path;
+        assertThat(asInstance.scan(input, path).getCleanHTML(), is(input));
+        // No preloaded nor passed policy, expected to fail.
+        try {
+            as.scan(input, null, AntiSamy.DOM);
+            fail("Scan with no policy must have thrown an exception.");
+        } catch (PolicyException e) {
+            // An error is expected. Pass.
+        }
     }
 }
 
