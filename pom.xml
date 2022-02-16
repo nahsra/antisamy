@@ -3,7 +3,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.5</version>
+    <version>1.7.0-dev</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -42,10 +42,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2022-01-31T23:13:00Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2022-02-30T14:33:00Z</project.build.outputTimestamp>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
-        <!--  The latest commons-io is 2.11.0, but requires Java 8 starting with 2.7 -->
-        <version.io>2.6</version.io>
+        <version.io>2.11.0</version.io>
         <version.slf4j>1.7.36</version.slf4j>
         <version.spotbugs.maven>4.5.3.0</version.spotbugs.maven>
         <version.spotbugs>4.5.3</version.spotbugs>
@@ -243,10 +242,10 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.0</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                    <testSource>1.7</testSource>
-                    <testTarget>1.7</testTarget>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <testSource>1.8</testSource>
+                    <testTarget>1.8</testTarget>
                     <compilerArgument>-Xlint:unchecked</compilerArgument>
                 </configuration>
             </plugin>
@@ -258,7 +257,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <!-- Note that this plugin version and the specified dependency require Java 8-->
                 <version>3.0.0</version>
                 <dependencies>
                     <dependency>
@@ -274,10 +272,10 @@
                         <configuration>
                             <rules>
                                 <enforceBytecodeVersion>
-                                    <maxJdkVersion>1.7</maxJdkVersion>
+                                    <maxJdkVersion>1.8</maxJdkVersion>
                                     <ignoreOptionals>true</ignoreOptionals>
                                     <ignoredScopes>test</ignoredScopes>
-                                    <message>Dependencies shouldn't require Java 8+.</message>
+                                    <message>Dependencies shouldn't require Java 9+.</message>
                                 </enforceBytecodeVersion>
                                 <requireMavenVersion>
                                     <version>3.3.9</version>
@@ -292,8 +290,8 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>1.7</version>
-                                    <message>Antisamy is written to support Java 7+.</message>
+                                    <version>1.8</version>
+                                    <message>Antisamy is written to support Java 8+.</message>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -483,7 +481,7 @@
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-pmd-plugin</artifactId>
                <configuration>
-                   <targetJdk>1.7</targetJdk>
+                   <targetJdk>1.8</targetJdk>
                    <sourceEncoding>utf-8</sourceEncoding>
                    <!-- excludeFromFailureFile>exclude-pmd.properties</excludeFromFailureFile -->
                </configuration>
