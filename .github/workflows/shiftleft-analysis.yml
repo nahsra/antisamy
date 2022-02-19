@@ -12,7 +12,7 @@ jobs:
   Scan-Build:
     # Scan runs on ubuntu, mac and windows
     runs-on: ubuntu-latest
-      permissions:
+    permissions:
       security-events: write
     steps:
     - uses: actions/checkout@v1
