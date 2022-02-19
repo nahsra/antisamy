@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -113,29 +113,6 @@ public class CssHandler implements DocumentHandler {
 	 * an open selector tag and an close selector tag
 	 */
 	private boolean selectorOpen = false;
-
-	/**
-	 * Constructs a handler for stylesheets using the given policy and queue for
-	 * imported stylesheets.
-	 * 
-	 * @param policy
-	 *            the policy to use
-	 * @param embeddedStyleSheets
-	 *            the queue of stylesheets imported
-	 * @param errorMessages
-	 *            the List of error messages to add error messages too if there are errors
-	 * @param messages
-	 *            the error message bundle to pull from
-	 *
-	 * @deprecated The embeddedStyleSheets List parameter is removed in the newer version of
-	 * this constructor as the handler has its own internal list that can be accessed through
-	 * the getImportedStylesheetsURIList() method.
-	 */
-	@Deprecated
-	public CssHandler(Policy policy, LinkedList<URI> embeddedStyleSheets,
-					  List<String> errorMessages, ResourceBundle messages) {
-		this(policy, embeddedStyleSheets, errorMessages, null, messages);
-	}
 
 	/**
 	 * Constructs a handler for stylesheets using the given policy. The List of embedded stylesheets
