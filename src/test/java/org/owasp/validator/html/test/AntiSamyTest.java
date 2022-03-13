@@ -1662,5 +1662,43 @@ static final String test33 = "<html>\n"
         assertThat(as.scan(input, revised, AntiSamy.DOM).getCleanHTML(), both(containsString("-webkit-border-radius")).and(containsString("-moz-border-radius")));
         assertThat(as.scan(input, revised, AntiSamy.SAX).getCleanHTML(), both(containsString("-webkit-border-radius")).and(containsString("-moz-border-radius")));
     }
+
+    @Test
+    public void testScansWithDifferentPolicyLoading() throws ScanException, PolicyException, URISyntaxException {
+        final String input = "<span>text</span>";
+        // Preload policy, do not specify scan type.
+        AntiSamy asInstance = new AntiSamy(policy);
+        assertThat(asInstance.scan(input).getCleanHTML(), is(input));
+        // Pass policy, assume DOM scan type.
+        assertThat(asInstance.scan(input, policy).getCleanHTML(), is(input));
+        // Pass policy as File.
+        File policyFile = new File(getClass().getResource("/antisamy.xml").toURI());
+        assertThat(asInstance.scan(input, policyFile).getCleanHTML(), is(input));
+        // Pass policy filename.
+        String path = getClass().getResource("/antisamy.xml").getPath();
+        path = System.getProperty("file.separator").equals("\\") && path.startsWith("/") ? path.substring(1) : path;
+        assertThat(asInstance.scan(input, path).getCleanHTML(), is(input));
+        // No preloaded nor passed policy, expected to fail.
+        try {
+            as.scan(input, null, AntiSamy.DOM);
+            fail("Scan with no policy must have thrown an exception.");
+        } catch (PolicyException e) {
+            // An error is expected. Pass.
+        }
+    }
+
+    @Test
+    public void testGithubIssue151() throws ScanException, PolicyException {
+        // Concern is error messages when parsing stylesheets are no longer returned in AntiSamy 1.6.5
+        String input = "<img style=\"FLOAT: right; CURSOR: hand\" src=\"http://site.com/pic.jpg\" />";
+
+        CleanResults result = as.scan(input, policy, AntiSamy.DOM);
+        assertThat(result.getErrorMessages().size(), is(1));
+        assertThat(result.getCleanHTML(), both(containsString("img")).and(not(containsString("CURSOR"))));
+
+        result = as.scan(input, policy, AntiSamy.SAX);
+        assertThat(result.getErrorMessages().size(), is(1));
+        assertThat(result.getCleanHTML(), both(containsString("img")).and(not(containsString("CURSOR"))));
+    }
 }
 
