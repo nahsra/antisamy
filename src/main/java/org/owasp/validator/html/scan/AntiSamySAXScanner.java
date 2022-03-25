@@ -41,7 +41,7 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 
 import org.apache.xerces.xni.parser.XMLDocumentFilter;
-import org.cyberneko.html.parsers.SAXParser;
+import net.sourceforge.htmlunit.cyberneko.parsers.SAXParser;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;

@@ -25,7 +25,7 @@ package org.owasp.validator.html.scan;
 
 import org.apache.batik.css.parser.ParseException;
 import org.apache.xerces.dom.DocumentImpl;
-import org.cyberneko.html.parsers.DOMFragmentParser;
+import net.sourceforge.htmlunit.cyberneko.parsers.DOMFragmentParser;
 import org.owasp.validator.css.CssScanner;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
