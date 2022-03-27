@@ -1688,5 +1688,22 @@ static final String test33 = "<html>\n"
             // An error is expected. Pass.
         }
     }
+<<<<<<< Updated upstream
+=======
+
+    @Test
+    public void testGithubIssue151() throws ScanException, PolicyException {
+        // Concern is error messages when parsing stylesheets are no longer returned in AntiSamy 1.6.5
+        String input = "<img style=\"FLOAT: right; CURSOR: hand\" src=\"http://site.com/pic.jpg\" />";
+
+        CleanResults result = as.scan(input, policy, AntiSamy.DOM);
+        assertThat(result.getErrorMessages().size(), is(1));
+        assertThat(result.getCleanHTML(), both(containsString("img")).and(not(containsString("CURSOR"))));
+
+        result = as.scan(input, policy, AntiSamy.SAX);
+        assertThat(result.getErrorMessages().size(), is(1));
+        assertThat(result.getCleanHTML(), both(containsString("img")).and(not(containsString("CURSOR"))));
+    }
+>>>>>>> Stashed changes
 }
 
