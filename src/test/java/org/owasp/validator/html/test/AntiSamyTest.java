@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
  *
  * All rights reserved.
  *
@@ -1688,9 +1688,7 @@ static final String test33 = "<html>\n"
             // An error is expected. Pass.
         }
     }
-<<<<<<< Updated upstream
-=======
-
+    
     @Test
     public void testGithubIssue151() throws ScanException, PolicyException {
         // Concern is error messages when parsing stylesheets are no longer returned in AntiSamy 1.6.5
@@ -1704,6 +1702,5 @@ static final String test33 = "<html>\n"
         assertThat(result.getErrorMessages().size(), is(1));
         assertThat(result.getCleanHTML(), both(containsString("img")).and(not(containsString("CURSOR"))));
     }
->>>>>>> Stashed changes
 }
 
