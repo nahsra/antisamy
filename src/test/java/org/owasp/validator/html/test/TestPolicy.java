@@ -43,7 +43,7 @@ import org.owasp.validator.html.model.Tag;
  */
 public class TestPolicy extends InternalPolicy {
 
-    protected TestPolicy(Policy.ParseContext parseContext) throws PolicyException {
+    protected TestPolicy(Policy.ParseContext parseContext) {
         super(parseContext);
     }
 
