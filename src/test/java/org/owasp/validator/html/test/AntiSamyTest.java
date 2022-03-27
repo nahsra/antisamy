@@ -1511,11 +1511,13 @@ static final String test33 = "<html>\n"
         // Concern is that "&" is not being encoded and "#00058" was not being interpreted as ":"
         // so the validations based on regexp passed and a browser would load "&:" together.
         // All this when not using the XHTML serializer.
+
+        // UPDATE:  Using a new HTML parser library starts decoding entities like #00058
         Policy revised = policy.cloneWithDirective("useXHTML","false");
         assertThat(as.scan("<p><a href=\"javascript&#00058x=1,%61%6c%65%72%74%28%22%62%6f%6f%6d%22%29\">xss</a></p>", revised, AntiSamy.DOM).getCleanHTML(),
-                containsString("javascript&amp;#00058"));
+                not(containsString("javascript")));
         assertThat(as.scan("<p><a href=\"javascript&#00058x=1,%61%6c%65%72%74%28%22%62%6f%6f%6d%22%29\">xss</a></p>", revised, AntiSamy.SAX).getCleanHTML(),
-                containsString("javascript&amp;#00058"));
+                not(containsString("javascript")));
     }
 
     @Test
