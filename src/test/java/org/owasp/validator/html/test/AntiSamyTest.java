@@ -1702,5 +1702,19 @@ static final String test33 = "<html>\n"
         assertThat(result.getErrorMessages().size(), is(1));
         assertThat(result.getCleanHTML(), both(containsString("img")).and(not(containsString("CURSOR"))));
     }
+
+    @Test
+    public void testSmuggledTagsInStyleContent() throws ScanException, PolicyException {
+        // HTML tags may be smuggled into a style tag after parsing input to an internal representation.
+        // If that happens, they should be treated as text content and not as children nodes.
+
+        Policy revised = policy.cloneWithDirective(Policy.USE_XHTML,"true");
+        assertThat(as.scan("<style/>b<![cdata[</style><a href=javascript:alert(1)>test", revised, AntiSamy.DOM).getCleanHTML(), not(containsString("javascript")));
+        assertThat(as.scan("<style/>b<![cdata[</style><a href=javascript:alert(1)>test", revised, AntiSamy.SAX).getCleanHTML(), not(containsString("javascript")));
+
+        Policy revised2 = policy.cloneWithDirective(Policy.USE_XHTML,"false");
+        assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("script")));
+        assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("script")));
+    }
 }
 
