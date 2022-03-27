@@ -1722,12 +1722,13 @@ static final String test33 = "<html>\n"
     @Test(timeout = 3000)
     public void testMalformedPIScan() {
         // Certain malformed input including a malformed processing instruction may lead the parser to an internal memory error.
-
         try {
             as.scan("<!--><?a/", policy, AntiSamy.DOM).getCleanHTML();
             as.scan("<!--><?a/", policy, AntiSamy.SAX).getCleanHTML();
+        } catch (ScanException ex) {
+            // It is OK, internal parser should fail.
         } catch (Exception ex) {
-            fail("Parser should not throw an exception");
+            fail("Parser should not throw a non-ScanException");
         }
     }
 }
