@@ -1718,5 +1718,16 @@ static final String test33 = "<html>\n"
         assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("script")));
         assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("script")));
     }
-}
 
+    @Test(timeout = 3000)
+    public void testMalformedPIScan() {
+        // Certain malformed input including a malformed processing instruction may lead the parser to an internal memory error.
+
+        try {
+            as.scan("<!--><?a/", policy, AntiSamy.DOM).getCleanHTML();
+            as.scan("<!--><?a/", policy, AntiSamy.SAX).getCleanHTML();
+        } catch (Exception ex) {
+            fail("Parser should not throw an exception");
+        }
+    }
+}
