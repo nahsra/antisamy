@@ -77,7 +77,7 @@
             <groupId>net.sourceforge.htmlunit</groupId>
             <artifactId>neko-htmlunit</artifactId>
             <!-- version 2.25+ requires Java 8 -->
-            <version>2.24</version>
+            <version>2.60.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
