@@ -12,8 +12,10 @@ import java.util.Locale;
 /**
  * This is an extension of the default XHTMLSerializer class that's had it's endElementIO()
  * method tweaked to serialize closing tags and self-closing tags the way we require.
+ *
+ * @deprecated XHTML usage will go away in AntiSamy 1.7+
  */
-@SuppressWarnings("deprecation")
+@Deprecated
 public class ASXHTMLSerializer extends org.apache.xml.serialize.XHTMLSerializer {
 
 	private boolean encodeAllPossibleEntities;
