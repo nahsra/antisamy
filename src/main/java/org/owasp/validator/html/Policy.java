@@ -133,6 +133,8 @@ public class Policy {
 
     public static final String OMIT_XML_DECLARATION = "omitXmlDeclaration";
     public static final String OMIT_DOCTYPE_DECLARATION = "omitDoctypeDeclaration";
+    /** @deprecated XHTML usage will go away in AntiSamy 1.7+ */
+    @Deprecated
     public static final String USE_XHTML = "useXHTML";
     public static final String FORMAT_OUTPUT = "formatOutput";
     public static final String EMBED_STYLESHEETS = "embedStyleSheets";
