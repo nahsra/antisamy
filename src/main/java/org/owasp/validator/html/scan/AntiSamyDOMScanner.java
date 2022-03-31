@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
  *
  * All rights reserved.
  *
@@ -25,7 +25,7 @@ package org.owasp.validator.html.scan;
 
 import org.apache.batik.css.parser.ParseException;
 import org.apache.xerces.dom.DocumentImpl;
-import org.cyberneko.html.parsers.DOMFragmentParser;
+import net.sourceforge.htmlunit.cyberneko.parsers.DOMFragmentParser;
 import org.owasp.validator.css.CssScanner;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
@@ -407,10 +407,17 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         CssScanner styleScanner = new CssScanner(policy, messages, policy.isEmbedStyleSheets());
 
         try {
-            Node firstChild = ele.getFirstChild();
-            if (firstChild != null) {
+            if (ele.getChildNodes().getLength() > 0) {
+                String toScan = "";
 
-                String toScan = firstChild.getNodeValue();
+                for (int i = 0; i < ele.getChildNodes().getLength(); i++) {
+                    Node childNode = ele.getChildNodes().item(i);
+                    if (!toScan.isEmpty()){
+                        toScan += "\n";
+                    }
+                    toScan += childNode.getTextContent();
+                }
+
                 CleanResults cr = styleScanner.scanStyleSheet(toScan, policy.getMaxInputSize());
                 errorMessages.addAll(cr.getErrorMessages());
 
@@ -422,12 +429,17 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                  * break all CSS. To prevent that, we have this check.
                  */
 
-                final String cleanHTML = cr.getCleanHTML();
+                String cleanHTML = cr.getCleanHTML();
+                cleanHTML = cleanHTML == null || cleanHTML.equals("") ? "/* */" : cleanHTML;
 
-                if (cleanHTML == null || cleanHTML.equals("")) {
-                    firstChild.setNodeValue("/* */");
-                } else {
-                    firstChild.setNodeValue(cleanHTML);
+                ele.getFirstChild().setNodeValue(cleanHTML);
+                /*
+                 * Remove every other node after cleaning CSS, there will
+                 * be only one node in the end, as it always should have.
+                 */
+                for (int i = 1; i < ele.getChildNodes().getLength(); i++) {
+                    Node childNode = ele.getChildNodes().item(i);
+                    ele.removeChild(childNode);
                 }
             }
 

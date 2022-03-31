@@ -61,16 +61,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.sourceforge.nekohtml</groupId>
-            <artifactId>nekohtml</artifactId>
-            <version>1.9.22</version>
-            <exclusions>
-                <!-- exclude this as nekohtml uses an older xercesImpl and we want to eliminate the convergence mismatch -->
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>net.sourceforge.htmlunit</groupId>
+            <artifactId>neko-htmlunit</artifactId>
+            <version>2.60.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

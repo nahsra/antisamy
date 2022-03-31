@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -36,7 +36,7 @@ import org.apache.xerces.xni.XMLAttributes;
 import org.apache.xerces.xni.XMLString;
 import org.apache.xerces.xni.XNIException;
 import org.apache.xerces.xni.parser.XMLDocumentFilter;
-import org.cyberneko.html.filters.DefaultFilter;
+import net.sourceforge.htmlunit.cyberneko.filters.DefaultFilter;
 import org.owasp.validator.css.CssScanner;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.InternalPolicy;
