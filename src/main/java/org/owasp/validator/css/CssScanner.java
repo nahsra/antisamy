@@ -275,6 +275,7 @@ public class CssScanner {
             }
 
             RequestConfig requestConfig = RequestConfig.custom()
+                    .setConnectTimeout(timeout)
                     .setResponseTimeout(timeout)
                     .setConnectionRequestTimeout(timeout)
                     .build();
