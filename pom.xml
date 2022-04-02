@@ -3,7 +3,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.6-dev</version>
+    <version>1.6.6</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -42,7 +42,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2022-01-31T23:13:00Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2022-04-21T21:46:00Z</project.build.outputTimestamp>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <version.io>2.11.0</version.io>
         <version.slf4j>1.7.36</version.slf4j>
@@ -69,6 +69,13 @@
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
             <version>5.1.3</version>
+            <exclusions>
+                <!-- exclude this old version of slf4j-api as newer can be used -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.core5</groupId>

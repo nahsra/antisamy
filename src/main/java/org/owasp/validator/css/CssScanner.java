@@ -333,7 +333,7 @@ public class CssScanner {
                 try {
                     String responseBody = httpClient.execute(new HttpGet(stylesheetUri), responseHandler);
                     // pull down stylesheet, observing size limit
-                    stylesheet = responseBody.getBytes();
+                    stylesheet = responseBody.getBytes(Charset.forName("UTF8"));
                     if (stylesheet != null && stylesheet.length > sizeLimit) {
                         errorMessages.add(ErrorMessageUtil.getMessage(
                                 messages,

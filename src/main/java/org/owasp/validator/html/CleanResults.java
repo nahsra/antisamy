@@ -98,7 +98,8 @@ public class CleanResults {
 
 	/**
 	 * Return the DOM version of the clean HTML.
-	 * return The XML Document fragment version of the clean HTML produced during the sanitization process.
+	 *
+	 * @return The XML Document fragment version of the clean HTML produced during the sanitization process.
 	 *        This may be null, even if the clean HTML String is not null.
 	 */
 	public DocumentFragment getCleanXMLDocumentFragment() {

@@ -408,17 +408,17 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
         try {
             if (ele.getChildNodes().getLength() > 0) {
-                String toScan = "";
+                StringBuffer toScan = new StringBuffer();
 
                 for (int i = 0; i < ele.getChildNodes().getLength(); i++) {
                     Node childNode = ele.getChildNodes().item(i);
-                    if (!toScan.isEmpty()){
-                        toScan += "\n";
+                    if (toScan.length() > 0) {
+                        toScan.append("\n");
                     }
-                    toScan += childNode.getTextContent();
+                    toScan.append(childNode.getTextContent());
                 }
 
-                CleanResults cr = styleScanner.scanStyleSheet(toScan, policy.getMaxInputSize());
+                CleanResults cr = styleScanner.scanStyleSheet(toScan.toString(), policy.getMaxInputSize());
                 errorMessages.addAll(cr.getErrorMessages());
 
                 /*
