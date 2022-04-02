@@ -167,7 +167,7 @@ public class CssHandler implements DocumentHandler {
 	 *            the tag name associated with this inline style
 	 */
 	public CssHandler(Policy policy, List<String> errorMessages, ResourceBundle messages, String tagName) {
-		this(policy, null, new ArrayList<String>(), tagName, messages);
+		this(policy, null, errorMessages, tagName, messages);
 	}
 
 	/**

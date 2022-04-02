@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
  *
  * All rights reserved.
  *
@@ -44,11 +44,13 @@ import org.hamcrest.text.MatchesPattern;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1509,11 +1511,13 @@ static final String test33 = "<html>\n"
         // Concern is that "&" is not being encoded and "#00058" was not being interpreted as ":"
         // so the validations based on regexp passed and a browser would load "&:" together.
         // All this when not using the XHTML serializer.
+
+        // UPDATE: Using a new HTML parser library starts decoding entities like #00058
         Policy revised = policy.cloneWithDirective("useXHTML","false");
         assertThat(as.scan("<p><a href=\"javascript&#00058x=1,%61%6c%65%72%74%28%22%62%6f%6f%6d%22%29\">xss</a></p>", revised, AntiSamy.DOM).getCleanHTML(),
-                containsString("javascript&amp;#00058"));
+                not(containsString("javascript")));
         assertThat(as.scan("<p><a href=\"javascript&#00058x=1,%61%6c%65%72%74%28%22%62%6f%6f%6d%22%29\">xss</a></p>", revised, AntiSamy.SAX).getCleanHTML(),
-                containsString("javascript&amp;#00058"));
+                not(containsString("javascript")));
     }
 
     @Test
@@ -1661,6 +1665,71 @@ static final String test33 = "<html>\n"
         // Test properties
         assertThat(as.scan(input, revised, AntiSamy.DOM).getCleanHTML(), both(containsString("-webkit-border-radius")).and(containsString("-moz-border-radius")));
         assertThat(as.scan(input, revised, AntiSamy.SAX).getCleanHTML(), both(containsString("-webkit-border-radius")).and(containsString("-moz-border-radius")));
+    }
+
+    @Test
+    public void testScansWithDifferentPolicyLoading() throws ScanException, PolicyException, URISyntaxException {
+        final String input = "<span>text</span>";
+        // Preload policy, do not specify scan type.
+        AntiSamy asInstance = new AntiSamy(policy);
+        assertThat(asInstance.scan(input).getCleanHTML(), is(input));
+        // Pass policy, assume DOM scan type.
+        assertThat(asInstance.scan(input, policy).getCleanHTML(), is(input));
+        // Pass policy as File.
+        File policyFile = new File(getClass().getResource("/antisamy.xml").toURI());
+        assertThat(asInstance.scan(input, policyFile).getCleanHTML(), is(input));
+        // Pass policy filename.
+        String path = getClass().getResource("/antisamy.xml").getPath();
+        path = System.getProperty("file.separator").equals("\\") && path.startsWith("/") ? path.substring(1) : path;
+        assertThat(asInstance.scan(input, path).getCleanHTML(), is(input));
+        // No preloaded nor passed policy, expected to fail.
+        try {
+            as.scan(input, null, AntiSamy.DOM);
+            fail("Scan with no policy must have thrown an exception.");
+        } catch (PolicyException e) {
+            // An error is expected. Pass.
+        }
+    }
+
+    @Test
+    public void testGithubIssue151() throws ScanException, PolicyException {
+        // Concern is error messages when parsing stylesheets are no longer returned in AntiSamy 1.6.5
+        String input = "<img style=\"FLOAT: right; CURSOR: hand\" src=\"http://site.com/pic.jpg\" />";
+
+        CleanResults result = as.scan(input, policy, AntiSamy.DOM);
+        assertThat(result.getErrorMessages().size(), is(1));
+        assertThat(result.getCleanHTML(), both(containsString("img")).and(not(containsString("CURSOR"))));
+
+        result = as.scan(input, policy, AntiSamy.SAX);
+        assertThat(result.getErrorMessages().size(), is(1));
+        assertThat(result.getCleanHTML(), both(containsString("img")).and(not(containsString("CURSOR"))));
+    }
+
+    @Test
+    public void testSmuggledTagsInStyleContent() throws ScanException, PolicyException {
+        // HTML tags may be smuggled into a style tag after parsing input to an internal representation.
+        // If that happens, they should be treated as text content and not as children nodes.
+
+        Policy revised = policy.cloneWithDirective(Policy.USE_XHTML,"true");
+        assertThat(as.scan("<style/>b<![cdata[</style><a href=javascript:alert(1)>test", revised, AntiSamy.DOM).getCleanHTML(), not(containsString("javascript")));
+        assertThat(as.scan("<style/>b<![cdata[</style><a href=javascript:alert(1)>test", revised, AntiSamy.SAX).getCleanHTML(), not(containsString("javascript")));
+
+        Policy revised2 = policy.cloneWithDirective(Policy.USE_XHTML,"false");
+        assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("script")));
+        assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("script")));
+    }
+
+    @Test(timeout = 3000)
+    public void testMalformedPIScan() {
+        // Certain malformed input including a malformed processing instruction may lead the parser to an internal memory error.
+        try {
+            as.scan("<!--><?a/", policy, AntiSamy.DOM).getCleanHTML();
+            as.scan("<!--><?a/", policy, AntiSamy.SAX).getCleanHTML();
+        } catch (ScanException ex) {
+            // It is OK, internal parser should fail.
+        } catch (Exception ex) {
+            fail("Parser should not throw a non-ScanException");
+        }
     }
 }
 

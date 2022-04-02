@@ -43,12 +43,17 @@ import java.util.regex.Pattern;
 
 import org.apache.batik.css.parser.ParseException;
 import org.apache.batik.css.parser.Parser;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.util.Timeout;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
@@ -70,7 +75,7 @@ import org.w3c.css.sac.InputSource;
  */
 public class CssScanner {
 
-    protected static final int DEFAULT_TIMEOUT = 1000;
+    protected static final Timeout DEFAULT_TIMEOUT = Timeout.ofMilliseconds(1000);
 
     private static final String CDATA = "^\\s*<!\\[CDATA\\[(.*)\\]\\]>\\s*$";
     
@@ -263,15 +268,15 @@ public class CssScanner {
 
             // Ensure that we have appropriate timeout values so we don't
             // get DoSed waiting for returns
-            int timeout = DEFAULT_TIMEOUT;
+            Timeout timeout = DEFAULT_TIMEOUT;
             try {
-                timeout = Integer.parseInt(policy.getDirective(Policy.CONNECTION_TIMEOUT));
+                timeout = Timeout.ofMilliseconds(Long.parseLong(policy.getDirective(Policy.CONNECTION_TIMEOUT)));
             } catch (NumberFormatException nfe) {
             }
 
             RequestConfig requestConfig = RequestConfig.custom()
-                    .setSocketTimeout(timeout)
                     .setConnectTimeout(timeout)
+                    .setResponseTimeout(timeout)
                     .setConnectionRequestTimeout(timeout)
                     .build();
 
@@ -302,13 +307,33 @@ public class CssScanner {
                     continue;
                 }
 
-                HttpGet stylesheetRequest = new HttpGet(stylesheetUri);
+                // Pulled directly from: https://github.com/apache/httpcomponents-client/blob/5.1.x/httpclient5/src/test/java/org/apache/hc/client5/http/examples/ClientWithResponseHandler.java
+                // Create a custom response handler to read in the stylesheet
+                final HttpClientResponseHandler<String> responseHandler = new HttpClientResponseHandler<String>() {
+
+                    @Override
+                    public String handleResponse(
+                            final ClassicHttpResponse response) throws IOException {
+                        final int status = response.getCode();
+                        if (status >= HttpStatus.SC_SUCCESS && status < HttpStatus.SC_REDIRECTION) {
+                            final HttpEntity entity = response.getEntity();
+                            try {
+                                return entity != null ? EntityUtils.toString(entity) : null;
+                            } catch (final ParseException | org.apache.hc.core5.http.ParseException ex) {
+                                throw new ClientProtocolException(ex);
+                            }
+                        } else {
+                            throw new ClientProtocolException("Unexpected response status: " + status);
+                        }
+                    }
+                };
 
                 byte[] stylesheet = null;
+
                 try {
+                    String responseBody = httpClient.execute(new HttpGet(stylesheetUri), responseHandler);
                     // pull down stylesheet, observing size limit
-                    HttpResponse response = httpClient.execute(stylesheetRequest);
-                    stylesheet = EntityUtils.toByteArray(response.getEntity());
+                    stylesheet = responseBody.getBytes();
                     if (stylesheet != null && stylesheet.length > sizeLimit) {
                         errorMessages.add(ErrorMessageUtil.getMessage(
                                 messages,
@@ -323,8 +348,6 @@ public class CssScanner {
                             messages,
                             ErrorMessageUtil.ERROR_CSS_IMPORT_FAILURE,
                             new Object[] { HTMLEntityEncoder.htmlEntityEncode(stylesheetUri.toString()) }));
-                } finally {
-                    stylesheetRequest.releaseConnection();
                 }
 
                 if (stylesheet != null) {

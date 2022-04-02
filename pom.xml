@@ -44,8 +44,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2022-01-31T23:13:00Z</project.build.outputTimestamp>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
-        <!--   The latest commons-io is 2.11.0, but requires Java 8 starting with 2.7  -->
-        <version.io>2.6</version.io>
+        <version.io>2.11.0</version.io>
         <version.slf4j>1.7.36</version.slf4j>
         <version.spotbugs.maven>4.6.0.0</version.spotbugs.maven>
         <version.spotbugs>4.6.0</version.spotbugs>
@@ -61,49 +60,20 @@
     </profiles>
 
     <dependencies>
-        <!-- dependency>
-            <groupId>net.sourceforge.nekohtml</groupId>
-            <artifactId>nekohtml</artifactId>
-            <version>1.9.22</version>
-            <exclusions>
-                <! exclude this as nekohtml uses an older xercesImpl and we want to eliminate the convergence mismatch >
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency -->
         <dependency>
             <groupId>net.sourceforge.htmlunit</groupId>
             <artifactId>neko-htmlunit</artifactId>
-            <!-- version 2.25+ requires Java 8 -->
-            <version>2.24</version>
+            <version>2.60.0</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
-            <exclusions>
-                <!-- exclude these as httpclient uses older versions of these libraries that we directly import and we want to eliminate the convergence mismatch -->
-                <exclusion>
-                    <groupId>commons-codec</groupId>
-                    <artifactId>commons-codec</artifactId>
-                </exclusion>
-                <!-- exclude obsolete commons-logging in favor of jcl-over-slf4j to ensure logs all pipe through slf4j-api -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                   <groupId>org.apache.httpcomponents</groupId>
-                   <artifactId>httpcore</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.1.3</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.4.15</version>
+            <groupId>org.apache.httpcomponents.core5</groupId>
+            <artifactId>httpcore5</artifactId>
+            <version>5.1.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
@@ -279,10 +249,10 @@
                         <configuration>
                             <rules>
                                 <enforceBytecodeVersion>
-                                    <maxJdkVersion>1.7</maxJdkVersion>
+                                    <maxJdkVersion>1.8</maxJdkVersion>
                                     <ignoreOptionals>true</ignoreOptionals>
                                     <ignoredScopes>test</ignoredScopes>
-                                    <message>Dependencies shouldn't require Java 8+.</message>
+                                    <message>Dependencies shouldn't require Java 9+.</message>
                                 </enforceBytecodeVersion>
                                 <requireMavenVersion>
                                     <version>3.3.9</version>
@@ -298,7 +268,7 @@
                             <rules>
                                 <requireJavaVersion>
                                     <version>1.7</version>
-                                    <message>Antisamy is written to support Java 7+.</message>
+                                    <message>Antisamy source code is written to support Java 7+.</message>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>

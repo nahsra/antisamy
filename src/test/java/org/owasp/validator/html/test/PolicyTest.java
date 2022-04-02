@@ -72,9 +72,9 @@ public class PolicyTest {
     private static final String FOOTER = "</anti-samy-rules>";
 
     // Returns a valid policy file with the specified allowedEmptyTags
-    private String assembleFile(String allowedEmptyTagsSection) {
+    private String assembleFile(String finalTagsSection) {
         return HEADER + DIRECTIVES + COMMON_REGEXPS + COMMON_ATTRIBUTES + GLOBAL_TAG_ATTRIBUTES + DYNAMIC_TAG_ATTRIBUTES + TAG_RULES + CSS_RULES +
-               allowedEmptyTagsSection + FOOTER;
+                finalTagsSection + FOOTER;
     }
 
     @Before
@@ -126,14 +126,64 @@ public class PolicyTest {
     @Test
     public void testGetAllowedEmptyTags_NoSection() throws PolicyException {
         String allowedEmptyTagsSection = "";
-
         String policyFile = assembleFile(allowedEmptyTagsSection);
 
         policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
 
         assertTrue(policy.getAllowedEmptyTags().size() == Constants.defaultAllowedEmptyTags.size());
     }
-    
+
+    @Test
+    public void testGetRequireClosingTags() throws PolicyException {
+        String requireClosingTagsSection = "<require-closing-tags>\n" +
+                "    <literal-list>\n" +
+                "                <literal value=\"td\"/>\n" +
+                "                <literal value=\"span\"/>\n" +
+                "    </literal-list>\n" +
+                "</require-closing-tags>\n";
+        String policyFile = assembleFile(requireClosingTagsSection);
+
+        policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+
+        TagMatcher actualTags = policy.getRequiresClosingTags();
+
+        assertTrue(actualTags.matches("td"));
+        assertTrue(actualTags.matches("span"));
+    }
+
+    @Test
+    public void testGetRequireClosingTags_emptyList() throws PolicyException {
+        String requireClosingTagsSection = "<require-closing-tags>\n" +
+                "    <literal-list>\n" +
+                "    </literal-list>\n" +
+                "</require-closing-tags>\n";
+        String policyFile = assembleFile(requireClosingTagsSection);
+
+        policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+
+        assertEquals(0, policy.getRequiresClosingTags().size());
+    }
+
+    @Test
+    public void testGetRequireClosingTags_emptySection() throws PolicyException {
+        String requireClosingTagsSection = "<require-closing-tags>\n" + "</require-closing-tags>\n";
+        String policyFile = assembleFile(requireClosingTagsSection);
+
+        policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+
+        assertEquals(0, policy.getRequiresClosingTags().size());
+    }
+
+    @Test
+    public void testGetRequireClosingTags_NoSection() throws PolicyException {
+        String requireClosingTagsSection = "";
+        String policyFile = assembleFile(requireClosingTagsSection);
+
+        policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+
+        assertTrue(policy.getRequiresClosingTags().size() == Constants.defaultRequireClosingTags.size());
+    }
+
     @Test
     public void testInvalidPolicies() {
         // Default is to now enforce schema validation on policy files.
@@ -293,6 +343,24 @@ public class PolicyTest {
         } catch (PolicyException e) {
             assertNotNull(e);
         }
+    }
+
+    @Test
+    public void testSchemaValidationWithOptionallyDefinedTags() throws PolicyException {
+        String allowedEmptyTagsSection = "<allowed-empty-tags>\n" +
+                "    <literal-list>\n" +
+                "                <literal value=\"span\"/>\n" +
+                "    </literal-list>\n" +
+                "</allowed-empty-tags>\n";
+        String requireClosingTagsSection = "<require-closing-tags>\n" +
+                "    <literal-list>\n" +
+                "                <literal value=\"span\"/>\n" +
+                "    </literal-list>\n" +
+                "</require-closing-tags>\n";
+        String policyFile = assembleFile(allowedEmptyTagsSection + requireClosingTagsSection);
+
+        policy = Policy.getInstance(new ByteArrayInputStream(policyFile.getBytes()));
+        // If it reaches this point, it passed schema validation, which is what we want.
     }
 
     @Test

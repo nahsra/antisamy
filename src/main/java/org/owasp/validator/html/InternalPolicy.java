@@ -132,6 +132,8 @@ public class InternalPolicy extends Policy {
         return omitXmlDeclaration;
     }
 
+    /** @deprecated XHTML usage will go away in AntiSamy 1.7+ */
+    @Deprecated
     public boolean isUseXhtml() {
         return useXhtml;
     }
