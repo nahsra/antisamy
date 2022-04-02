@@ -31,3 +31,5 @@ These are the known CVEs reported for AntiSamy:
 * AntiSamy CVE #1 - CVE-2016-10006: XSS Bypass in AntiSamy before v1.5.5 - https://www.cvedetails.com/cve/CVE-2016-10006
 * AntiSamy CVE #2 - CVE-2017-14735: XSS via HTML5 Entities in AntiSamy before v1.5.7 - https://www.cvedetails.com/cve/CVE-2017-14735
 * AntiSamy CVE #3 - CVE-2021-35043: XSS via HTML attributes using &#00058 as replacement for : character before v1.6.4 - https://www.cvedetails.com/cve/CVE-2021-35043
+# AntiSamy CVEs #4 & #5 - We don't have CVEs yet for these. A vulnerability in a dependency was also found at the same time and fixed by upgrading to a fixed version of that dependency.
+
