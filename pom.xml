@@ -3,7 +3,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.6</version>
+    <version>1.6.6.1</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -41,9 +41,11 @@
     </scm>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2022-04-21T21:46:00Z</project.build.outputTimestamp>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.outputTimestamp>2022-04-07T19:23:45Z</project.build.outputTimestamp>
+        <project.java.target>1.7</project.java.target>
+        <version.findsecbugs>1.12.0</version.findsecbugs>
         <version.io>2.11.0</version.io>
         <version.slf4j>1.7.36</version.slf4j>
         <version.spotbugs.maven>4.6.0.0</version.spotbugs.maven>
@@ -219,18 +221,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <testSource>1.8</testSource>
-                    <testTarget>1.8</testTarget>
-                    <compilerArgument>-Xlint:unchecked</compilerArgument>
+                    <source>${project.java.target}</source>
+                    <target>${project.java.target}</target>
+                    <testSource>${project.java.target}</testSource>
+                    <testTarget>${project.java.target}</testTarget>
+                    <compilerArgument>
+                        <!-- Eventual desire is to use -Xlint:all -->
+                        -Xlint:unchecked
+                    </compilerArgument>
                 </configuration>
             </plugin>
             <plugin>
@@ -247,6 +252,11 @@
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>extra-enforcer-rules</artifactId>
                         <version>1.5.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>animal-sniffer-enforcer-rule</artifactId>
+                        <version>1.21</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -274,11 +284,28 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>1.7</version>
+                                    <version>${project.java.target}</version>
                                     <message>Antisamy source code is written to support Java 7+.</message>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
+                    </execution>
+                    <execution>
+                      <id>check-java7API-signatures</id>
+                      <phase>compile</phase>
+                      <goals><goal>enforce</goal></goals>
+                      <configuration>
+                        <rules>
+                          <checkSignatureRule implementation="org.codehaus.mojo.animal_sniffer.enforcer.CheckSignatureRule">
+                            <signature>
+                              <groupId>org.codehaus.mojo.signature</groupId>
+                              <!-- Check against Java 7 API -->
+                              <artifactId>java17</artifactId>
+                              <version>1.0</version>
+                            </signature>
+                          </checkSignatureRule>
+                        </rules>
+                      </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -326,6 +353,21 @@
                </executions>
             </plugin>
             <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-jxr-plugin</artifactId>
+               <version>3.2.0</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-pmd-plugin</artifactId>
+               <version>3.16.0</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-project-info-reports-plugin</artifactId>
+               <version>3.2.2</version>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.2.0</version>
@@ -350,7 +392,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>3.0.0-M6</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.10.0</version>
             </plugin>
             <plugin>
                 <groupId>org.cyclonedx</groupId>
@@ -366,7 +413,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
+                <version>0.8.8</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -411,31 +458,72 @@
                 </dependencies>
             </plugin>
             <plugin>
-               <!-- Necessary on pmd 3.16.0 only due to leak of old asm, remove this after next pmd plugin release.
-                    Delete this entire build plugin block in 3.16+ as maven-pmd-plugin is only needed in the reporting block.  -->
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-pmd-plugin</artifactId>
-               <version>3.16.0</version>
-               <dependencies>
-                   <!-- Without this, 3.15.0+ causes lots of warning like: [WARNING] Could not find class org.owasp.validator.html.util.ErrorMessageUtil,
-               due to: java.lang.IncompatibleClassChangeError: class net.sourceforge.pmd.lang.java.typeresolution.visitors.PMDASMVisitor
-               has interface org.objectweb.asm.ClassVisitor as super class.
-               However, these warnings don't adversely affect the PMD results, so we are keeping this upgrade. -->
-                   <dependency>
-                       <groupId>org.ow2.asm</groupId>
-                       <artifactId>asm</artifactId>
-                       <version>9.2</version>
-                   </dependency>
-               </dependencies>
+                <groupId>com.h3xstream.findsecbugs</groupId>
+                <artifactId>findsecbugs-plugin</artifactId>
+                <version>${version.findsecbugs}</version>
             </plugin>
+
         </plugins>
     </build>
+
     <reporting>
+        <!-- All plugins used here should first be declared in the <plugins> section above with their
+             versions, so the versions get reported in the plugins Updates report.
+         -->
         <plugins>
+           <plugin>
+               <groupId>com.github.spotbugs</groupId>
+               <artifactId>spotbugs-maven-plugin</artifactId>
+               <configuration>
+                   <plugins>
+                       <plugin>
+                           <groupId>com.h3xstream.findsecbugs</groupId>
+                           <artifactId>findsecbugs-plugin</artifactId>
+                           <version>${version.findsecbugs}</version>
+                       </plugin>
+                   </plugins>
+                   <effort>Max</effort>
+                   <relaxed>false</relaxed>
+                   <excludeFilterFile>src/test/spotbugsFilterFile.xml</excludeFilterFile>
+               </configuration>
+           </plugin>
+
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-javadoc-plugin</artifactId>
+           </plugin>
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-jxr-plugin</artifactId>
+           </plugin>
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-pmd-plugin</artifactId>
+               <configuration>
+                   <targetJdk>${project.java.target}</targetJdk>
+                   <sourceEncoding>utf-8</sourceEncoding>
+                   <!-- excludeFromFailureFile>exclude-pmd.properties</excludeFromFailureFile -->
+               </configuration>
+           </plugin>
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-project-info-reports-plugin</artifactId>
+               <reportSets>
+                 <reportSet>
+                   <reports>
+                     <report>index</report>
+                     <report>dependency-convergence</report>
+                   </reports>
+                 </reportSet>
+               </reportSets>
+               <configuration>
+                 <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+               </configuration>
+           </plugin>
+
            <plugin>
                <groupId>org.codehaus.mojo</groupId>
                <artifactId>versions-maven-plugin</artifactId>
-               <version>2.10.0</version>
                <reportSets>
                  <reportSet>
                    <reports>
@@ -457,56 +545,8 @@
                  </reportSet>
                </reportSets>
            </plugin>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-javadoc-plugin</artifactId>
-           </plugin>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-pmd-plugin</artifactId>
-               <configuration>
-                   <targetJdk>1.7</targetJdk>
-                   <sourceEncoding>utf-8</sourceEncoding>
-                   <!-- excludeFromFailureFile>exclude-pmd.properties</excludeFromFailureFile -->
-               </configuration>
-           </plugin>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-jxr-plugin</artifactId>
-               <version>3.2.0</version>
-           </plugin>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-project-info-reports-plugin</artifactId>
-               <version>3.2.2</version>
-               <reportSets>
-                 <reportSet>
-                   <reports>
-                     <report>index</report>
-                     <report>dependency-convergence</report>
-                   </reports>
-                 </reportSet>
-               </reportSets>
-               <configuration>
-                 <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-               </configuration>
-           </plugin>
-           <plugin>
-               <groupId>com.github.spotbugs</groupId>
-               <artifactId>spotbugs-maven-plugin</artifactId>
-               <configuration>
-                   <plugins>
-                       <plugin>
-                           <groupId>com.h3xstream.findsecbugs</groupId>
-                           <artifactId>findsecbugs-plugin</artifactId>
-                           <version>1.11.0</version>
-                       </plugin>
-                   </plugins>
-                   <effort>Max</effort>
-                   <relaxed>false</relaxed>
-                   <excludeFilterFile>src/test/spotbugsFilterFile.xml</excludeFilterFile>
-               </configuration>
-           </plugin>
+
         </plugins>
     </reporting>
+
 </project>
