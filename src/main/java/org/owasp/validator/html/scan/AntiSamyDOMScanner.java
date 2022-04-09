@@ -407,7 +407,8 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         CssScanner styleScanner = new CssScanner(policy, messages, policy.isEmbedStyleSheets());
 
         try {
-            if (ele.getChildNodes().getLength() > 0) {
+            int childNodesCount = ele.getChildNodes().getLength();
+            if (childNodesCount > 0) {
                 StringBuffer toScan = new StringBuffer();
 
                 for (int i = 0; i < ele.getChildNodes().getLength(); i++) {
@@ -428,7 +429,6 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                  * would normally be left with an empty style tag and
                  * break all CSS. To prevent that, we have this check.
                  */
-
                 String cleanHTML = cr.getCleanHTML();
                 cleanHTML = cleanHTML == null || cleanHTML.equals("") ? "/* */" : cleanHTML;
 
@@ -436,21 +436,19 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
                 /*
                  * Remove every other node after cleaning CSS, there will
                  * be only one node in the end, as it always should have.
+                 * Starting from the end due to list updating on the fly.
                  */
-                for (int i = 1; i < ele.getChildNodes().getLength(); i++) {
+                for (int i = childNodesCount - 1; i >= 1; i--) {
                     Node childNode = ele.getChildNodes().item(i);
                     ele.removeChild(childNode);
                 }
             }
-
         } catch (DOMException | ScanException | ParseException | NumberFormatException e) {
-
             /*
              * ParseException shouldn't be possible anymore, but we'll leave it
              * here because I (Arshan) am hilariously dumb sometimes.
              * Batik can throw NumberFormatExceptions (see bug #48).
              */
-
             addError(ErrorMessageUtil.ERROR_CSS_TAG_MALFORMED, new Object[]{HTMLEntityEncoder.htmlEntityEncode(ele.getFirstChild().getNodeValue())});
             parentNode.removeChild(ele);
             return true;
