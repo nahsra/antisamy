@@ -1713,10 +1713,14 @@ static final String test33 = "<html>\n"
         Policy revised = policy.cloneWithDirective(Policy.USE_XHTML,"true");
         assertThat(as.scan("<style/>b<![cdata[</style><a href=javascript:alert(1)>test", revised, AntiSamy.DOM).getCleanHTML(), not(containsString("javascript")));
         assertThat(as.scan("<style/>b<![cdata[</style><a href=javascript:alert(1)>test", revised, AntiSamy.SAX).getCleanHTML(), not(containsString("javascript")));
+        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised, AntiSamy.DOM).getCleanHTML(), not(containsString("input")));
+        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised, AntiSamy.SAX).getCleanHTML(), not(containsString("input")));
 
         Policy revised2 = policy.cloneWithDirective(Policy.USE_XHTML,"false");
         assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("script")));
         assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("script")));
+        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("input")));
+        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("input")));
     }
 
     @Test(timeout = 3000)
