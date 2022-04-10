@@ -3,7 +3,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.6.1</version>
+    <version>1.6.7</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -43,7 +43,7 @@
     <properties>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2022-04-07T19:23:45Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2022-04-10T18:12:34Z</project.build.outputTimestamp>
         <project.java.target>1.7</project.java.target>
         <version.findsecbugs>1.12.0</version.findsecbugs>
         <version.io>2.11.0</version.io>
