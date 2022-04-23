@@ -1723,12 +1723,20 @@ static final String test33 = "<html>\n"
         assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("input")));
     }
 
-    @Test(timeout = 3000)
+    @Test(timeout = 4000)
     public void testMalformedPIScan() {
         // Certain malformed input including a malformed processing instruction may lead the parser to an internal memory error.
+        // Does not matter if it is DOM or SAX scan, the problem was internally the same on HTML parser.
         try {
             as.scan("<!--><?a/", policy, AntiSamy.DOM).getCleanHTML();
-            as.scan("<!--><?a/", policy, AntiSamy.SAX).getCleanHTML();
+        } catch (ScanException ex) {
+            // It is OK, internal parser should fail.
+        } catch (Exception ex) {
+            fail("Parser should not throw a non-ScanException");
+        }
+
+        try {
+            as.scan("<!--?><?a/", policy, AntiSamy.DOM).getCleanHTML();
         } catch (ScanException ex) {
             // It is OK, internal parser should fail.
         } catch (Exception ex) {
