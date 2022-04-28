@@ -1713,18 +1713,30 @@ static final String test33 = "<html>\n"
         Policy revised = policy.cloneWithDirective(Policy.USE_XHTML,"true");
         assertThat(as.scan("<style/>b<![cdata[</style><a href=javascript:alert(1)>test", revised, AntiSamy.DOM).getCleanHTML(), not(containsString("javascript")));
         assertThat(as.scan("<style/>b<![cdata[</style><a href=javascript:alert(1)>test", revised, AntiSamy.SAX).getCleanHTML(), not(containsString("javascript")));
+        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised, AntiSamy.DOM).getCleanHTML(), not(containsString("input")));
+        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised, AntiSamy.SAX).getCleanHTML(), not(containsString("input")));
 
         Policy revised2 = policy.cloneWithDirective(Policy.USE_XHTML,"false");
         assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("script")));
         assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("script")));
+        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("input")));
+        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("input")));
     }
 
-    @Test(timeout = 3000)
+    @Test(timeout = 4000)
     public void testMalformedPIScan() {
         // Certain malformed input including a malformed processing instruction may lead the parser to an internal memory error.
+        // Does not matter if it is DOM or SAX scan, the problem was internally the same on HTML parser.
         try {
             as.scan("<!--><?a/", policy, AntiSamy.DOM).getCleanHTML();
-            as.scan("<!--><?a/", policy, AntiSamy.SAX).getCleanHTML();
+        } catch (ScanException ex) {
+            // It is OK, internal parser should fail.
+        } catch (Exception ex) {
+            fail("Parser should not throw a non-ScanException");
+        }
+
+        try {
+            as.scan("<!--?><?a/", policy, AntiSamy.DOM).getCleanHTML();
         } catch (ScanException ex) {
             // It is OK, internal parser should fail.
         } catch (Exception ex) {
