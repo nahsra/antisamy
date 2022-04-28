@@ -35,7 +35,6 @@ These are the known CVEs reported for AntiSamy:
 * AntiSamy CVE #5 - CVE-2022-29577: AntiSamy before 1.6.7 allows XSS via HTML tag smuggling on STYLE content. - https://www.cvedetails.com/cve/CVE-2022-29577. This is the complete fix to the previous CVE.
 
 CVEs in AntiSamy dependencies:
-* AntiSamy prior to 1.6.6 used the old CyberNeko HTML library v1.9.22, which is subject to https://www.cvedetails.com/cve/CVE-2022-28366 and no longer maintained.
-AntiSamy 1.6.6 upgraded to an active fork of CyberNeko called HtmlUnit-Neko which fixed this CVE in v2.27 of that library. AntiSamy 1.6.6 upgraded to version 2.60.0 of HtmlUnit-Neko.
+* AntiSamy prior to 1.6.6 used the old CyberNeko HTML library v1.9.22, which is subject to https://www.cvedetails.com/cve/CVE-2022-28366 and no longer maintained. AntiSamy 1.6.6 upgraded to an active fork of CyberNeko called HtmlUnit-Neko which fixed this CVE in v2.27 of that library. AntiSamy 1.6.6 upgraded to version 2.60.0 of HtmlUnit-Neko.
 * AntiSamy 1.6.8 upgraded to HtmlUnit-Neko v2.61.0 because v2.60.0 is subject to https://www.cvedetails.com/cve/CVE-2022-29546
 
