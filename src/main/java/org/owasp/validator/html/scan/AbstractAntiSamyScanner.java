@@ -96,11 +96,6 @@ public abstract class AbstractAntiSamyScanner {
     }
 
     protected org.apache.xml.serialize.HTMLSerializer getHTMLSerializer(Writer w, OutputFormat format) {
-
-        if (policy.isUseXhtml()) {
-            return new ASXHTMLSerializer(w, format, policy);
-        }
-
         return new ASHTMLSerializer(w, format, policy);
     }
 

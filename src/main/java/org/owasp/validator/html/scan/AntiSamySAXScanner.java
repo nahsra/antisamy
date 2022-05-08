@@ -164,12 +164,11 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
 
             final Transformer transformer = cachedItem.transformer;
             boolean formatOutput = policy.isFormatOutput();
-            boolean useXhtml = policy.isUseXhtml();
             boolean omitXml = policy.isOmitXmlDeclaration();
 
             transformer.setOutputProperty(OutputKeys.INDENT, formatOutput ? "yes" : "no");
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, omitXml ? "yes" : "no");
-            transformer.setOutputProperty(OutputKeys.METHOD, useXhtml ? "xml" : "html");
+            transformer.setOutputProperty(OutputKeys.METHOD, "html");
 
             //noinspection deprecation
             final org.apache.xml.serialize.OutputFormat format = getOutputFormat();
