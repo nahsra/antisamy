@@ -312,16 +312,16 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 					} else if (attribute != null) {
 						// validate the values against the policy
 						boolean isValid = false;
-                        if (attribute.containsAllowedValue(value.toLowerCase())) {
-                            validattributes.addAttribute(makeSimpleQname(name), "CDATA", value);
+                        if (attribute.containsAllowedValue(value.toLowerCase())
+								|| attribute.matchesAllowedExpression(value)) {
+							int attrIndex;
+							if ((attrIndex = validattributes.getIndex(name)) > 0) {
+								// If attribute is repeated, use last value.
+								validattributes.setValue(attrIndex, value);
+							} else {
+								validattributes.addAttribute(makeSimpleQname(name), "CDATA", value);
+							}
                             isValid = true;
-                        }
-
-                        if (!isValid) {
-                            isValid = attribute.matchesAllowedExpression(value);
-                            if (isValid) {
-                                validattributes.addAttribute(makeSimpleQname(name), "CDATA", value);
-                            }
                         }
 
                         // if value or regexp matched, attribute is already
@@ -386,7 +386,12 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 						}
 						String relValue = Attribute.mergeRelValuesInAnchor(addNofollow, addNoopenerAndNoreferrer, currentRelValue);
 						if (!relValue.isEmpty()){
-							validattributes.addAttribute(makeSimpleQname("rel"), "CDATA", relValue);
+							int relIndex;
+							if ((relIndex = validattributes.getIndex("rel")) > 0) {
+								validattributes.setValue(relIndex, relValue);
+							} else {
+								validattributes.addAttribute(makeSimpleQname("rel"), "CDATA", relValue);
+							}
 						}
 					}
 
