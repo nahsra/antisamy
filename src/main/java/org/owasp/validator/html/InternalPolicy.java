@@ -22,7 +22,6 @@ public class InternalPolicy extends Policy {
     private final boolean omitXmlDeclaration;
     private final boolean omitDoctypeDeclaration;
     private final boolean entityEncodeIntlCharacters;
-    private final boolean useXhtml;
     private final Tag embedTag;
     private final Tag styleTag;
     private final String onUnknownTag;
@@ -43,7 +42,6 @@ public class InternalPolicy extends Policy {
         this.omitXmlDeclaration = isTrue(Policy.OMIT_XML_DECLARATION);
         this.omitDoctypeDeclaration = isTrue(Policy.OMIT_DOCTYPE_DECLARATION);
         this.entityEncodeIntlCharacters = isTrue(Policy.ENTITY_ENCODE_INTL_CHARS);
-        this.useXhtml = isTrue(Policy.USE_XHTML);
         this.embedTag = getTagByLowercaseName("embed");
         this.onUnknownTag = getDirective("onUnknownTag");
         this.isEncodeUnknownTag = "encode".equals(onUnknownTag);
@@ -69,7 +67,6 @@ public class InternalPolicy extends Policy {
         this.omitXmlDeclaration = isTrue(Policy.OMIT_XML_DECLARATION);
         this.omitDoctypeDeclaration = isTrue(Policy.OMIT_DOCTYPE_DECLARATION);
         this.entityEncodeIntlCharacters = isTrue(Policy.ENTITY_ENCODE_INTL_CHARS);
-        this.useXhtml = isTrue(Policy.USE_XHTML);
         this.embedTag = getTagByLowercaseName("embed");
         this.onUnknownTag = getDirective("onUnknownTag");
         this.isEncodeUnknownTag = "encode".equals(onUnknownTag);
@@ -130,10 +127,6 @@ public class InternalPolicy extends Policy {
 
     public boolean isOmitXmlDeclaration() {
         return omitXmlDeclaration;
-    }
-
-    public boolean isUseXhtml() {
-        return useXhtml;
     }
 
     public boolean isOmitDoctypeDeclaration() {

@@ -77,12 +77,13 @@ public class CssScannerTest {
     public void testAvoidCdataWhenUsingXhtml() throws ScanException {
         final String input = "<![CDATA[.very-specific-antisamy {font: 15pt \"Arial\"; color: blue;}]]>";
 
-        TestPolicy revised = policy.cloneWithDirective(Policy.USE_XHTML,"true");
+        /* Commented due to XHTML deprecation.
+        TestPolicy revised = policy.cloneWithDirective("useXHTML","true");
         CssScanner scanner = new CssScanner(revised, messages);
         assertThat(scanner.scanStyleSheet(input, 1000).getCleanHTML(), not(containsString("CDATA")));
+         */
 
-        revised = policy.cloneWithDirective(Policy.USE_XHTML,"false");
-        scanner = new CssScanner(revised, messages);
+        CssScanner scanner = new CssScanner(policy, messages);
         assertThat(scanner.scanStyleSheet(input, 1000).getCleanHTML(), containsString("CDATA"));
     }
 

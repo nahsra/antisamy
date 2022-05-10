@@ -109,7 +109,6 @@ public class Policy {
 
     public static final String OMIT_XML_DECLARATION = "omitXmlDeclaration";
     public static final String OMIT_DOCTYPE_DECLARATION = "omitDoctypeDeclaration";
-    public static final String USE_XHTML = "useXHTML";
     public static final String FORMAT_OUTPUT = "formatOutput";
     public static final String EMBED_STYLESHEETS = "embedStyleSheets";
     public static final String CONNECTION_TIMEOUT = "connectionTimeout";

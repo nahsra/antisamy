@@ -184,8 +184,8 @@ public class CssScanner {
 
         String cleaned = getCleanStylesheetWithImports(sizeLimit, errorMessages, handler);
 
-        if ( isCdata && !policy.isUseXhtml()) {
-            cleaned = "<![CDATA[[" + cleaned + "]]>";
+        if (isCdata) {
+            cleaned = "<![CDATA[" + cleaned + "]]>";
         }
 
         return new CleanResults(startOfScan, cleaned, null, errorMessages);

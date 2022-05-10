@@ -31,7 +31,6 @@ import org.owasp.validator.html.model.Tag;
 
 public class Constants {
 
-    public static final String DEFAULT_ENCODING_ALGORITHM = "UTF-8";
     public static final Tag BASIC_PARAM_TAG_RULE;
     public static final List<String> defaultAllowedEmptyTags;
     public static final List<String> defaultRequireClosingTags;

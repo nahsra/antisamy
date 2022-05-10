@@ -35,6 +35,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.hamcrest.CoreMatchers.both;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -54,7 +55,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.concurrent.ExecutionException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -395,7 +395,6 @@ public class AntiSamyTest {
 
     @Test
     public void issue12() throws ScanException, PolicyException {
-
         /*
          * issues 12 (and 36, which was similar). empty tags cause display
          * problems/"formjacking"
@@ -415,8 +414,8 @@ public class AntiSamyTest {
         assertFalse(p.matcher(s1).matches());
         assertFalse(p.matcher(s2).matches());
 
-        assertTrue(s1.contains("<hr />") || s1.contains("<hr/>"));
-        assertTrue(s2.contains("<hr />") || s2.contains("<hr/>"));
+        assertThat(s1 , containsString("<hr>"));
+        assertThat(s2 , containsString("<hr>"));
     }
 
     @Test
@@ -472,7 +471,7 @@ public class AntiSamyTest {
         /* next followup - does non-CDATA parsing still work? */
 
         String s3 = "<style>P {\n\tmargin-bottom: 0.08in;\n}\n";
-        cr = as.scan(s3, policy.cloneWithDirective(Policy.USE_XHTML, "false"), AntiSamy.DOM);
+        cr = as.scan(s3, policy, AntiSamy.DOM);
         assertEquals("<style>P {\n\tmargin-bottom: 0.08in;\n}\n</style>\n", cr.getCleanHTML());
     }
 
@@ -906,7 +905,9 @@ public class AntiSamyTest {
 
     @Test
     public void issue112() throws ScanException, PolicyException {
-        TestPolicy revised = policy.cloneWithDirective(Policy.PRESERVE_COMMENTS, "true").cloneWithDirective(Policy.PRESERVE_SPACE, "true").cloneWithDirective(Policy.FORMAT_OUTPUT, "false");
+        TestPolicy revised = policy.cloneWithDirective(Policy.PRESERVE_COMMENTS, "true")
+                .cloneWithDirective(Policy.PRESERVE_SPACE, "true")
+                .cloneWithDirective(Policy.FORMAT_OUTPUT, "false");
 
         /*
         * #112 - empty tag becomes self closing
@@ -922,13 +923,12 @@ public class AntiSamyTest {
 
         StringBuilder sb = new StringBuilder();
         sb.append("<html><head><title>foobar</title></head><body>");
-        sb.append("<img src=\"http://foobar.com/pic.gif\" /></body></html>");
+        sb.append("<img src=\"http://foobar.com/pic.gif\"></body></html>");
 
         html = sb.toString();
 
-        Policy aTrue = revised.cloneWithDirective(Policy.USE_XHTML, "true");
-        crDom = as.scan(html, aTrue, AntiSamy.DOM).getCleanHTML();
-        crSax = as.scan(html, aTrue, AntiSamy.SAX).getCleanHTML();
+        crDom = as.scan(html, revised, AntiSamy.DOM).getCleanHTML();
+        crSax = as.scan(html, revised, AntiSamy.SAX).getCleanHTML();
 
         assertTrue(html.equals(crDom));
         assertTrue(html.equals(crSax));
@@ -959,17 +959,9 @@ public class AntiSamyTest {
         assertTrue(crDom.contains("\u00e4"));
         assertTrue(crSax.contains("\u00e4"));
 
-        Policy revised2 = policy.cloneWithDirective(Policy.USE_XHTML, "false").cloneWithDirective(Policy.ENTITY_ENCODE_INTL_CHARS, "true");
+        Policy revised2 = policy.cloneWithDirective(Policy.ENTITY_ENCODE_INTL_CHARS, "true");
         crDom = as.scan(html, revised2, AntiSamy.DOM).getCleanHTML();
         crSax = as.scan(html, revised2, AntiSamy.SAX).getCleanHTML();
-        assertTrue(!crDom.contains("\u00e4"));
-        assertTrue(crDom.contains("&auml;"));
-        assertTrue(!crSax.contains("\u00e4"));
-        assertTrue(crSax.contains("&auml;"));
-
-        Policy revised3 = policy.cloneWithDirective(Policy.USE_XHTML, "true").cloneWithDirective(Policy.ENTITY_ENCODE_INTL_CHARS, "true");
-        crDom = as.scan(html, revised3, AntiSamy.DOM).getCleanHTML();
-        crSax = as.scan(html, revised3, AntiSamy.SAX).getCleanHTML();
         assertTrue(!crDom.contains("\u00e4"));
         assertTrue(crDom.contains("&auml;"));
         assertTrue(!crSax.contains("\u00e4"));
@@ -1028,23 +1020,23 @@ public class AntiSamyTest {
     @Test
     public void validateParamAsEmbed() throws ScanException, PolicyException {
         // activate policy setting for this test
-        Policy revised = policy.cloneWithDirective(Policy.VALIDATE_PARAM_AS_EMBED, "true").cloneWithDirective(Policy.FORMAT_OUTPUT, "false").cloneWithDirective(Policy.USE_XHTML, "true");
+        Policy revised = policy.cloneWithDirective(Policy.VALIDATE_PARAM_AS_EMBED, "true").cloneWithDirective(Policy.FORMAT_OUTPUT, "false");
 
         // let's start with a YouTube embed
         String input = "<object width=\"560\" height=\"340\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed></object>";
-        String expectedOutput = "<object height=\"340\" width=\"560\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" /><param name=\"allowFullScreen\" value=\"true\" /><param name=\"allowscriptaccess\" value=\"always\" /><embed allowfullscreen=\"true\" allowscriptaccess=\"always\" height=\"340\" src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" width=\"560\" /></object>";
+        String expectedOutput = "<object height=\"340\" width=\"560\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"><param name=\"allowFullScreen\" value=\"true\"><param name=\"allowscriptaccess\" value=\"always\"><embed allowfullscreen=\"true\" allowscriptaccess=\"always\" height=\"340\" src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" width=\"560\"></embed></object>";
         CleanResults cr = as.scan(input, revised, AntiSamy.DOM);
         assertThat(cr.getCleanHTML(), containsString(expectedOutput));
 
-        String saxExpectedOutput = "<object width=\"560\" height=\"340\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" /><param name=\"allowFullScreen\" value=\"true\" /><param name=\"allowscriptaccess\" value=\"always\" /><embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\" /></object>";
+        String saxExpectedOutput = "<object width=\"560\" height=\"340\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"><param name=\"allowFullScreen\" value=\"true\"><param name=\"allowscriptaccess\" value=\"always\"><embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed></object>";
         cr = as.scan(input, revised, AntiSamy.SAX);
         assertThat(cr.getCleanHTML(), equalTo(saxExpectedOutput));
 
         // now what if someone sticks malicious URL in the value of the
         // value attribute in the param tag? remove that param tag
         input = "<object width=\"560\" height=\"340\"><param name=\"movie\" value=\"http://supermaliciouscode.com/badstuff.swf\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed></object>";
-        expectedOutput = "<object height=\"340\" width=\"560\"><param name=\"allowFullScreen\" value=\"true\" /><param name=\"allowscriptaccess\" value=\"always\" /><embed allowfullscreen=\"true\" allowscriptaccess=\"always\" height=\"340\" src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" width=\"560\" /></object>";
-        saxExpectedOutput = "<object width=\"560\" height=\"340\"><param name=\"allowFullScreen\" value=\"true\" /><param name=\"allowscriptaccess\" value=\"always\" /><embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\" /></object>";
+        expectedOutput = "<object height=\"340\" width=\"560\"><param name=\"allowFullScreen\" value=\"true\"><param name=\"allowscriptaccess\" value=\"always\"><embed allowfullscreen=\"true\" allowscriptaccess=\"always\" height=\"340\" src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" width=\"560\"></embed></object>";
+        saxExpectedOutput = "<object width=\"560\" height=\"340\"><param name=\"allowFullScreen\" value=\"true\"><param name=\"allowscriptaccess\" value=\"always\"><embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed></object>";
         cr = as.scan(input, revised, AntiSamy.DOM);
         assertThat(cr.getCleanHTML(), containsString(expectedOutput));
 
@@ -1054,8 +1046,8 @@ public class AntiSamyTest {
         // now what if someone sticks malicious URL in the value of the src
         // attribute in the embed tag? remove that embed tag
         input = "<object width=\"560\" height=\"340\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://hereswhereikeepbadcode.com/ohnoscary.swf\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed></object>";
-        expectedOutput = "<object height=\"340\" width=\"560\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" /><param name=\"allowFullScreen\" value=\"true\" /><param name=\"allowscriptaccess\" value=\"always\" /></object>";
-        saxExpectedOutput = "<object width=\"560\" height=\"340\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" /><param name=\"allowFullScreen\" value=\"true\" /><param name=\"allowscriptaccess\" value=\"always\" /></object>";
+        expectedOutput = "<object height=\"340\" width=\"560\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"><param name=\"allowFullScreen\" value=\"true\"><param name=\"allowscriptaccess\" value=\"always\"></object>";
+        saxExpectedOutput = "<object width=\"560\" height=\"340\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"><param name=\"allowFullScreen\" value=\"true\"><param name=\"allowscriptaccess\" value=\"always\"></object>";
 
         cr = as.scan(input, revised, AntiSamy.DOM);
         assertThat(cr.getCleanHTML(), containsString(expectedOutput));
@@ -1202,10 +1194,11 @@ public class AntiSamyTest {
     @Test
     public void testWhitespaceNotBeingMangled() throws ScanException, PolicyException {
         String test = "<select name=\"name\"><option value=\"Something\">Something</select>";
-        String expected = "<select name=\"name\"><option value=\"Something\">Something</option></select>";
+        // option closing tag is not mandatory
+        String expected = "<select name=\"name\"><option value=\"Something\">Something</select>";
         Policy preserveSpace = policy.cloneWithDirective( Policy.PRESERVE_SPACE, "true" );
         CleanResults preserveSpaceResults = as.scan(test, preserveSpace, AntiSamy.SAX);
-        assertEquals( expected, preserveSpaceResults.getCleanHTML() );
+        assertEquals(expected, preserveSpaceResults.getCleanHTML());
     }
 
     @Test
@@ -1239,8 +1232,8 @@ public class AntiSamyTest {
         CleanResults results_sax = as.scan(test, policy, AntiSamy.SAX);
         CleanResults results_dom = as.scan(test, policy, AntiSamy.DOM);
 
-        assertEquals( results_sax.getCleanHTML(), results_dom.getCleanHTML());
-        assertEquals("whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\" />", results_dom.getCleanHTML());
+        assertEquals(results_sax.getCleanHTML(), results_dom.getCleanHTML());
+        assertEquals("whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\">", results_dom.getCleanHTML());
     }
 
     @Test
@@ -1273,13 +1266,13 @@ public class AntiSamyTest {
     }
     
     @Test
-    public void testStreamScan() throws ScanException, PolicyException, InterruptedException, ExecutionException {
-        String testImgSrcURL = "<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\" ";
-        Reader reader = new StringReader("<bogus>whatever</bogus>" + testImgSrcURL + "onmouseover=\"alert('xss')\">");
+    public void testStreamScan() throws ScanException {
+        String testImgSrcURL = "<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\"";
+        Reader reader = new StringReader("<bogus>whatever</bogus>" + testImgSrcURL + " onmouseover=\"alert('xss')\">");
         Writer writer = new StringWriter();
         as.scan(reader, writer, policy);
         String cleanHtml = writer.toString().trim();
-        assertEquals("whatever" + testImgSrcURL + "/>", cleanHtml);
+        assertEquals("whatever" + testImgSrcURL + ">", cleanHtml);
     }
     
     @Test
@@ -1293,8 +1286,11 @@ public class AntiSamyTest {
     	
     	// The a.replaceAll("\\s","") is used to strip out all the whitespace in the CleanHTML so we can successfully find
     	// what we expect to find.
-        assertThat(as.scan(test23, policy, AntiSamy.SAX).getCleanHTML().replaceAll("\\s",""), containsString("<ul><li>a</li>"));
-        assertThat(as.scan(test23, policy, AntiSamy.DOM).getCleanHTML().replaceAll("\\s",""), containsString("<ul><li>a</li>"));
+        // Tags like UL and LI have optional closing, so they are not closed on output for now.
+        assertThat(as.scan(test23, policy, AntiSamy.DOM).getCleanHTML().replaceAll("\\s",""),
+                either(containsString("<ul><li>a</li>")).or(containsString("<ul><li>a<li>")));
+        assertThat(as.scan(test23, policy, AntiSamy.SAX).getCleanHTML().replaceAll("\\s",""),
+                either(containsString("<ul><li>a</li>")).or(containsString("<ul><li>a<li>")));
         
         // However, the test above can't replicate this misbehavior.
     }
@@ -1513,10 +1509,10 @@ static final String test33 = "<html>\n"
         // All this when not using the XHTML serializer.
 
         // UPDATE:  Using a new HTML parser library starts decoding entities like #00058
-        Policy revised = policy.cloneWithDirective("useXHTML","false");
-        assertThat(as.scan("<p><a href=\"javascript&#00058x=1,%61%6c%65%72%74%28%22%62%6f%6f%6d%22%29\">xss</a></p>", revised, AntiSamy.DOM).getCleanHTML(),
+        // UPDATE 2: XHTML is no longer used
+        assertThat(as.scan("<p><a href=\"javascript&#00058x=1,%61%6c%65%72%74%28%22%62%6f%6f%6d%22%29\">xss</a></p>", policy, AntiSamy.DOM).getCleanHTML(),
                 not(containsString("javascript")));
-        assertThat(as.scan("<p><a href=\"javascript&#00058x=1,%61%6c%65%72%74%28%22%62%6f%6f%6d%22%29\">xss</a></p>", revised, AntiSamy.SAX).getCleanHTML(),
+        assertThat(as.scan("<p><a href=\"javascript&#00058x=1,%61%6c%65%72%74%28%22%62%6f%6f%6d%22%29\">xss</a></p>", policy, AntiSamy.SAX).getCleanHTML(),
                 not(containsString("javascript")));
     }
 
@@ -1710,17 +1706,18 @@ static final String test33 = "<html>\n"
         // HTML tags may be smuggled into a style tag after parsing input to an internal representation.
         // If that happens, they should be treated as text content and not as children nodes.
 
-        Policy revised = policy.cloneWithDirective(Policy.USE_XHTML,"true");
+        /* Commented due to XHTML deprecation.
+        Policy revised = policy.cloneWithDirective("useXHTML","true");
         assertThat(as.scan("<style/>b<![cdata[</style><a href=javascript:alert(1)>test", revised, AntiSamy.DOM).getCleanHTML(), not(containsString("javascript")));
         assertThat(as.scan("<style/>b<![cdata[</style><a href=javascript:alert(1)>test", revised, AntiSamy.SAX).getCleanHTML(), not(containsString("javascript")));
         assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised, AntiSamy.DOM).getCleanHTML(), not(containsString("input")));
         assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised, AntiSamy.SAX).getCleanHTML(), not(containsString("input")));
+        */
 
-        Policy revised2 = policy.cloneWithDirective(Policy.USE_XHTML,"false");
-        assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("script")));
-        assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("script")));
-        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised2, AntiSamy.DOM).getCleanHTML(), not(containsString("input")));
-        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised2, AntiSamy.SAX).getCleanHTML(), not(containsString("input")));
+        assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", policy, AntiSamy.DOM).getCleanHTML(), not(containsString("script")));
+        assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", policy, AntiSamy.SAX).getCleanHTML(), not(containsString("script")));
+        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", policy, AntiSamy.DOM).getCleanHTML(), not(containsString("input")));
+        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", policy, AntiSamy.SAX).getCleanHTML(), not(containsString("input")));
     }
 
     @Test(timeout = 4000)

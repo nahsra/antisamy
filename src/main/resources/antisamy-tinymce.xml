@@ -12,7 +12,6 @@
 		<directive name="omitDoctypeDeclaration" value="false" />
 		<directive name="maxInputSize" value="100000" />
 		<directive name="embedStyleSheets" value="false" />
-		<directive name="useXHTML" value="true" />
 		<directive name="formatOutput" value="true" />
 	</directives>
 
