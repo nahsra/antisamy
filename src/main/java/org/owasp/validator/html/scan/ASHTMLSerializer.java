@@ -45,7 +45,7 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
 		// last element and this element's closing tag.
 		// [keith] Provided this is not an anchor.
 		// HTML: some elements do not print closing tag (e.g. LI)
-		if (rawName == null || !HTMLdtd.isOnlyOpening(rawName)) {
+		if (rawName == null || !HTMLdtd.isOnlyOpening(rawName) || HTMLdtd.isOptionalClosing(rawName)) {
 			if (_indenting && !state.preserveSpace && state.afterElement)
 				_printer.breakLine();
 			// Must leave CData section first (Illegal in HTML, but still)
