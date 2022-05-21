@@ -1194,8 +1194,7 @@ public class AntiSamyTest {
     @Test
     public void testWhitespaceNotBeingMangled() throws ScanException, PolicyException {
         String test = "<select name=\"name\"><option value=\"Something\">Something</select>";
-        // option closing tag is not mandatory
-        String expected = "<select name=\"name\"><option value=\"Something\">Something</select>";
+        String expected = "<select name=\"name\"><option value=\"Something\">Something</option></select>";
         Policy preserveSpace = policy.cloneWithDirective( Policy.PRESERVE_SPACE, "true" );
         CleanResults preserveSpaceResults = as.scan(test, preserveSpace, AntiSamy.SAX);
         assertEquals(expected, preserveSpaceResults.getCleanHTML());
@@ -1286,11 +1285,8 @@ public class AntiSamyTest {
     	
     	// The a.replaceAll("\\s","") is used to strip out all the whitespace in the CleanHTML so we can successfully find
     	// what we expect to find.
-        // Tags like UL and LI have optional closing, so they are not closed on output for now.
-        assertThat(as.scan(test23, policy, AntiSamy.DOM).getCleanHTML().replaceAll("\\s",""),
-                either(containsString("<ul><li>a</li>")).or(containsString("<ul><li>a<li>")));
-        assertThat(as.scan(test23, policy, AntiSamy.SAX).getCleanHTML().replaceAll("\\s",""),
-                either(containsString("<ul><li>a</li>")).or(containsString("<ul><li>a<li>")));
+        assertThat(as.scan(test23, policy, AntiSamy.DOM).getCleanHTML().replaceAll("\\s",""), containsString("<ul><li>a</li>"));
+        assertThat(as.scan(test23, policy, AntiSamy.SAX).getCleanHTML().replaceAll("\\s",""), containsString("<ul><li>a</li>"));
         
         // However, the test above can't replicate this misbehavior.
     }
@@ -1705,15 +1701,6 @@ static final String test33 = "<html>\n"
     public void testSmuggledTagsInStyleContent() throws ScanException, PolicyException {
         // HTML tags may be smuggled into a style tag after parsing input to an internal representation.
         // If that happens, they should be treated as text content and not as children nodes.
-
-        /* Commented due to XHTML deprecation.
-        Policy revised = policy.cloneWithDirective("useXHTML","true");
-        assertThat(as.scan("<style/>b<![cdata[</style><a href=javascript:alert(1)>test", revised, AntiSamy.DOM).getCleanHTML(), not(containsString("javascript")));
-        assertThat(as.scan("<style/>b<![cdata[</style><a href=javascript:alert(1)>test", revised, AntiSamy.SAX).getCleanHTML(), not(containsString("javascript")));
-        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised, AntiSamy.DOM).getCleanHTML(), not(containsString("input")));
-        assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", revised, AntiSamy.SAX).getCleanHTML(), not(containsString("input")));
-        */
-
         assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", policy, AntiSamy.DOM).getCleanHTML(), not(containsString("script")));
         assertThat(as.scan("<select<style/>W<xmp<script>alert(1)</script>", policy, AntiSamy.SAX).getCleanHTML(), not(containsString("script")));
         assertThat(as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", policy, AntiSamy.DOM).getCleanHTML(), not(containsString("input")));

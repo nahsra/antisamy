@@ -160,7 +160,7 @@ public class CssScanner {
         Matcher m = cdataMatchPattern.matcher(taintedCss);
         boolean isCdata = m.matches();
 
-        if ( isCdata ) {
+        if (isCdata) {
             taintedCss = m.group(1);
         }
 
