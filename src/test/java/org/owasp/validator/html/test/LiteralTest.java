@@ -29,12 +29,10 @@
 package org.owasp.validator.html.test;
 
 import java.net.URL;
-
+import junit.framework.TestCase;
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
-
-import junit.framework.TestCase;
 
 /**
  * Test that literal values for HTML attributes are honored correctly.
@@ -43,80 +41,84 @@ import junit.framework.TestCase;
  */
 public class LiteralTest extends TestCase {
 
-	private Policy policy = null;
+  private Policy policy = null;
 
-	protected void setUp() throws Exception {
+  protected void setUp() throws Exception {
 
-		/*
-		 * Load the policy. You may have to change the path to find the Policy
-		 * file for your environment.
-		 */
-		//get Policy instance from a URL.
-		URL url = getClass().getResource("/antisamy.xml");
-		//System.out.println("Loading policy from URL: " + url);
-		policy = Policy.getInstance(url);
-	}
-	
-	public void testSAXGoodResult() throws Exception {
-		//System.out.println("Policy: " + policy);
+    /*
+     * Load the policy. You may have to change the path to find the Policy
+     * file for your environment.
+     */
+    // get Policy instance from a URL.
+    URL url = getClass().getResource("/antisamy.xml");
+    // System.out.println("Loading policy from URL: " + url);
+    policy = Policy.getInstance(url);
+  }
 
-		// good
-		String html = "<div align=\"right\">html</div>";
+  public void testSAXGoodResult() throws Exception {
+    // System.out.println("Policy: " + policy);
 
-		CleanResults cleanResults = new AntiSamy(policy).scan(html, AntiSamy.SAX);
-		//System.out.println("SAX cleanResults: " + cleanResults.getCleanHTML());
-		//System.out.println("SAX cleanResults error messages: " + cleanResults.getErrorMessages().size());
+    // good
+    String html = "<div align=\"right\">html</div>";
 
-        for (String msg : cleanResults.getErrorMessages()) {
-            System.out.println("error msg: " + msg);
-        }
+    CleanResults cleanResults = new AntiSamy(policy).scan(html, AntiSamy.SAX);
+    // System.out.println("SAX cleanResults: " + cleanResults.getCleanHTML());
+    // System.out.println("SAX cleanResults error messages: " +
+    // cleanResults.getErrorMessages().size());
 
-		assertTrue(cleanResults.getErrorMessages().isEmpty());
-	}
-
-    public void testSAXBadResult() throws Exception {
-        //System.out.println("Policy: " + policy);
-
-        // AntiSamy should complain about the attribute value "foo" ... but it is not
-        String badHtml = "<div align=\"foo\">badhtml</div>";
-
-        CleanResults cleanResults2 = new AntiSamy(policy).scan(badHtml, AntiSamy.SAX);
-
-        //System.out.println("SAX cleanResults2: " + cleanResults2.getCleanHTML());
-        //System.out.println("SAX cleanResults2 error messages: " + cleanResults2.getErrorMessages().size());
-        /* for (String msg : cleanResults2.getErrorMessages()) {
-            System.out.println("error msg: " + msg);
-        } */
-        assertTrue(cleanResults2.getErrorMessages().size() > 0);
+    for (String msg : cleanResults.getErrorMessages()) {
+      System.out.println("error msg: " + msg);
     }
 
-    public void testDOMGoodResult() throws Exception {
-		//System.out.println("Policy: " + policy);
+    assertTrue(cleanResults.getErrorMessages().isEmpty());
+  }
 
-		// good
-		String html = "<div align=\"right\">html</div>";
+  public void testSAXBadResult() throws Exception {
+    // System.out.println("Policy: " + policy);
 
-		CleanResults cleanResults = new AntiSamy(policy).scan(html, AntiSamy.DOM);
-		//System.out.println("DOM cleanResults error messages: " + cleanResults.getErrorMessages().size());
-        for (String msg : cleanResults.getErrorMessages()) {
-            System.out.println("error msg: " + msg);
-        }
+    // AntiSamy should complain about the attribute value "foo" ... but it is not
+    String badHtml = "<div align=\"foo\">badhtml</div>";
 
-		assertTrue(cleanResults.getErrorMessages().isEmpty());
-	}
+    CleanResults cleanResults2 = new AntiSamy(policy).scan(badHtml, AntiSamy.SAX);
 
-    public void testDOMBadResult() throws Exception {
-        //System.out.println("Policy: " + policy);
+    // System.out.println("SAX cleanResults2: " + cleanResults2.getCleanHTML());
+    // System.out.println("SAX cleanResults2 error messages: " +
+    // cleanResults2.getErrorMessages().size());
+    /* for (String msg : cleanResults2.getErrorMessages()) {
+        System.out.println("error msg: " + msg);
+    } */
+    assertTrue(cleanResults2.getErrorMessages().size() > 0);
+  }
 
-        // AntiSamy should complain about the attribute value "foo" ... but it is not
-        String badHtml = "<div align=\"foo\">badhtml</div>";
+  public void testDOMGoodResult() throws Exception {
+    // System.out.println("Policy: " + policy);
 
-        CleanResults cleanResults2 = new AntiSamy(policy).scan(badHtml, AntiSamy.DOM);
+    // good
+    String html = "<div align=\"right\">html</div>";
 
-        //System.out.println("DOM cleanResults2 error messages: " + cleanResults2.getErrorMessages().size());
-        /* for (String msg : cleanResults2.getErrorMessages()) {
-            System.out.println("error msg: " + msg);
-        } */
-        assertTrue(cleanResults2.getErrorMessages().size() > 0);
+    CleanResults cleanResults = new AntiSamy(policy).scan(html, AntiSamy.DOM);
+    // System.out.println("DOM cleanResults error messages: " +
+    // cleanResults.getErrorMessages().size());
+    for (String msg : cleanResults.getErrorMessages()) {
+      System.out.println("error msg: " + msg);
     }
+
+    assertTrue(cleanResults.getErrorMessages().isEmpty());
+  }
+
+  public void testDOMBadResult() throws Exception {
+    // System.out.println("Policy: " + policy);
+
+    // AntiSamy should complain about the attribute value "foo" ... but it is not
+    String badHtml = "<div align=\"foo\">badhtml</div>";
+
+    CleanResults cleanResults2 = new AntiSamy(policy).scan(badHtml, AntiSamy.DOM);
+
+    // System.out.println("DOM cleanResults2 error messages: " +
+    // cleanResults2.getErrorMessages().size());
+    /* for (String msg : cleanResults2.getErrorMessages()) {
+        System.out.println("error msg: " + msg);
+    } */
+    assertTrue(cleanResults2.getErrorMessages().size() > 0);
+  }
 }

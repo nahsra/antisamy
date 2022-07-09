@@ -7,8 +7,8 @@ GitHut issues list (for both open and closed issues) to see if it has already be
 
 If it has not, then please contact Dave Wichers (dave.wichers at owasp.org) _directly_.
 Please do **not** report any suspected vulnerabilities via GitHub issues
-as we wish to keep our users secure while a patch is implemented and deployed. 
-This is because if this is reported as a GitHub issue, it more or less is equivalent 
+as we wish to keep our users secure while a patch is implemented and deployed.
+This is because if this is reported as a GitHub issue, it more or less is equivalent
 to dropping a 0-day on all applications using AntiSamy. Instead, we encourage
 responsible disclosure.
 

@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
- * 
+ *
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * - Redistributions of source code must retain the above copyright notice, 
+ * - Redistributions of source code must retain the above copyright notice,
  * 	 this list of conditions and the following disclaimer.
  * - Redistributions in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
@@ -33,57 +33,66 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * A model for CSS properties and the "rules" they must follow (either literals
- * or regular expressions) in order to be considered valid.
- * 
+ * A model for CSS properties and the "rules" they must follow (either literals or regular
+ * expressions) in order to be considered valid.
+ *
  * @author Jason Li
  */
 public class Property {
-	private final String name;
+  private final String name;
 
-	private final List<Pattern> allowedRegExp;
+  private final List<Pattern> allowedRegExp;
 
-    private final List<String> allowedValues;
+  private final List<String> allowedValues;
 
-	private final List<String> shorthandRefs;
+  private final List<String> shorthandRefs;
 
-    public Property(String name, List<Pattern> allowedRegexp3, List<String> allowedValue, List<String> shortHandRefs, String description, String onInvalidStr) {
-        this.name = name;
-        this.allowedRegExp  = Collections.unmodifiableList(allowedRegexp3);
-        this.allowedValues = Collections.unmodifiableList(allowedValue);
-        this.shorthandRefs = Collections.unmodifiableList(shortHandRefs);
-    }
+  public Property(
+      String name,
+      List<Pattern> allowedRegexp3,
+      List<String> allowedValue,
+      List<String> shortHandRefs,
+      String description,
+      String onInvalidStr) {
+    this.name = name;
+    this.allowedRegExp = Collections.unmodifiableList(allowedRegexp3);
+    this.allowedValues = Collections.unmodifiableList(allowedValue);
+    this.shorthandRefs = Collections.unmodifiableList(shortHandRefs);
+  }
 
-	/**
-	 * Return a <code>List</code> of allowed regular expressions
-	 * @return The List of allowed regular expressions.
-	 */
-	public List<Pattern> getAllowedRegExp() {
-		return allowedRegExp;
-	}
+  /**
+   * Return a <code>List</code> of allowed regular expressions
+   *
+   * @return The List of allowed regular expressions.
+   */
+  public List<Pattern> getAllowedRegExp() {
+    return allowedRegExp;
+  }
 
-	/**
-	 * Return a <code>List</code> of allowed literal values
-	 * @return The List of allowed literal values.
-	 */
-	public List<String> getAllowedValues() {
-		return allowedValues;
-	}
+  /**
+   * Return a <code>List</code> of allowed literal values
+   *
+   * @return The List of allowed literal values.
+   */
+  public List<String> getAllowedValues() {
+    return allowedValues;
+  }
 
-	/**
-	 * Return a <code>List</code> of allowed shorthand references
-	 * @return The List of allowed shorthand references.
-	 */
-	public List<String> getShorthandRefs() {
-		return shorthandRefs;
-	}
+  /**
+   * Return a <code>List</code> of allowed shorthand references
+   *
+   * @return The List of allowed shorthand references.
+   */
+  public List<String> getShorthandRefs() {
+    return shorthandRefs;
+  }
 
-	/**
-	 * Get the name of the property.
-	 * @return The name of the property.
-	 */
-	public String getName() {
-		return name;
-	}
-
+  /**
+   * Get the name of the property.
+   *
+   * @return The name of the property.
+   */
+  public String getName() {
+    return name;
+  }
 }

@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
- * 
+ *
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
- * 
+ *
  * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
  * Neither the name of OWASP nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
@@ -31,7 +31,6 @@ import java.io.Writer;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -39,9 +38,8 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
-
-import org.apache.xerces.xni.parser.XMLDocumentFilter;
 import net.sourceforge.htmlunit.cyberneko.parsers.SAXParser;
+import org.apache.xerces.xni.parser.XMLDocumentFilter;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
@@ -52,167 +50,175 @@ import org.xml.sax.SAXNotSupportedException;
 
 public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
 
-    private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
+  private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
 
-    private static final TransformerFactory sTransformerFactory;
+  private static final TransformerFactory sTransformerFactory;
 
-    static {
-        // Per issue #103, an IllegalArgumentException could be thrown below if the SAX parser does not
-        // support these JAXP 1.5 features. This did actually occur in certain environments where we let
-        // the TransformerFactory create whatever instance it decided to create. For example, if
-        // xalan:2.7.2 was on the classpath, which doesn't support these JAXP features.
-        // However, this should never happen anymore because, by default, we now force the use of the
-        // JDK provided Xalan SAX parser, which DOES support these features. However, if someone REALLY
-        // wants to use a different implementation, they can set the new property "antisamy.transformerfactory.impl"
-        // to whatever they prefer to use, but that class must implement the two attributes we set.
+  static {
+    // Per issue #103, an IllegalArgumentException could be thrown below if the SAX parser does
+    // not
+    // support these JAXP 1.5 features. This did actually occur in certain environments where we
+    // let
+    // the TransformerFactory create whatever instance it decided to create. For example, if
+    // xalan:2.7.2 was on the classpath, which doesn't support these JAXP features.
+    // However, this should never happen anymore because, by default, we now force the use of
+    // the
+    // JDK provided Xalan SAX parser, which DOES support these features. However, if someone
+    // REALLY
+    // wants to use a different implementation, they can set the new property
+    // "antisamy.transformerfactory.impl"
+    // to whatever they prefer to use, but that class must implement the two attributes we set.
 
-        String TRANSFORMER_FACTORY_IMPL = System.getProperty("antisamy.transformerfactory.impl",
-                "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
+    String TRANSFORMER_FACTORY_IMPL =
+        System.getProperty(
+            "antisamy.transformerfactory.impl",
+            "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
 
-        sTransformerFactory =
-                TransformerFactory.newInstance(TRANSFORMER_FACTORY_IMPL, null );
+    sTransformerFactory = TransformerFactory.newInstance(TRANSFORMER_FACTORY_IMPL, null);
 
-        // Disable external entities, etc.
-        sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+    // Disable external entities, etc.
+    sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    sTransformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+  }
+
+  static class CachedItem {
+    private final Transformer transformer;
+    private final SAXParser saxParser;
+    private final MagicSAXFilter magicSAXFilter;
+
+    CachedItem(Transformer transformer, SAXParser saxParser, MagicSAXFilter magicSAXFilter) {
+      this.transformer = transformer;
+      this.saxParser = saxParser;
+      this.magicSAXFilter = magicSAXFilter;
+      XMLDocumentFilter[] filters = {magicSAXFilter};
+      try {
+        saxParser.setProperty("http://cyberneko.org/html/properties/filters", filters);
+      } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  public AntiSamySAXScanner(Policy policy) {
+    super(policy);
+  }
+
+  @Override
+  public CleanResults getResults() {
+    return null;
+  }
+
+  @Override
+  public CleanResults scan(String html) throws ScanException {
+    return scan(html, this.policy);
+  }
+
+  public CleanResults scan(String html, Policy policy) throws ScanException {
+    if (html == null) {
+      throw new ScanException(new NullPointerException("Null html input"));
     }
 
-    static class CachedItem {
-        private final Transformer transformer;
-        private final SAXParser saxParser;
-        private final MagicSAXFilter magicSAXFilter;
+    int maxInputSize = this.policy.getMaxInputSize();
 
-        CachedItem(Transformer transformer, SAXParser saxParser, MagicSAXFilter magicSAXFilter)  {
-            this.transformer = transformer;
-            this.saxParser = saxParser;
-            this.magicSAXFilter = magicSAXFilter;
-            XMLDocumentFilter[] filters = { magicSAXFilter };
-            try {
-                saxParser.setProperty("http://cyberneko.org/html/properties/filters", filters);
-            } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    if (html.length() > maxInputSize) {
+      addError(ErrorMessageUtil.ERROR_INPUT_SIZE, new Object[] {html.length(), maxInputSize});
+      throw new ScanException(errorMessages.get(0));
     }
 
-    public AntiSamySAXScanner(Policy policy) {
-        super(policy);
-    }
+    final StringWriter out = new StringWriter();
+    StringReader reader = new StringReader(html);
 
-    @Override
-    public CleanResults getResults() {
-        return null;
-    }
-
-    @Override
-    public CleanResults scan(String html) throws ScanException {
-        return scan(html, this.policy);
-    }
-
-    public CleanResults scan(String html, Policy policy) throws ScanException {
-       if (html == null) {
-           throw new ScanException(new NullPointerException("Null html input"));
-       }
-
-       int maxInputSize = this.policy.getMaxInputSize();
-
-       if (html.length() > maxInputSize) {
-           addError(ErrorMessageUtil.ERROR_INPUT_SIZE, new Object[] {html.length(), maxInputSize});
-           throw new ScanException(errorMessages.get(0));
-       }
-       
-        final StringWriter out = new StringWriter();
-        StringReader reader = new StringReader(html);
-
-        CleanResults results = scan(reader, out);
-        final String tainted = html;
-        Callable<String> cleanCallable = new Callable<String>() {
-            public String call() throws Exception {
-                return trim(tainted, out.toString());
-            }
+    CleanResults results = scan(reader, out);
+    final String tainted = html;
+    Callable<String> cleanCallable =
+        new Callable<String>() {
+          public String call() throws Exception {
+            return trim(tainted, out.toString());
+          }
         };
-        return new CleanResults(results.getStartOfScan(), cleanCallable, null, results.getErrorMessages());
+    return new CleanResults(
+        results.getStartOfScan(), cleanCallable, null, results.getErrorMessages());
+  }
+
+  /**
+   * Using a SAX parser, can pass Streams for input and output. Use case is a Servlet filter where
+   * request or response is large and caller does not need the entire string in memory.
+   *
+   * @param reader A Reader which can feed the SAXParser a little input at a time
+   * @param writer A Writer that can take a little output at a time
+   * @return CleanResults where the cleanHtml is null. If a caller wants the HTML as a string, it
+   *     must capture the contents of the writer (i.e., use a StringWriter).
+   * @throws ScanException When there is a problem encountered while scanning the HTML.
+   */
+  public CleanResults scan(Reader reader, Writer writer) throws ScanException {
+    try {
+
+      CachedItem candidateCachedItem = cachedItems.poll();
+      if (candidateCachedItem == null) {
+        candidateCachedItem =
+            new CachedItem(getNewTransformer(), getParser(), new MagicSAXFilter(messages));
+      }
+
+      final CachedItem cachedItem = candidateCachedItem;
+
+      SAXParser parser = cachedItem.saxParser;
+      cachedItem.magicSAXFilter.reset(policy);
+
+      long startOfScan = System.currentTimeMillis();
+
+      final SAXSource source = new SAXSource(parser, new InputSource(reader));
+
+      final Transformer transformer = cachedItem.transformer;
+      boolean formatOutput = policy.isFormatOutput();
+      boolean omitXml = policy.isOmitXmlDeclaration();
+
+      transformer.setOutputProperty(OutputKeys.INDENT, formatOutput ? "yes" : "no");
+      transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, omitXml ? "yes" : "no");
+      transformer.setOutputProperty(OutputKeys.METHOD, "html");
+
+      //noinspection deprecation
+      final org.apache.xml.serialize.OutputFormat format = getOutputFormat();
+      //noinspection deprecation
+      final org.apache.xml.serialize.HTMLSerializer serializer = getHTMLSerializer(writer, format);
+
+      transformer.transform(source, new SAXResult(serializer));
+      errorMessages.clear();
+      errorMessages.addAll(cachedItem.magicSAXFilter.getErrorMessages());
+      cachedItems.add(cachedItem);
+      return new CleanResults(startOfScan, (String) null, null, errorMessages);
+
+    } catch (Exception e) {
+      throw new ScanException(e);
     }
+  }
 
-    /**
-     * Using a SAX parser, can pass Streams for input and output.
-     * Use case is a Servlet filter where request or response is large
-     * and caller does not need the entire string in memory.
-     * @param reader A Reader which can feed the SAXParser a little input at a time
-     * @param writer A Writer that can take a little output at a time
-     * @return CleanResults where the cleanHtml is null. If a caller wants the HTML as a string,
-     *         it must capture the contents of the writer (i.e., use a StringWriter).
-     * @throws ScanException When there is a problem encountered
-     *         while scanning the HTML.
-     */
-    public CleanResults scan(Reader reader, Writer writer) throws ScanException {
-        try {
-
-            CachedItem candidateCachedItem = cachedItems.poll();
-            if (candidateCachedItem == null){
-                candidateCachedItem = new CachedItem(getNewTransformer(), getParser(), new MagicSAXFilter(messages));
-            }
-            
-            final CachedItem cachedItem = candidateCachedItem;
-
-            SAXParser parser = cachedItem.saxParser;
-            cachedItem.magicSAXFilter.reset(policy);
-
-            long startOfScan = System.currentTimeMillis();
-
-            final SAXSource source = new SAXSource(parser, new InputSource(reader));
-
-            final Transformer transformer = cachedItem.transformer;
-            boolean formatOutput = policy.isFormatOutput();
-            boolean omitXml = policy.isOmitXmlDeclaration();
-
-            transformer.setOutputProperty(OutputKeys.INDENT, formatOutput ? "yes" : "no");
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, omitXml ? "yes" : "no");
-            transformer.setOutputProperty(OutputKeys.METHOD, "html");
-
-            //noinspection deprecation
-            final org.apache.xml.serialize.OutputFormat format = getOutputFormat();
-            //noinspection deprecation
-            final org.apache.xml.serialize.HTMLSerializer serializer = getHTMLSerializer(writer, format);
-            
-            transformer.transform(source, new SAXResult(serializer));
-            errorMessages.clear();
-            errorMessages.addAll(cachedItem.magicSAXFilter.getErrorMessages());
-            cachedItems.add( cachedItem);
-            return new CleanResults(startOfScan, (String) null, null, errorMessages);
-
-        } catch (Exception e) {
-            throw new ScanException(e);
-        }
+  /**
+   * Return a new Transformer instance. This is wrapped in a synchronized method because there is no
+   * guarantee that the TransformerFactory is thread-safe.
+   *
+   * @return a new Transformer instance.
+   */
+  private static synchronized Transformer getNewTransformer() {
+    try {
+      return sTransformerFactory.newTransformer();
+    } catch (TransformerConfigurationException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-     /**
-      * Return a new Transformer instance. This is wrapped in a synchronized method because there is
-      * no guarantee that the TransformerFactory is thread-safe.
-      *
-      * @return a new Transformer instance.
-      */
-     private static synchronized Transformer getNewTransformer()  {
-         try {
-             return sTransformerFactory.newTransformer();
-         } catch (TransformerConfigurationException e) {
-             throw new RuntimeException(e);
-         }
-     }
+  private static SAXParser getParser() {
+    try {
+      SAXParser parser = new SAXParser();
+      parser.setFeature("http://xml.org/sax/features/namespaces", false);
+      parser.setFeature("http://cyberneko.org/html/features/balance-tags/document-fragment", true);
+      parser.setFeature("http://cyberneko.org/html/features/scanner/cdata-sections", true);
+      parser.setFeature("http://apache.org/xml/features/scanner/notify-char-refs", true);
+      parser.setFeature("http://apache.org/xml/features/scanner/notify-builtin-refs", true);
 
-    private static SAXParser getParser()  {
-        try {
-            SAXParser parser = new SAXParser();
-            parser.setFeature("http://xml.org/sax/features/namespaces", false);
-            parser.setFeature("http://cyberneko.org/html/features/balance-tags/document-fragment", true);
-            parser.setFeature("http://cyberneko.org/html/features/scanner/cdata-sections", true);
-            parser.setFeature("http://apache.org/xml/features/scanner/notify-char-refs", true);
-            parser.setFeature("http://apache.org/xml/features/scanner/notify-builtin-refs", true);
-
-            parser.setProperty("http://cyberneko.org/html/properties/names/elems", "lower");
-            return parser;
-        } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+      parser.setProperty("http://cyberneko.org/html/properties/names/elems", "lower");
+      return parser;
+    } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+      throw new RuntimeException(e);
     }
+  }
 }

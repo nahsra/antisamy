@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
- * 
+ *
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
- * 
+ *
  * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
  * Neither the name of OWASP nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
@@ -24,27 +24,24 @@
 package org.owasp.validator.css;
 
 /**
- * This exception gets thrown when there is an unrecognized Selector type parsing
- * the tainted CSS.
- * 
+ * This exception gets thrown when there is an unrecognized Selector type parsing the tainted CSS.
+ *
  * @author Jason Li
  */
 import org.owasp.validator.html.ScanException;
 
 public class UnknownSelectorException extends ScanException {
-    
-    private final String selectorName;
-    
-    public UnknownSelectorException(String selectorName) {
-	super("Unknown selector " + selectorName);
-	
-	this.selectorName = selectorName;
-    }
 
-    /**
-     * @return the selectorName
-     */
-    public String getSelectorName() {
-        return selectorName;
-    }
+  private final String selectorName;
+
+  public UnknownSelectorException(String selectorName) {
+    super("Unknown selector " + selectorName);
+
+    this.selectorName = selectorName;
+  }
+
+  /** @return the selectorName */
+  public String getSelectorName() {
+    return selectorName;
+  }
 }
