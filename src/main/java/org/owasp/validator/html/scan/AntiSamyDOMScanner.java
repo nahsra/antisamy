@@ -115,7 +115,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     public CleanResults scan(String html) throws ScanException {
 
         if (html == null) {
-            throw new ScanException(new NullPointerException("Null html input"));
+            throw new ScanException(new NullPointerException("Null HTML input"));
         }
 
         errorMessages.clear();

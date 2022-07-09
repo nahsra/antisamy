@@ -354,7 +354,7 @@ public class Policy {
     protected static Element getTopLevelElement(InputSource source, Callable<InputSource> getResetSource) throws PolicyException {
         // Track whether an exception was ever thrown while processing policy file
         try {
-            return getDocumentElementFromSource(source, true);
+            return getDocumentElementFromSource(source);
         } catch (SAXException | ParserConfigurationException | IOException e) {
             throw new PolicyException(e);
         }
@@ -384,9 +384,8 @@ public class Policy {
         return new ByteArrayInputStream(byteArray);
     }
 
-    private static Element getDocumentElementFromSource(InputSource source, boolean schemaValidationEnabled)
+    private static Element getDocumentElementFromSource(InputSource source)
             throws ParserConfigurationException, SAXException, IOException {
-    	// FIXME: remove boolean schemaValidationEnabled from this API and refactor all callers. 
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 

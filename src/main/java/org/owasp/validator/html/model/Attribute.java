@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2013, Arshan Dabirsiaghi, Jason Li, Kristian Rosenvold
+ * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li, Kristian Rosenvold
  * 
  * All rights reserved.
  * 
@@ -24,12 +24,18 @@
 
 package org.owasp.validator.html.model;
 
-import java.util.*;
-import java.util.regex.Pattern;
-
 import static org.owasp.validator.html.model.Tag.ANY_NORMAL_WHITESPACES;
 import static org.owasp.validator.html.model.Tag.ATTRIBUTE_DIVIDER;
 import static org.owasp.validator.html.model.Tag.CLOSE_ATTRIBUTE;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * A model for HTML attributes and the "rules" they must follow (either literals or regular expressions) in
@@ -37,7 +43,6 @@ import static org.owasp.validator.html.model.Tag.CLOSE_ATTRIBUTE;
  * 
  * @author Arshan Dabirsiaghi
  * @author Kristian Rosenvold
- *
  */
 
 public class Attribute  {

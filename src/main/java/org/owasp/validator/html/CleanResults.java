@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2021, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -98,7 +98,8 @@ public class CleanResults {
 
 	/**
 	 * Return the DOM version of the clean HTML.
-	 * return The XML Document fragment version of the clean HTML produced during the sanitization process.
+	 * 
+	 * @return The XML Document fragment version of the clean HTML produced during the sanitization process.
 	 *        This may be null, even if the clean HTML String is not null.
 	 */
 	public DocumentFragment getCleanXMLDocumentFragment() {

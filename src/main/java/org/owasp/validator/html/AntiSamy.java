@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2019, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -32,12 +32,11 @@ import java.io.Reader;
 import java.io.Writer;
 
 /**
- * 
  * This is the only class from which the outside world should be calling. The
  * <code>scan()</code> method holds the meat and potatoes of AntiSamy. The file
  * contains a number of ways for <code>scan()</code>'ing depending on the
  * accessibility of the policy file.
- * 
+ *
  * @author Arshan Dabirsiaghi
  */
 

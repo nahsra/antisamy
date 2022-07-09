@@ -52,7 +52,7 @@ public class InternalPolicy extends Policy {
 
         if (!isNoopenerAndNoreferrerAnchors) {
             logger.warn("The directive \"" + Policy.ANCHORS_NOOPENER_NOREFERRER +
-                    "\" is not enabled by default. It is recommended to enable it to prevent reverse tabnabbing attacks.");
+                    "\" is enabled by default, but disabled in this policy. It is recommended to leave it enabled to prevent reverse tabnabbing attacks.");
         }
     }
 
@@ -77,7 +77,7 @@ public class InternalPolicy extends Policy {
 
         if (!isNoopenerAndNoreferrerAnchors) {
             logger.warn("The directive \"" + Policy.ANCHORS_NOOPENER_NOREFERRER +
-                    "\" is not enabled by default. It is recommended to enable it to prevent reverse tabnabbing attacks.");
+                    "\" is enabled by default, but disabled in this policy. It is recommended to leave it enabled to prevent reverse tabnabbing attacks.");
         }
     }
 

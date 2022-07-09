@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
  * 
  * All rights reserved.
  * 
@@ -24,12 +24,10 @@
 package org.owasp.validator.css;
 
 /**
- * 
  * This exception gets thrown when there is an unrecognized Selector type parsing
  * the tainted CSS.
  * 
  * @author Jason Li
- *
  */
 import org.owasp.validator.html.ScanException;
 
