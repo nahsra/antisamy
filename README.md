@@ -10,10 +10,10 @@ Throughout the development of the 1.6.x series, we have identified and deprecate
 
 CssHandler had 2 constructors which dropped the LinkedList<URI> embeddedStyleSheets parameter. Both contructors now create an empty internal LinkedList<URI> and the method getImportedStylesheetsURIList() can be used to get a reference to it, if needed. This is rarely used so is unlikely to affect most users of AntiSamy. Normally, an empty list was passed in as this parameter value and that list was never used again.
 
- * The CssHandler(Policy, LinkedList<URI>, List<String>, ResourceBundle) was dropped
-   * It was replaced with: CssHandler(Policy, List<String>, ResourceBundle)
- * The CssHandler(Policy, LinkedList<URI>, List<String>, String, ResourceBundle) was dropped
-   * It was replaced with: CssHandler(Policy, List<String>, ResourceBundle, String). NOTE: The order of the last 2 parameters to this method was reversed.
+ * The CssHandler(Policy, LinkedList\<URI\>, List\<String\>, ResourceBundle) was dropped
+   * It was replaced with: CssHandler(Policy, List\<String\>, ResourceBundle)
+ * The CssHandler(Policy, LinkedList\<URI\>, List\<String\>, String, ResourceBundle) was dropped
+   * It was replaced with: CssHandler(Policy, List\<String\>, ResourceBundle, String). NOTE: The order of the last 2 parameters to this method was reversed.
 
  * Support for XHTML was dropped. AntiSamy now only supports HTML. As we believe this was a rarely used feature, we don't expect this to affect many AntiSamy users.
  * XML Schema validation is now required on AntiSamy policy files and cannot be disabled. You must make your policy file schema compliant in order to use it with AntiSamy.
@@ -53,7 +53,8 @@ MySpace was, at the time this project was born, the most popular social networki
 
 I don’t know of a possible use case for this policy file. If you wanted to allow every single valid HTML and CSS element (but without JavaScript or blatant CSS-related phishing attacks), you can use this policy file. Not even MySpace was this crazy. However, it does serve as a good reference because it contains base rules for every element, so you can use it as a knowledge base when using tailoring the other policy files.
 
-### Logging: AntiSamy now includes the slf4j-simple library for its logging, but AntiSamy users can import and use an alternate slf4j compatible logging library if they prefer. They can also then exclude slf4j-simple if they want to.
+### Logging
+AntiSamy now includes the slf4j-simple library for its logging, but AntiSamy users can import and use an alternate slf4j compatible logging library if they prefer. They can also then exclude slf4j-simple if they want to.
 
 WARNING: AntiSamy's use of slf4j-simple, without any configuration file, logs messages in a buffered manner to standard output. As such, some or all of these log messages may get lost if an Exception, such as a PolicyException is thrown. This can likely be rectified by configuring slf4j-simple to log to standard error instead, or use an alternate slf4j logger that does so.
 
@@ -85,14 +86,11 @@ There are a few ways to create a `Policy` object. The `getInstance()` method can
 AntiSamy as = new AntiSamy();
 CleanResults cr = as.scan(dirtyInput, policyFilePath);
 ```
-
 Finally, policy files can also be referenced by `File` objects directly in the second parameter:
-
 ```
 AntiSamy as = new AntiSamy();
 CleanResults cr = as.scan(dirtyInput, new File(policyFilePath));
 ```
-
 ### 5. Analyzing CleanResults
 The `CleanResults` object provides a lot of useful stuff.
 
@@ -127,6 +125,5 @@ $ git clone https://github.com/nahsra/antisamy
 $ cd antisamy
 $ mvn package
 ```
-
 ## License
 Released under the [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) license as specified here: [LICENSE](https://github.com/nahsra/antisamy/blob/main/LICENSE).
