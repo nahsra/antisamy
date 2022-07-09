@@ -1,8 +1,23 @@
 # AntiSamy
 
-A library for performing fast, configurable cleansing of HTML coming from untrusted sources. Supports Java 7+.
+A library for performing fast, configurable cleansing of HTML coming from untrusted sources. Supports Java 8+.
 
 Another way of saying that could be: It's an API that helps you make sure that clients don't supply malicious cargo code in the HTML they supply for their profile, comments, etc., that get persisted on the server. The term "malicious code" in regards to web applications usually mean "JavaScript." Mostly, Cascading Stylesheets are only considered malicious when they invoke JavaScript. However, there are many situations where "normal" HTML and CSS can be used in a malicious manner.
+
+## IMPORTANT! - API breaking changes in 1.7.0
+
+Throughout the development of the 1.6.x series, we have identified and deprecated a number of features and APIs. All of these deprecated items have been removed in the 1.7.0 release. These changes were all tracked in ticket: https://github.com/nahsra/antisamy/issues/195. Each of the changes are described below:
+
+CssHandler had 2 constructors which dropped the LinkedList<URI> embeddedStyleSheets parameter. Both contructors now create an empty internal LinkedList<URI> and the method getImportedStylesheetsURIList() can be used to get a reference to it, if needed. This is rarely used so is unlikely to affect most users of AntiSamy. Normally, an empty list was passed in as this parameter value and that list was never used again.
+
+ * The CssHandler(Policy, LinkedList<URI>, List<String>, ResourceBundle) was dropped
+   * It was replaced with: CssHandler(Policy, List<String>, ResourceBundle)
+ * The CssHandler(Policy, LinkedList<URI>, List<String>, String, ResourceBundle) was dropped
+   * It was replaced with: CssHandler(Policy, List<String>, ResourceBundle, String). NOTE: The order of the last 2 parameters to this method was reversed.
+
+ * Support for XHTML was dropped. AntiSamy now only supports HTML. As we believe this was a rarely used feature, we don't expect this to affect many AntiSamy users.
+ * XML Schema validation is now required on AntiSamy policy files and cannot be disabled. You must make your policy file schema compliant in order to use it with AntiSamy.
+ * The policy directive 'noopenerAndNoreferrerAnchors' is now ON by default. If it is disabled, AntiSamy issues a nag, encouraging you to enable it.
 
 ## How to Use
 
@@ -38,25 +53,7 @@ MySpace was, at the time this project was born, the most popular social networki
 
 I don’t know of a possible use case for this policy file. If you wanted to allow every single valid HTML and CSS element (but without JavaScript or blatant CSS-related phishing attacks), you can use this policy file. Not even MySpace was this crazy. However, it does serve as a good reference because it contains base rules for every element, so you can use it as a knowledge base when using tailoring the other policy files.
 
-### NOTE: Schema validation behavior change starting with AntiSamy 1.6.0
-
-While working on some improvements to AntiSamy's XML Schema Definition (XSD) for AntiSamy policy files, we noticed that AntiSamy was NOT actually enforcing the XSD. So, we've CHANGED the default behavior starting with AntiSamy 1.6.0 to enforce the schema, and not continue if the AntiSamy policy is invalid. However ...
-
-we recognize that it might not be possible for developers to fix their AntiSamy policies right away if they are non-compliant, and yet still want to upgrade AntiSamy to pick up any security improvements, feature enhancements, and bug fixes. As such, we've provided two ways to (temporarily!) disable schema validation:
-
-1) Set the Java System property: owasp.validator.validateschema to false. This can be done at the command line (e.g., -Dowasp.validator.validateschema=false) or via the Java System properties file. Neither requires a code change.
-
-2) Change the code using AntiSamy to invoke: Policy.setSchemaValidation(false) before loading the AntiSamy policy. This is a static call so once disabled, it is disabled for all new Policy instances.
-
-To encourage AntiSamy users to only use XSD compliant policies, AntiSamy will always log some type of warning when schema validation is disabled. It will either WARN that the policy is non-compliant so it can be fixed, or it will WARN that the policy is compliant, but schema validation is OFF, so validation should be turned back on (i.e., stop disabling it). We also added INFO level logging when AntiSamy schema's are loaded and validated.
-
-### Disabling schema validation is deprecated immediately, and will go away in AntiSamy 1.7+
-
-The ability to disable the new schema validation feature is intended to be temporary, to smooth the transition to properly valid AntiSamy policy files. We plan to drop this feature in the next major release. We estimate that this will be some time mid-late 2022, so not any time soon. The idea is to give dev teams using AntiSamy directly, or through other libraries like ESAPI, plenty of time to get their policy files schema compliant before schema validation becomes required. 
-
-### Logging: The logging introduced in 1.6.0 accidentally used log4j, while declaring slf4 as the logging API.
-
-This was quickly fixed in 1.6.1 to use slf4j APIs only. AntiSamy now includes the slf4j-simple library for its logging, but AntiSamy users can import and use an alternate slf4j compatible logging library if they prefer. They can also then exclude slf4j-simple if they want to.
+### Logging: AntiSamy now includes the slf4j-simple library for its logging, but AntiSamy users can import and use an alternate slf4j compatible logging library if they prefer. They can also then exclude slf4j-simple if they want to.
 
 WARNING: AntiSamy's use of slf4j-simple, without any configuration file, logs messages in a buffered manner to standard output. As such, some or all of these log messages may get lost if an Exception, such as a PolicyException is thrown. This can likely be rectified by configuring slf4j-simple to log to standard error instead, or use an alternate slf4j logger that does so.
 
@@ -103,10 +100,10 @@ The `CleanResults` object provides a lot of useful stuff.
  * `getCleanHTML()` - the clean, safe HTML output
  * `getCleanXMLDocumentFragment()` - the clean, safe `XMLDocumentFragment` which is reflected in `getCleanHTML()`
  * `getScanTime()` - returns the scan time in seconds
- 
+
 __Important Note__: There has been much confusion about the `getErrorMessages()` method. The `getErrorMessages()` method does not subtly answer the question "is this safe input?" in the affirmative if it returns an empty list. You must always use the sanitized input and there is no way to be sure the input passed in had no attacks.
 
-The serialization and deserialization process that is critical to the effectiveness of the sanitizer is purposefully lossy and will filter out attacks via a number of attack vectors. Unfortunately, one of the tradeoffs of this strategy is that we don't always know in retrospect that an attack was seen. Thus, the `getErrorMessages()` API is there to help users understand their well-intentioned input meet the requirements of the system, not help a developer detect if an attack was present. 
+The serialization and deserialization process that is critical to the effectiveness of the sanitizer is purposefully lossy and will filter out attacks via a number of attack vectors. Unfortunately, one of the tradeoffs of this strategy is that we don't always know in retrospect that an attack was seen. Thus, the `getErrorMessages()` API is there to help users understand their well-intentioned input meet the requirements of the system, not help a developer detect if an attack was present.
 
 ## Other Documentation
 
