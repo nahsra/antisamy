@@ -386,6 +386,7 @@ public class Policy {
 
     private static Element getDocumentElementFromSource(InputSource source, boolean schemaValidationEnabled)
             throws ParserConfigurationException, SAXException, IOException {
+    	// FIXME: remove boolean schemaValidationEnabled from this API and refactor all callers. 
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
@@ -397,11 +398,10 @@ public class Policy {
         dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
         dbf.setFeature(LOAD_EXTERNAL_DTD, false);
 
-        if (schemaValidationEnabled) {
-            getPolicySchema();
-            dbf.setNamespaceAware(true);
-            dbf.setSchema(schema);
-        }
+    	// Schema validation is always required now. So turn it on.
+        getPolicySchema();
+        dbf.setNamespaceAware(true);
+        dbf.setSchema(schema);
 
         DocumentBuilder db = dbf.newDocumentBuilder();
         db.setErrorHandler(new SAXErrorHandler());

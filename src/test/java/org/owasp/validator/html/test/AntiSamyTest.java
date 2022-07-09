@@ -1502,10 +1502,8 @@ static final String test33 = "<html>\n"
     public void entityReferenceEncodedInHtmlAttribute() throws ScanException, PolicyException {
         // Concern is that "&" is not being encoded and "#00058" was not being interpreted as ":"
         // so the validations based on regexp passed and a browser would load "&:" together.
-        // All this when not using the XHTML serializer.
 
         // UPDATE:  Using a new HTML parser library starts decoding entities like #00058
-        // UPDATE 2: XHTML is no longer used
         assertThat(as.scan("<p><a href=\"javascript&#00058x=1,%61%6c%65%72%74%28%22%62%6f%6f%6d%22%29\">xss</a></p>", policy, AntiSamy.DOM).getCleanHTML(),
                 not(containsString("javascript")));
         assertThat(as.scan("<p><a href=\"javascript&#00058x=1,%61%6c%65%72%74%28%22%62%6f%6f%6d%22%29\">xss</a></p>", policy, AntiSamy.SAX).getCleanHTML(),

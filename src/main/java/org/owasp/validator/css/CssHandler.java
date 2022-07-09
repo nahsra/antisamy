@@ -127,12 +127,12 @@ public class CssHandler implements DocumentHandler {
 	 *            the error message bundle to pull from
 	 */
 	public CssHandler(Policy policy, List<String> errorMessages, ResourceBundle messages) {
-		this(policy, null, errorMessages, null, messages);
+		this(policy, errorMessages, messages, null);
 	}
 
 	/**
 	 * Constructs a handler for stylesheets using the given policy. The List of embedded stylesheets
-	 * produced by this constructor is now available via the getImportedStylesheetsURIList() method.
+	 * produced by this constructor is available via the getImportedStylesheetsURIList() method.
 	 *
 	 * @param policy
 	 *            the policy to use
@@ -144,31 +144,6 @@ public class CssHandler implements DocumentHandler {
 	 *            the tag name associated with this inline style
 	 */
 	public CssHandler(Policy policy, List<String> errorMessages, ResourceBundle messages, String tagName) {
-		this(policy, null, errorMessages, tagName, messages);
-	}
-
-	/**
-	 * Constructs a handler for inline style declarations using the given policy
-	 * and queue for imported stylesheets.
-	 *
-	 * @param policy
-	 *            the policy to use
-	 * @param embeddedStyleSheets
-	 *            the queue of stylesheets imported
-	 * @param errorMessages
-	 *            the List of error messages to add error messages too if there are errors
-	 * @param tagName
-	 *            the tag name associated with this inline style
-	 * @param messages
-	 *            the error message bundle to pull from
-	 *
-	 * @deprecated The embeddedStyleSheets List parameter is removed in the newer version of
-	 * this constructor as the handler has its own internal list that can be accessed through
-	 * the getImportedStylesheetsURIList() method.
-	 */
-	@Deprecated
-	public CssHandler(Policy policy, LinkedList<URI> embeddedStyleSheets,
-					  List<String> errorMessages, String tagName, ResourceBundle messages) {
 		assert policy instanceof InternalPolicy : policy.getClass();
 		this.policy = (InternalPolicy) policy;
 		this.errorMessages = errorMessages;
@@ -176,7 +151,7 @@ public class CssHandler implements DocumentHandler {
 		this.validator = new CssValidator(policy);
 		// Create a queue of all style sheets that need to be validated to
 		// account for any sheets that may be imported by the current CSS
-		this.importedStyleSheets = (embeddedStyleSheets != null ? embeddedStyleSheets : new LinkedList<URI>());
+		this.importedStyleSheets = new LinkedList<URI>();
 		this.tagName = tagName;
 		this.isInline = (tagName != null);
 	}

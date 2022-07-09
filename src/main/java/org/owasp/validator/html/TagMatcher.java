@@ -43,9 +43,9 @@ public class TagMatcher {
     /**
      * Examines if this tag matches the values in this matcher.
      *
-     * Please note that this is case-insensitive, which is ok for html and xhtml, but not really for xml
+     * Please note that this is case-insensitive, which is OK for HTML, but not really for XML
      * @param tagName The tag name to look for
-     * @return true if the tag name matches this mach
+     * @return true if the tag name matches this matcher
      */
     public boolean matches(String tagName) {
         return allowedLowercase.contains(tagName.toLowerCase());
