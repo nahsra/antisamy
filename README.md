@@ -8,7 +8,7 @@ Another way of saying that could be: It's an API that helps you make sure that c
 
 Throughout the development of the 1.6.x series, we have identified and deprecated a number of features and APIs. All of these deprecated items have been removed in the 1.7.0 release. These changes were all tracked in ticket: https://github.com/nahsra/antisamy/issues/195. Each of the changes are described below:
 
-CssHandler had 2 constructors which dropped the LinkedList<URI> embeddedStyleSheets parameter. Both contructors now create an empty internal LinkedList<URI> and the method getImportedStylesheetsURIList() can be used to get a reference to it, if needed. This is rarely used so is unlikely to affect most users of AntiSamy. Normally, an empty list was passed in as this parameter value and that list was never used again.
+CssHandler had 2 constructors which dropped the LinkedList<URI> embeddedStyleSheets parameter. Both contructors now create an empty internal LinkedList<URI> and the method getImportedStylesheetsURIList() can be used to get a reference to it, if needed. This feature is rarely used, and in fact direct invocation of these constructors is also rare, so this change is unlikely to affect most users of AntiSamy. When used, normally an empty list is passed in as this parameter value and that list is never used again.
 
  * The CssHandler(Policy, LinkedList\<URI\>, List\<String\>, ResourceBundle) was dropped
    * It was replaced with: CssHandler(Policy, List\<String\>, ResourceBundle)
@@ -43,7 +43,7 @@ Accordingly, we’ve built a policy file that allows fairly similar functionalit
 
 2) antisamy-ebay.xml
 
-eBay is the most popular online auction site in the universe, as far as I can tell. It is a public site so anyone is allowed to post listings with rich HTML content. It’s not surprising that given the attractiveness of eBay as a target that it has been subject to a few complex XSS attacks. Listings are allowed to contain much more rich content than, say, Slashdot -- so it’s attack surface is considerably larger.
+eBay is the most popular online auction site in the universe, as far as we can tell. It is a public site so anyone is allowed to post listings with rich HTML content. It’s not surprising that given the attractiveness of eBay as a target that it has been subject to a few complex XSS attacks. Listings are allowed to contain much more rich content than, say, Slashdot -- so it’s attack surface is considerably larger.
 
 3) antisamy-myspace.xml
 
@@ -51,7 +51,7 @@ MySpace was, at the time this project was born, the most popular social networki
 
 4) antisamy-anythinggoes.xml
 
-I don’t know of a possible use case for this policy file. If you wanted to allow every single valid HTML and CSS element (but without JavaScript or blatant CSS-related phishing attacks), you can use this policy file. Not even MySpace was this crazy. However, it does serve as a good reference because it contains base rules for every element, so you can use it as a knowledge base when using tailoring the other policy files.
+We don’t know of a possible use case for this policy file. If you wanted to allow every single valid HTML and CSS element (but without JavaScript or blatant CSS-related phishing attacks), you can use this policy file. Not even MySpace was this crazy. However, it does serve as a good reference because it contains base rules for every element, so you can use it as a knowledge base when using tailoring the other policy files.
 
 ### Logging
 AntiSamy now includes the slf4j-simple library for its logging, but AntiSamy users can import and use an alternate slf4j compatible logging library if they prefer. They can also then exclude slf4j-simple if they want to.
