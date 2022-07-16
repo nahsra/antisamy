@@ -4,7 +4,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.0-dev</version>
+    <version>1.7.0</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -44,7 +44,7 @@
     <properties>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2022-06-26T19:54:30Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2022-07-16T23:54:30Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.12.0</version.findsecbugs>
         <version.io>2.11.0</version.io>
@@ -295,6 +295,26 @@
                             </rules>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>check-java7API-signatures</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <checkSignatureRule
+                                    implementation="org.codehaus.mojo.animal_sniffer.enforcer.CheckSignatureRule">
+                                    <signature>
+                                        <groupId>org.codehaus.mojo.signature</groupId>
+                                        <!-- Check against Java 7 API -->
+                                        <artifactId>java17</artifactId>
+                                        <version>1.0</version>
+                                    </signature>
+                                </checkSignatureRule>
+                            </rules>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin> <!-- This plugin is disabled by default. Invoke the release profile (-Prelease) to enable it. -->
@@ -537,6 +557,7 @@
                 <artifactId>findsecbugs-plugin</artifactId>
                 <version>${version.findsecbugs}</version>
             </plugin>
+
         </plugins>
     </build>
 
@@ -621,4 +642,5 @@
             </plugin>
         </plugins>
     </reporting>
+
 </project>

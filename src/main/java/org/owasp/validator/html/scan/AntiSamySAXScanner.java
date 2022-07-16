@@ -56,18 +56,14 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
 
   static {
     // Per issue #103, an IllegalArgumentException could be thrown below if the SAX parser does
-    // not
-    // support these JAXP 1.5 features. This did actually occur in certain environments where we
-    // let
-    // the TransformerFactory create whatever instance it decided to create. For example, if
-    // xalan:2.7.2 was on the classpath, which doesn't support these JAXP features.
-    // However, this should never happen anymore because, by default, we now force the use of
-    // the
-    // JDK provided Xalan SAX parser, which DOES support these features. However, if someone
-    // REALLY
+    // not support these JAXP 1.5 features. This did actually occur in certain environments where we
+    // let the TransformerFactory create whatever instance it decided to create. For example, if
+    // xalan:2.7.2 was on the classpath, which doesn't support these JAXP features. However, this
+    // should never happen anymore because, by default, we now force the use of the
+    // JDK provided Xalan SAX parser, which DOES support these features. However, if someone REALLY
     // wants to use a different implementation, they can set the new property
-    // "antisamy.transformerfactory.impl"
-    // to whatever they prefer to use, but that class must implement the two attributes we set.
+    // "antisamy.transformerfactory.impl" to whatever they prefer to use, but that class must
+    // implement the two attributes we set.
 
     String TRANSFORMER_FACTORY_IMPL =
         System.getProperty(
