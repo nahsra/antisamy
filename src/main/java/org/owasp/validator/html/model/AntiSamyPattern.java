@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2007-2011, Arshan Dabirsiaghi, Jason Li
- * 
+ * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
+ *
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
- * 
+ *
  * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
  * Neither the name of OWASP nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
@@ -28,35 +28,33 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * An extension of the Pattern  with helper methods.
+ * An extension of the Pattern with helper methods.
  *
  * @author Arshan Dabirsiaghi
  */
 public class AntiSamyPattern {
 
-    private final Pattern pattern;
+  private final Pattern pattern;
 
-    /**
-     * Constructor for AntiSamyPattern.
-     *
-     * @param pattern The Pattern to lookup based on the "name".
-     */
-    public AntiSamyPattern(Pattern pattern) {
-        this.pattern = pattern;
-    }
+  /**
+   * Constructor for AntiSamyPattern.
+   *
+   * @param pattern The Pattern to lookup based on the "name".
+   */
+  public AntiSamyPattern(Pattern pattern) {
+    this.pattern = pattern;
+  }
 
-    /**
-     * @return Return the Pattern of the <code>AntiSamyPattern</code>.
-     */
-    public Pattern getPattern() {
-        return pattern;
-    }
+  /** @return Return the Pattern of the <code>AntiSamyPattern</code>. */
+  public Pattern getPattern() {
+    return pattern;
+  }
 
-    public Matcher matcher(CharSequence input) {
-        return pattern.matcher(input);
-    }
+  public Matcher matcher(CharSequence input) {
+    return pattern.matcher(input);
+  }
 
-    public boolean matches(String other) {
-        return matcher(other).matches();
-    }
+  public boolean matches(String other) {
+    return matcher(other).matches();
+  }
 }

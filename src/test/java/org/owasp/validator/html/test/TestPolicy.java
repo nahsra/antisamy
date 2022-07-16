@@ -31,69 +31,70 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
 import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.model.Tag;
 
-/**
- * @author Kristian Rosenvold
- */
+/** @author Kristian Rosenvold */
 public class TestPolicy extends InternalPolicy {
 
-    protected TestPolicy(Policy.ParseContext parseContext) {
-        super(parseContext);
-    }
+  protected TestPolicy(Policy.ParseContext parseContext) {
+    super(parseContext);
+  }
 
-    protected TestPolicy(Policy old, Map<String, String> directives, Map<String, Tag> tagRules, Map<String, Property> cssRules) {
-        super(old, directives, tagRules, cssRules);
-    }
+  protected TestPolicy(
+      Policy old,
+      Map<String, String> directives,
+      Map<String, Tag> tagRules,
+      Map<String, Property> cssRules) {
+    super(old, directives, tagRules, cssRules);
+  }
 
-    public static TestPolicy getInstance() throws PolicyException {
-        return getInstance(Policy.class.getClassLoader().getResource(DEFAULT_POLICY_URI));
-    }
+  public static TestPolicy getInstance() throws PolicyException {
+    return getInstance(Policy.class.getClassLoader().getResource(DEFAULT_POLICY_URI));
+  }
 
-    public static TestPolicy getInstance(String filename) throws PolicyException {
-        File file = new File(filename);
-        return getInstance(file);
-    }
+  public static TestPolicy getInstance(String filename) throws PolicyException {
+    File file = new File(filename);
+    return getInstance(file);
+  }
 
-    public static TestPolicy getInstance(File file) throws PolicyException {
-        try {
-            URI uri = file.toURI();
-            return getInstance(uri.toURL());
-        } catch (IOException e) {
-            throw new PolicyException(e);
-        }
+  public static TestPolicy getInstance(File file) throws PolicyException {
+    try {
+      URI uri = file.toURI();
+      return getInstance(uri.toURL());
+    } catch (IOException e) {
+      throw new PolicyException(e);
     }
+  }
 
-    public static TestPolicy getInstance(URL url) throws PolicyException {
-        return new TestPolicy(getParseContext(getTopLevelElement(url), url));
-    }
+  public static TestPolicy getInstance(URL url) throws PolicyException {
+    return new TestPolicy(getParseContext(getTopLevelElement(url), url));
+  }
 
-    public TestPolicy cloneWithDirective(String name, String value) {
-        Map<String, String> directives = new HashMap<String, String>(this.directives);
-        directives.put(name, value);
-        return new TestPolicy(this, Collections.unmodifiableMap(directives), tagRules, cssRules);
-    }
+  public TestPolicy cloneWithDirective(String name, String value) {
+    Map<String, String> directives = new HashMap<String, String>(this.directives);
+    directives.put(name, value);
+    return new TestPolicy(this, Collections.unmodifiableMap(directives), tagRules, cssRules);
+  }
 
-    public TestPolicy addTagRule(Tag tag) {
-        Map<String, Tag> newTagRules = new HashMap<String, Tag>(tagRules);
-        newTagRules.put(tag.getName().toLowerCase(), tag);
-        return new TestPolicy(this, this.directives, newTagRules, cssRules);
-    }
+  public TestPolicy addTagRule(Tag tag) {
+    Map<String, Tag> newTagRules = new HashMap<String, Tag>(tagRules);
+    newTagRules.put(tag.getName().toLowerCase(), tag);
+    return new TestPolicy(this, this.directives, newTagRules, cssRules);
+  }
 
-    public TestPolicy mutateTag(Tag tag) {
-        Map<String, Tag> newRules = new HashMap<String, Tag>(this.tagRules);
-        newRules.put( tag.getName().toLowerCase(), tag);
-        return new TestPolicy(this, this.directives, newRules, cssRules);
-    }
+  public TestPolicy mutateTag(Tag tag) {
+    Map<String, Tag> newRules = new HashMap<String, Tag>(this.tagRules);
+    newRules.put(tag.getName().toLowerCase(), tag);
+    return new TestPolicy(this, this.directives, newRules, cssRules);
+  }
 
-    public TestPolicy addCssProperty(Property property) {
-        Map<String, Property> newCssRules = new HashMap<String, Property>(cssRules);
-        newCssRules.put(property.getName().toLowerCase(), property);
-        return new TestPolicy(this, this.directives, tagRules, newCssRules);
-    }
+  public TestPolicy addCssProperty(Property property) {
+    Map<String, Property> newCssRules = new HashMap<String, Property>(cssRules);
+    newCssRules.put(property.getName().toLowerCase(), property);
+    return new TestPolicy(this, this.directives, tagRules, newCssRules);
+  }
 }

@@ -32,26 +32,27 @@ import java.util.Set;
  * @author Kristian Rosenvold
  */
 public class TagMatcher {
-    private final Set<String> allowedLowercase = new HashSet<String>();
+  private final Set<String> allowedLowercase = new HashSet<String>();
 
-    public TagMatcher(Iterable<String> allowedValues) {
-        for (String item : allowedValues) {
-            allowedLowercase.add(item.toLowerCase());
-        }
+  public TagMatcher(Iterable<String> allowedValues) {
+    for (String item : allowedValues) {
+      allowedLowercase.add(item.toLowerCase());
     }
+  }
 
-    /**
-     * Examines if this tag matches the values in this matcher.
-     *
-     * Please note that this is case-insensitive, which is ok for html and xhtml, but not really for xml
-     * @param tagName The tag name to look for
-     * @return true if the tag name matches this mach
-     */
-    public boolean matches(String tagName) {
-        return allowedLowercase.contains(tagName.toLowerCase());
-    }
+  /**
+   * Examines if this tag matches the values in this matcher.
+   *
+   * <p>Please note that this is case-insensitive, which is OK for HTML, but not really for XML
+   *
+   * @param tagName The tag name to look for
+   * @return true if the tag name matches this matcher
+   */
+  public boolean matches(String tagName) {
+    return allowedLowercase.contains(tagName.toLowerCase());
+  }
 
-    public int size() {
-        return allowedLowercase.size();
-    }
+  public int size() {
+    return allowedLowercase.size();
+  }
 }

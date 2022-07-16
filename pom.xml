@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.0-dev</version>
+    <version>1.7.0</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -20,20 +21,20 @@
     <url>https://github.com/nahsra/antisamy</url>
 
     <developers>
-      <developer>
-        <id>nahsra</id>
-        <name>Arshan Dabirsiaghi</name>
-        <email>arshan.dabirsiaghi@gmail.com</email>
-      </developer>
+        <developer>
+            <id>nahsra</id>
+            <name>Arshan Dabirsiaghi</name>
+            <email>arshan.dabirsiaghi@gmail.com</email>
+        </developer>
     </developers>
 
     <licenses>
-      <license>
-        <name>BSD 3</name>
-        <url>https://opensource.org/licenses/BSD-3-Clause</url>
-      </license>
+        <license>
+            <name>BSD 3</name>
+            <url>https://opensource.org/licenses/BSD-3-Clause</url>
+        </license>
     </licenses>
-   
+
     <scm>
         <connection>scm:git:git@github.com:nahsra/antisamy.git</connection>
         <url>scm:git:git@github.com:nahsra/antisamy.git</url>
@@ -43,8 +44,8 @@
     <properties>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2022-06-26T19:54:30Z</project.build.outputTimestamp>
-        <project.java.target>1.7</project.java.target>
+        <project.build.outputTimestamp>2022-07-16T23:54:30Z</project.build.outputTimestamp>
+        <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.12.0</version.findsecbugs>
         <version.io>2.11.0</version.io>
         <version.slf4j>1.7.36</version.slf4j>
@@ -53,12 +54,12 @@
     </properties>
 
     <profiles>
-      <profile>
-        <id>release</id>
-        <properties>
-          <gpg.skip>false</gpg.skip>
-        </properties>
-      </profile>
+        <profile>
+            <id>release</id>
+            <properties>
+                <gpg.skip>false</gpg.skip>
+            </properties>
+        </profile>
     </profiles>
 
     <dependencies>
@@ -124,8 +125,8 @@
             <version>${version.slf4j}</version>
             <scope>test</scope>
         </dependency>
-        <!-- While Java 7+ includes Xerces in the JRE, it apparently doesn't provide all the features we use
-             that are in the 3rd party version. So we import it directly. -->
+        <!-- While Java 7+ includes Xerces in the JRE, it apparently doesn't provide all the features we use that are in the 3rd party version. 
+            So we import it directly. -->
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
@@ -183,15 +184,15 @@
 
         <pluginManagement>
             <plugins>
-               <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-assembly-plugin</artifactId>
-                  <version>3.4.1</version>
-               </plugin>
-               <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-dependency-plugin</artifactId>
-                  <version>3.3.0</version>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.4.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.3.0</version>
                     <configuration>
                         <usedDependencies>
                             <dependency>commons-io:commons-io</dependency>
@@ -199,21 +200,21 @@
                             <dependency>org.slf4j:slf4j-simple</dependency>
                         </usedDependencies>
                     </configuration>
-               </plugin>
-               <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-javadoc-plugin</artifactId>
-                  <version>3.4.0</version>
-                  <configuration>
-                     <!-- supports reproducibility of generated Javadocs -->
-                     <notimestamp>true</notimestamp>
-                  </configuration>
-               </plugin>
-               <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-release-plugin</artifactId>
-                  <version>3.0.0-M6</version>
-               </plugin>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.4.0</version>
+                    <configuration>
+                        <!-- supports reproducibility of generated Javadocs -->
+                        <notimestamp>true</notimestamp>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>3.0.0-M6</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -262,7 +263,9 @@
                 <executions>
                     <execution>
                         <id>enforce-bytecode-version</id>
-                        <goals><goal>enforce</goal></goals>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
                         <configuration>
                             <rules>
                                 <enforceBytecodeVersion>
@@ -280,32 +283,37 @@
                     </execution>
                     <execution>
                         <id>enforce-jdk-version</id>
-                        <goals><goal>enforce</goal></goals>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
                                     <version>${project.java.target}</version>
-                                    <message>Antisamy source code is written to support Java 7+.</message>
+                                    <message>Antisamy source code is written to support Java 8+.</message>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
                     </execution>
                     <execution>
-                      <id>check-java7API-signatures</id>
-                      <phase>compile</phase>
-                      <goals><goal>enforce</goal></goals>
-                      <configuration>
-                        <rules>
-                          <checkSignatureRule implementation="org.codehaus.mojo.animal_sniffer.enforcer.CheckSignatureRule">
-                            <signature>
-                              <groupId>org.codehaus.mojo.signature</groupId>
-                              <!-- Check against Java 7 API -->
-                              <artifactId>java17</artifactId>
-                              <version>1.0</version>
-                            </signature>
-                          </checkSignatureRule>
-                        </rules>
-                      </configuration>
+                        <id>check-java7API-signatures</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <checkSignatureRule
+                                    implementation="org.codehaus.mojo.animal_sniffer.enforcer.CheckSignatureRule">
+                                    <signature>
+                                        <groupId>org.codehaus.mojo.signature</groupId>
+                                        <!-- Check against Java 7 API -->
+                                        <artifactId>java17</artifactId>
+                                        <version>1.0</version>
+                                    </signature>
+                                </checkSignatureRule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -317,7 +325,9 @@
                     <execution>
                         <id>sign-artifacts</id>
                         <phase>verify</phase>
-                        <goals><goal>sign</goal></goals>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -342,30 +352,32 @@
                 </configuration>
             </plugin>
             <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-javadoc-plugin</artifactId>
-               <executions>
-                 <execution>
-                   <id>attach-javadocs</id>
-                   <phase>package</phase>
-                   <goals><goal>jar</goal></goals>
-                 </execution>
-               </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-jxr-plugin</artifactId>
-               <version>3.2.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>3.2.0</version>
             </plugin>
             <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-pmd-plugin</artifactId>
-               <version>3.17.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.17.0</version>
             </plugin>
             <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-project-info-reports-plugin</artifactId>
-               <version>3.3.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.3.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -378,16 +390,18 @@
                 <version>4.0.0-M2</version>
             </plugin>
             <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-source-plugin</artifactId>
-               <version>3.2.1</version>
-               <executions>
-                 <execution>
-                   <id>attach-sources</id>
-                   <phase>package</phase>
-                   <goals><goal>jar-no-fork</goal></goals>
-                 </execution>
-               </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -404,10 +418,12 @@
                 <artifactId>cyclonedx-maven-plugin</artifactId>
                 <version>2.7.0</version>
                 <executions>
-                  <execution>
-                    <phase>package</phase>
-                    <goals><goal>makeBom</goal></goals>
-                  </execution>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>makeBom</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -417,28 +433,107 @@
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
-                        <goals><goal>prepare-agent</goal></goals>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
                     </execution>
                     <execution>
                         <id>report</id>
                         <phase>test</phase>
-                        <goals><goal>report</goal></goals>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
                     </execution>
                     <execution>
                         <id>jacoco-check</id>
                         <phase>test</phase>
-                        <goals><goal>check</goal></goals>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
                         <configuration>
-                           <haltOnFailure>false</haltOnFailure>
-                           <rules><rule>
-                              <element>CLASS</element>
-                              <limits><limit>
-                                  <counter>METHOD</counter>
-                                  <value>MISSEDCOUNT</value>
-                                  <maximum>0</maximum>
-                              </limit></limits>
-                           </rule></rules>
+                            <haltOnFailure>false</haltOnFailure>
+                            <rules>
+                                <rule>
+                                    <element>CLASS</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>METHOD</counter>
+                                            <value>MISSEDCOUNT</value>
+                                            <maximum>0</maximum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.22.8</version>
+                <configuration>
+                    <!-- optional: limit format enforcement to just the files changed by this feature branch -->
+                    <ratchetFrom>origin/main</ratchetFrom>
+                    <formats>
+                        <!-- you can define as many formats as you want, each is independent -->
+                        <format>
+                            <!-- define the files to apply to -->
+                            <includes>
+                                <include>*.md</include>
+                            </includes>
+                            <excludes>
+                                <exclude>target/**/*.*</exclude>
+                            </excludes>
+                            <!-- define the steps to apply to those files -->
+                            <trimTrailingWhitespace />
+                            <endWithNewline />
+                            <indent>
+                                <tabs>false</tabs>
+                                <spaces>true</spaces>
+                                <spacesPerTab>4</spacesPerTab>
+                            </indent>
+                        </format>
+
+                        <format>
+                            <includes>
+                                <include>**/*.xml</include>
+                            </includes>
+                            <excludes>
+                                <exclude>target/**/*.*</exclude>
+                            </excludes>
+                            <eclipseWtp>
+                                <type>XML</type>
+                                <files>
+                                    <file>DevStyleXml.prefs</file>
+                                </files>
+                            </eclipseWtp>
+                        </format>
+                    </formats>
+
+                    <!-- define a language-specific format -->
+                    <java>
+                        <importOrder /> <!-- standard import order -->
+                        <removeUnusedImports /> <!-- self-explanatory -->
+                        <toggleOffOn /> <!-- enable spotless override tags -->
+
+                        <!-- apply a specific flavor of google-java-format -->
+                        <googleJavaFormat>
+                            <version>1.7</version>
+                            <style>GOOGLE</style>
+                            <groupArtifact>com.google.googlejavaformat:google-java-format</groupArtifact>
+                        </googleJavaFormat>
+                    </java>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>spotless-apply</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -448,13 +543,13 @@
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>${version.spotbugs.maven}</version>
                 <dependencies>
-                  <!-- Overwrite dependency on SpotBugs if you want to specify the version of SpotBugs.
-                       SpotBugs itself is frequently several versions ahead of the spotbugs-maven-plugin -->
-                  <dependency>
-                    <groupId>com.github.spotbugs</groupId>
-                    <artifactId>spotbugs</artifactId>
-                    <version>${version.spotbugs}</version>
-                  </dependency>
+                    <!-- Overwrite dependency on SpotBugs if you want to specify the version of SpotBugs. SpotBugs itself is frequently several 
+                        versions ahead of the spotbugs-maven-plugin -->
+                    <dependency>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs</artifactId>
+                        <version>${version.spotbugs}</version>
+                    </dependency>
                 </dependencies>
             </plugin>
             <plugin>
@@ -467,85 +562,84 @@
     </build>
 
     <reporting>
-        <!-- All plugins used here should first be declared in the <plugins> section above with their
-             versions, so the versions get reported in the plugins Updates report.
-         -->
+        <!-- All plugins used here should first be declared in the <plugins> section above with their versions, so the versions get reported 
+            in the plugins Updates report. -->
         <plugins>
-           <plugin>
-               <groupId>com.github.spotbugs</groupId>
-               <artifactId>spotbugs-maven-plugin</artifactId>
-               <configuration>
-                   <plugins>
-                       <plugin>
-                           <groupId>com.h3xstream.findsecbugs</groupId>
-                           <artifactId>findsecbugs-plugin</artifactId>
-                           <version>${version.findsecbugs}</version>
-                       </plugin>
-                   </plugins>
-                   <effort>Max</effort>
-                   <relaxed>false</relaxed>
-                   <excludeFilterFile>src/test/spotbugsFilterFile.xml</excludeFilterFile>
-               </configuration>
-           </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <configuration>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.h3xstream.findsecbugs</groupId>
+                            <artifactId>findsecbugs-plugin</artifactId>
+                            <version>${version.findsecbugs}</version>
+                        </plugin>
+                    </plugins>
+                    <effort>Max</effort>
+                    <relaxed>false</relaxed>
+                    <excludeFilterFile>src/test/spotbugsFilterFile.xml</excludeFilterFile>
+                </configuration>
+            </plugin>
 
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-javadoc-plugin</artifactId>
-           </plugin>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-jxr-plugin</artifactId>
-           </plugin>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-pmd-plugin</artifactId>
-               <configuration>
-                   <targetJdk>${project.java.target}</targetJdk>
-                   <sourceEncoding>utf-8</sourceEncoding>
-                   <!-- excludeFromFailureFile>exclude-pmd.properties</excludeFromFailureFile -->
-               </configuration>
-           </plugin>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-project-info-reports-plugin</artifactId>
-               <reportSets>
-                 <reportSet>
-                   <reports>
-                     <report>index</report>
-                     <report>dependency-convergence</report>
-                   </reports>
-                 </reportSet>
-               </reportSets>
-               <configuration>
-                 <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-               </configuration>
-           </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <targetJdk>${project.java.target}</targetJdk>
+                    <sourceEncoding>utf-8</sourceEncoding>
+                    <!-- excludeFromFailureFile>exclude-pmd.properties</excludeFromFailureFile -->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                            <report>dependency-convergence</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+                <configuration>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
+            </plugin>
 
-           <plugin>
-               <groupId>org.codehaus.mojo</groupId>
-               <artifactId>versions-maven-plugin</artifactId>
-               <reportSets>
-                 <reportSet>
-                   <reports>
-                     <report>dependency-updates-report</report>
-                     <report>plugin-updates-report</report>
-                     <report>property-updates-report</report>
-                   </reports>
-                 </reportSet>
-               </reportSets>
-           </plugin>
-           <plugin>
-               <!-- This causes the Jacoco report generated during test to be added to the Project
-                    Reports section of the 'site' report. -->
-               <groupId>org.jacoco</groupId>
-               <artifactId>jacoco-maven-plugin</artifactId>
-               <reportSets>
-                 <reportSet>
-                   <reports><report>report</report></reports>
-                 </reportSet>
-               </reportSets>
-           </plugin>
-
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>dependency-updates-report</report>
+                            <report>plugin-updates-report</report>
+                            <report>property-updates-report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <!-- This causes the Jacoco report generated during test to be added to the Project Reports section of the 'site' report. -->
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
         </plugins>
     </reporting>
 

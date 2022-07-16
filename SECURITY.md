@@ -7,8 +7,8 @@ GitHut issues list (for both open and closed issues) to see if it has already be
 
 If it has not, then please contact Dave Wichers (dave.wichers at owasp.org) _directly_.
 Please do **not** report any suspected vulnerabilities via GitHub issues
-as we wish to keep our users secure while a patch is implemented and deployed. 
-This is because if this is reported as a GitHub issue, it more or less is equivalent 
+as we wish to keep our users secure while a patch is implemented and deployed.
+This is because if this is reported as a GitHub issue, it more or less is equivalent
 to dropping a 0-day on all applications using AntiSamy. Instead, we encourage
 responsible disclosure.
 
@@ -37,4 +37,3 @@ These are the known CVEs reported for AntiSamy:
 CVEs in AntiSamy dependencies:
 * AntiSamy prior to 1.6.6 used the old CyberNeko HTML library v1.9.22, which is subject to https://www.cvedetails.com/cve/CVE-2022-28366 and no longer maintained. AntiSamy 1.6.6 upgraded to an active fork of CyberNeko called HtmlUnit-Neko which fixed this CVE in v2.27 of that library. AntiSamy 1.6.6 upgraded to version 2.60.0 of HtmlUnit-Neko.
 * AntiSamy 1.6.8 upgraded to HtmlUnit-Neko v2.61.0 because v2.60.0 is subject to https://www.cvedetails.com/cve/CVE-2022-29546
-
