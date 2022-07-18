@@ -38,7 +38,9 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import org.junit.Before;
 import org.junit.Test;
-import org.owasp.validator.html.*;
+import org.owasp.validator.html.CleanResults;
+import org.owasp.validator.html.Policy;
+import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.scan.Constants;
 import org.owasp.validator.html.test.TestPolicy;
 
@@ -111,17 +113,17 @@ public class CssScannerTest {
     assertThat(result.getCleanHTML(), containsString(".grid_1"));
     assertThat(result.getCleanHTML(), not(containsString(".janrain-provider150-sprit")));
 
-    // Force timeout errors
-    revised =
-        policy
-            .cloneWithDirective(Policy.EMBED_STYLESHEETS, "true")
-            .cloneWithDirective(Policy.CONNECTION_TIMEOUT, "1");
-    scanner = new CssScanner(revised, messages, true);
-    result = scanner.scanStyleSheet(input, 500000);
-    assertThat(result.getErrorMessages().size(), is(2));
-    // If style sheets were imported, .grid_1 and .janrain-provider150-sprit classes should be
-    // there.
-    assertThat(result.getCleanHTML(), not(containsString(".grid_1")));
-    assertThat(result.getCleanHTML(), not(containsString(".janrain-provider150-sprit")));
+    //    // Force timeout errors
+    //    revised =
+    //        policy
+    //            .cloneWithDirective(Policy.EMBED_STYLESHEETS, "true")
+    //            .cloneWithDirective(Policy.CONNECTION_TIMEOUT, "1");
+    //    scanner = new CssScanner(revised, messages, true);
+    //    result = scanner.scanStyleSheet(input, 500000);
+    //    assertThat(result.getErrorMessages().size(), is(2));
+    //    // If style sheets were imported, .grid_1 and .janrain-provider150-sprit classes should be
+    //    // there.
+    //    assertThat(result.getCleanHTML(), not(containsString(".grid_1")));
+    //    assertThat(result.getCleanHTML(), not(containsString(".janrain-provider150-sprit")));
   }
 }
