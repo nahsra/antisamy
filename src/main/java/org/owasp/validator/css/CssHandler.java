@@ -391,16 +391,16 @@ public class CssHandler implements DocumentHandler {
                 ErrorMessageUtil.getMessage(
                     messages,
                     ErrorMessageUtil.ERROR_CSS_TAG_SELECTOR_NOTFOUND,
-                    new Object[] {HTMLEntityEncoder.htmlEntityEncode(selector.toString())}));
+                    new Object[] {
+                      HTMLEntityEncoder.htmlEntityEncode(tagName),
+                      HTMLEntityEncoder.htmlEntityEncode(selector.toString())
+                    }));
           } else {
             errorMessages.add(
                 ErrorMessageUtil.getMessage(
                     messages,
                     ErrorMessageUtil.ERROR_STYLESHEET_SELECTOR_NOTFOUND,
-                    new Object[] {
-                      HTMLEntityEncoder.htmlEntityEncode(tagName),
-                      HTMLEntityEncoder.htmlEntityEncode(selector.toString())
-                    }));
+                    new Object[] {HTMLEntityEncoder.htmlEntityEncode(selector.toString())}));
           }
         }
 
