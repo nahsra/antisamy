@@ -4,7 +4,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.0</version>
+    <version>1.7.0.1-dev</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -77,6 +77,11 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <!-- exclude an old version of this as newer one is imported directly below -->
+                <exclusion>
+                    <groupId>org.apache.httpcomponents.core5</groupId>
+                    <artifactId>httpcore5</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -377,7 +382,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -472,7 +477,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.22.8</version>
+                <version>2.23.0</version>
                 <configuration>
                     <!-- optional: limit format enforcement to just the files changed by this feature branch -->
                     <ratchetFrom>origin/main</ratchetFrom>
