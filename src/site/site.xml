@@ -9,7 +9,7 @@
     <skin>
         <groupId>org.apache.maven.skins</groupId>
         <artifactId>maven-fluido-skin</artifactId>
-        <version>1.10.0</version>
+        <version>1.11.1</version>
     </skin>
     <custom>
         <fluidoSkin>
@@ -19,9 +19,8 @@
     </custom>
     <body>
         <links>
-            <item name="OWASP Antisamy" href="https://owasp.org/www-project-antisamy/" />
+            <item name="OWASP AntiSamy" href="https://owasp.org/www-project-antisamy/" />
         </links>
         <menu ref="reports" />
     </body>
 </project>
-

@@ -295,7 +295,7 @@
                             <rules>
                                 <requireJavaVersion>
                                     <version>${project.java.target}</version>
-                                    <message>Antisamy source code is written to support Java 8+.</message>
+                                    <message>AntiSamy source code is written to support Java 8+.</message>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -390,9 +390,10 @@
                 <version>3.2.0</version>
             </plugin>
             <plugin>
+                <!-- Note: This uses the maven-fluido-skin plugin specified in src/site/site.xml. You should upgrade that periodically too. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.12.0</version>
+                <version>4.0.0-M3</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
