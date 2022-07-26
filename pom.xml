@@ -387,7 +387,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.0</version>
             </plugin>
             <plugin>
                 <!-- Note: This uses the maven-fluido-skin version specified next. The skin is referenced in src/site/site.xml. -->
