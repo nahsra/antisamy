@@ -38,6 +38,14 @@ import org.owasp.validator.html.PolicyException;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.util.ErrorMessageUtil;
 
+/**
+ * This is defines the basic structure for each type of AntiSamy scanner. All the
+ * scanning/filtration logic is to reside in each implementation of this class, but the
+ * implementations should not be called directly. All scanning should be done through an <code>
+ * AntiSamy.scan()</code> method invocation.
+ *
+ * @author Arshan Dabirsiaghi
+ */
 public abstract class AbstractAntiSamyScanner {
 
   protected final InternalPolicy policy;
@@ -54,11 +62,22 @@ public abstract class AbstractAntiSamyScanner {
 
   public abstract CleanResults getResults();
 
+  /**
+   * Construct an AntiSamy Scanner instance that uses the specified AntiSamy policy.
+   *
+   * @param policy The policy to use.
+   */
   public AbstractAntiSamyScanner(Policy policy) {
     assert policy instanceof InternalPolicy : policy.getClass();
     this.policy = (InternalPolicy) policy;
   }
 
+  /**
+   * Construct an AntiSamy Scanner instance that uses the default AntiSamy policy file.
+   *
+   * @throws PolicyException thrown when there is a problem validating or parsing the policy file.
+   *     Any validation errors not caught by the XML validation will be thrown with this exception.
+   */
   public AbstractAntiSamyScanner() throws PolicyException {
     policy = (InternalPolicy) Policy.getInstance();
   }

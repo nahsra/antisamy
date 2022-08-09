@@ -60,8 +60,9 @@ import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
 /**
- * This is where the magic lives. All the scanning/filtration logic resides here, but it should not
- * be called directly. All scanning should be done through an <code>AntiSamy.scan()</code> method.
+ * This is where the magic lives (all the HTML scanning/filtration logic resides here). This class
+ * should not be called directly. All scanning should be done through an <code>AntiSamy.scan()
+ * </code> method invocation.
  *
  * @author Arshan Dabirsiaghi
  */
@@ -90,11 +91,21 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     }
   }
 
+  /**
+   * Create an instance of this class configured to use the specified policy.
+   *
+   * @param policy The policy to use.
+   */
   public AntiSamyDOMScanner(Policy policy) {
     super(policy);
   }
 
-  /* UnusedDeclaration TODO Investigate */
+  /**
+   * Create an instance of this class configured to use the default AntiSamy policy.
+   *
+   * @throws PolicyException thrown when there is a problem validating or parsing the policy file.
+   *     Any validation errors not caught by the XML validation will be thrown with this exception.
+   */
   public AntiSamyDOMScanner() throws PolicyException {
     super();
   }
@@ -102,10 +113,13 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
   /**
    * This is where the magic lives.
    *
-   * @param html A String whose contents we want to scan.
-   * @return A <code>CleanResults</code> object with an <code>XMLDocumentFragment</code> object and
-   *     its String representation, as well as some scan statistics.
-   * @throws ScanException When there is a problem encountered while scanning the HTML.
+   * @param html A String whose contents is to be sanitized per the configured AntiSamy policy.
+   * @return A <code>CleanResults</code> object with (possibly) an <code>XMLDocumentFragment</code>
+   *     object and a String representation of the cleaned HTML, as well as some scan statistics.
+   *     Note that ONLY the cleaned HTML can be considered trustworthy. The absence of errorMessages
+   *     in the CleanResults does NOT necessarily indicate the input was safe (i.e., contained no
+   *     attacks).
+   * @throws ScanException When there is a problem encountered while scanning the HTML input.
    */
   @Override
   public CleanResults scan(String html) throws ScanException {

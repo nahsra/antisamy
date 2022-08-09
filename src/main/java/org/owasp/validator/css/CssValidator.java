@@ -49,7 +49,7 @@ import org.w3c.css.sac.SimpleSelector;
 
 /**
  * Encapsulates all the necessary operations for validating individual elements of a stylesheet
- * (namely: selectors, conditions and properties).
+ * (namely: selectors, conditions, and properties).
  *
  * @author Jason Li
  */
@@ -58,9 +58,10 @@ public class CssValidator {
   private final Policy policy;
 
   /**
-   * Constructs a validator for CSS selectors, conditions and properties based on the given policy.
+   * Constructs a validator for CSS selectors, conditions, and properties based on the given
+   * AntiSamy policy.
    *
-   * @param policy the policy file to use in this validator
+   * @param policy the policy file to use with this validator
    */
   public CssValidator(Policy policy) {
     this.policy = policy;

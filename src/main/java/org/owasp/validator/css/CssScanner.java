@@ -91,9 +91,9 @@ public class CssScanner {
   private static final Pattern cdataMatchPattern = Pattern.compile(CDATA, Pattern.DOTALL);
 
   /**
-   * Constructs a scanner based on the given policy. This version of the constructor defaults
-   * shouldParseImportedStyles to false. Look at the other constructor for a description of that
-   * parameter.
+   * Constructs a scanner based on the given AntiSamy policy. This version of the constructor
+   * defaults shouldParseImportedStyles to false. Look at the other constructor for a description of
+   * that parameter.
    *
    * @param policy the policy to follow when scanning
    * @param messages the error message bundle to pull from
@@ -103,7 +103,7 @@ public class CssScanner {
   }
 
   /**
-   * Constructs a scanner based on the given policy.
+   * Constructs a scanner based on the given AntiSamy policy.
    *
    * @param policy the policy to follow when scanning
    * @param messages the error message bundle to pull from
@@ -244,6 +244,7 @@ public class CssScanner {
         timeout =
             Timeout.ofMilliseconds(Long.parseLong(policy.getDirective(Policy.CONNECTION_TIMEOUT)));
       } catch (NumberFormatException nfe) {
+        // Use default if can't parse policy specified value
       }
 
       RequestConfig requestConfig =
@@ -265,6 +266,7 @@ public class CssScanner {
       try {
         allowedImports = Integer.parseInt(policy.getDirective("maxStyleSheetImports"));
       } catch (NumberFormatException nfe) {
+        // Use default if can't parse policy specified value
       }
 
       while (!stylesheets.isEmpty()) {

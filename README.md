@@ -8,7 +8,7 @@ Another way of saying that could be: It's an API that helps you make sure that c
 
 Throughout the development of the 1.6.x series, we have identified and deprecated a number of features and APIs. All of these deprecated items have been removed in the 1.7.0 release. These changes were all tracked in ticket: https://github.com/nahsra/antisamy/issues/195. Each of the changes are described below:
 
-CssHandler had 2 constructors which dropped the LinkedList<URI> embeddedStyleSheets parameter. Both contructors now create an empty internal LinkedList<URI> and the method getImportedStylesheetsURIList() can be used to get a reference to it, if needed. This feature is rarely used, and in fact direct invocation of these constructors is also rare, so this change is unlikely to affect most users of AntiSamy. When used, normally an empty list is passed in as this parameter value and that list is never used again.
+CssHandler had 2 constructors which dropped the LinkedList<URI> embeddedStyleSheets parameter. Both constructors now create an empty internal LinkedList<URI> and the method getImportedStylesheetsURIList() can be used to get a reference to it, if needed. This feature is rarely used, and in fact direct invocation of these constructors is also rare, so this change is unlikely to affect most users of AntiSamy. When used, normally an empty list is passed in as this parameter value and that list is never used again.
 
  * The CssHandler(Policy, LinkedList\<URI\>, List\<String\>, ResourceBundle) was dropped
    * It was replaced with: CssHandler(Policy, List\<String\>, ResourceBundle)
@@ -101,11 +101,11 @@ The `CleanResults` object provides a lot of useful stuff.
 
 __Important Note__: There has been much confusion about the `getErrorMessages()` method. The `getErrorMessages()` method does not subtly answer the question "is this safe input?" in the affirmative if it returns an empty list. You must always use the sanitized input and there is no way to be sure the input passed in had no attacks.
 
-The serialization and deserialization process that is critical to the effectiveness of the sanitizer is purposefully lossy and will filter out attacks via a number of attack vectors. Unfortunately, one of the tradeoffs of this strategy is that we don't always know in retrospect that an attack was seen. Thus, the `getErrorMessages()` API is there to help users understand their well-intentioned input meet the requirements of the system, not help a developer detect if an attack was present.
+The serialization and deserialization process that is critical to the effectiveness of the sanitizer is purposefully lossy and will filter out attacks via a number of attack vectors. Unfortunately, one of the tradeoffs of this strategy is that AntiSamy doesn't always know in retrospect that an attack was seen. Thus, the `getErrorMessages()` API is there to help users understand whether their well-intentioned input meets the requirements of the system, not help a developer detect if an attack was present.
 
 ## Other Documentation
 
-Additional documentation is available on this Github project's wiki page: https://github.com/nahsra/antisamy/wiki
+Additional documentation is available on this GitHub project's wiki page: https://github.com/nahsra/antisamy/wiki
 and the OWASP AntiSamy Project Page: https://owasp.org/www-project-antisamy/
 
 ## Contributing to AntiSamy
