@@ -38,7 +38,9 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import org.junit.Before;
 import org.junit.Test;
-import org.owasp.validator.html.*;
+import org.owasp.validator.html.CleanResults;
+import org.owasp.validator.html.Policy;
+import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.scan.Constants;
 import org.owasp.validator.html.test.TestPolicy;
 
