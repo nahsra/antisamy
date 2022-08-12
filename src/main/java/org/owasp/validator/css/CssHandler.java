@@ -157,7 +157,8 @@ public class CssHandler implements DocumentHandler {
   }
 
   /**
-   * Returns the error messages generated during parsing.
+   * Returns the error messages generated during parsing, if any. Note: the lack of error messages
+   * does not mean the HTML input being sanitized can be considered safe.
    *
    * @return the error messages generated during parsing
    */

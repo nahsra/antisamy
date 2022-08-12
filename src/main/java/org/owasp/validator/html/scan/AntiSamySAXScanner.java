@@ -48,6 +48,16 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
+/**
+ * This class allows you to use a SAX scanner to scan HTML rather than a DOM scanner. Its primary
+ * purpose is the support incremental scanning of large blocks of HTML using the scan(Reader reader,
+ * Writer writer) API so the HTML input and output doesn't all have to be held in memory at the same
+ * time. It should not be called directly. All scanning should be done through an <code>
+ * AntiSamy.scan()</code> method invocation. The HTML sanitization logic built into
+ * AntiSamyDOMScanner is leveraged by this class as well.
+ *
+ * @author Arshan Dabirsiaghi
+ */
 public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
 
   private static final Queue<CachedItem> cachedItems = new ConcurrentLinkedQueue<CachedItem>();
@@ -95,20 +105,64 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
     }
   }
 
+  /**
+   * Create an instance of this class configured to use the specified policy.
+   *
+   * @param policy The policy to use.
+   */
   public AntiSamySAXScanner(Policy policy) {
     super(policy);
   }
 
+  /**
+   * The SAXScanner can't remember and return the complete scan results in all cases because the
+   * scan(Reader reader, Writer writer) version of the scan() API incrementally scans the input to
+   * generate incremental output. So to be safe, this class always returns null for getResults(). As
+   * such, when using this class, you can only rely on the CleanResults returned by the scan()
+   * method you invoked, or the output from the writer passed into scan(Reader reader, Writer
+   * writer).
+   *
+   * @return always returns null
+   */
   @Override
   public CleanResults getResults() {
     return null;
   }
 
+  /**
+   * Scan the provided HTML using the AntiSamy policy specified when this Scanner instance was
+   * constructed, and return a CleanResult object that contains the sanitized output, along with
+   * possibly some error messages and scan time statistics. This version of the scan() API is the
+   * one that is typically used.
+   *
+   * @param html A String whose contents is to be sanitized per the configured AntiSamy policy.
+   * @return A <code>CleanResults</code> object with (possibly) an <code>XMLDocumentFragment</code>
+   *     object and a String representation of the cleaned HTML, as well as some scan statistics.
+   *     Note that ONLY the cleaned HTML can be considered trustworthy. The absence of errorMessages
+   *     in the CleanResults does NOT necessarily indicate the input was safe (i.e., contained no
+   *     attacks).
+   * @throws ScanException When there is a problem encountered while scanning the HTML input.
+   */
   @Override
   public CleanResults scan(String html) throws ScanException {
     return scan(html, this.policy);
   }
 
+  /**
+   * This is where the magic lives. Scan the provided HTML and return a CleanResult object that
+   * contains the sanitized output, along with possibly some error messages and scan time
+   * statistics.
+   *
+   * @param html A String whose contents is to be sanitized per the configured AntiSamy policy.
+   * @param policy The policy to use, overriding the policy specified when this class was
+   *     instantiated.
+   * @return A <code>CleanResults</code> object with (possibly) an <code>XMLDocumentFragment</code>
+   *     object and a String representation of the cleaned HTML, as well as some scan statistics.
+   *     Note that ONLY the cleaned HTML can be considered trustworthy. The absence of errorMessages
+   *     in the CleanResults does NOT necessarily indicate the input was safe (i.e., contained no
+   *     attacks).
+   * @throws ScanException When there is a problem encountered while scanning the HTML input.
+   */
   public CleanResults scan(String html, Policy policy) throws ScanException {
     if (html == null) {
       throw new ScanException(new NullPointerException("Null html input"));
@@ -137,14 +191,15 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
   }
 
   /**
-   * Using a SAX parser, can pass Streams for input and output. Use case is a Servlet filter where
-   * request or response is large and caller does not need the entire string in memory.
+   * Using a SAX parser, this supports Streams for input and output. The use case is a Servlet
+   * filter where the request or response is large and the caller does not need or want the entire
+   * string in memory all at one time.
    *
    * @param reader A Reader which can feed the SAXParser a little input at a time
    * @param writer A Writer that can take a little output at a time
    * @return CleanResults where the cleanHtml is null. If a caller wants the HTML as a string, it
    *     must capture the contents of the writer (i.e., use a StringWriter).
-   * @throws ScanException When there is a problem encountered while scanning the HTML.
+   * @throws ScanException When there is a problem encountered while scanning the HTML input.
    */
   public CleanResults scan(Reader reader, Writer writer) throws ScanException {
     try {
@@ -202,6 +257,11 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
     }
   }
 
+  /**
+   * Get a properly configured SAXParser instance.
+   *
+   * @return A newly created and configured SAXParser instance.
+   */
   private static SAXParser getParser() {
     try {
       SAXParser parser = new SAXParser();

@@ -1861,7 +1861,7 @@ public class AntiSamyTest {
   @Test
   public void testGithubIssue23() throws ScanException, PolicyException {
 
-    // Antisamy Stripping nested lists and tables
+    // AntiSamy Stripping nested lists and tables
     String test23 = "<ul><li>one</li><li>two</li><li>three<ul><li>a</li><li>b</li></ul></li></ul>";
     // Issue claims you end up with this:
     //    <ul><li>one</li><li>two</li><li>three<ul></ul></li><li>a</li><li>b</li></ul>

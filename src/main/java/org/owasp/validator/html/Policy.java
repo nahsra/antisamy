@@ -72,7 +72,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * Policy.java - This file holds the model for our policy engine.
+ * This class holds the model for our policy engine.
  *
  * <p>## Schema validation behavior change starting with AntiSamy 1.6.0 ##
  *
