@@ -39,7 +39,7 @@ import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.util.ErrorMessageUtil;
 
 /**
- * This is defines the basic structure for each type of AntiSamy scanner. All the
+ * This class defines the basic structure for each type of AntiSamy scanner. All the
  * scanning/filtration logic is to reside in each implementation of this class, but the
  * implementations should not be called directly. All scanning should be done through an <code>
  * AntiSamy.scan()</code> method invocation.

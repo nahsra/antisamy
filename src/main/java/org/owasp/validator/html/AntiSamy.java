@@ -120,8 +120,8 @@ public class AntiSamy {
   }
 
   /**
-   * Use this method if caller has Streams rather than Strings for I/O Useful for servlets where the
-   * response is very large and we don't validate, simply encode as bytes are consumed from the
+   * Use this method if caller has Streams rather than Strings for I/O. Useful for servlets where
+   * the response is very large and we don't validate, simply encode as bytes are consumed from the
    * stream.
    *
    * @param reader Reader that produces the input, possibly a little at a time

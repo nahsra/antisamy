@@ -94,14 +94,15 @@ CleanResults cr = as.scan(dirtyInput, new File(policyFilePath));
 ### 5. Analyzing CleanResults
 The `CleanResults` object provides a lot of useful stuff.
 
- * `getErrorMessages()` - a list of String error messages -- *if this returns 0 that does not mean there were no attacks!*
  * `getCleanHTML()` - the clean, safe HTML output
  * `getCleanXMLDocumentFragment()` - the clean, safe `XMLDocumentFragment` which is reflected in `getCleanHTML()`
+ * `getErrorMessages()` - a list of String error messages -- *if this returns 0 that does not mean there were no attacks!*
+ * `getNumberOfErrors()` - the number of error messages -- *Again, 0 does not mean the input was safe!*
  * `getScanTime()` - returns the scan time in seconds
 
-__Important Note__: There has been much confusion about the `getErrorMessages()` method. The `getErrorMessages()` method does not subtly answer the question "is this safe input?" in the affirmative if it returns an empty list. You must always use the sanitized input and there is no way to be sure the input passed in had no attacks.
+__Important Note__: There has been much confusion about the `getErrorMessages()` method. The `getErrorMessages()` method (nor `getNumberOfErrors()`) does not subtly answer the question "is this safe input?" in the affirmative if it returns an empty list. You must always use the sanitized input and there is no way to be sure the input passed in had no attacks.
 
-The serialization and deserialization process that is critical to the effectiveness of the sanitizer is purposefully lossy and will filter out attacks via a number of attack vectors. Unfortunately, one of the tradeoffs of this strategy is that AntiSamy doesn't always know in retrospect that an attack was seen. Thus, the `getErrorMessages()` API is there to help users understand whether their well-intentioned input meets the requirements of the system, not help a developer detect if an attack was present.
+The serialization and deserialization process that is critical to the effectiveness of the sanitizer is purposefully lossy and will filter out attacks via a number of attack vectors. Unfortunately, one of the tradeoffs of this strategy is that AntiSamy doesn't always know in retrospect that an attack was seen. Thus, the `getErrorMessages()` and `getNumberOfErrors()` APIs are there to help users understand whether their well-intentioned input meets the requirements of the system, not help a developer detect if an attack was present.
 
 ## Other Documentation
 

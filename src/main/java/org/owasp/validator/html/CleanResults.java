@@ -36,9 +36,10 @@ import org.w3c.dom.DocumentFragment;
  * information, like possible error messages and error message counts.
  *
  * <p>WARNING: The ONLY output from the class you can completely rely on is the CleanResults output.
- * As stated in the README, the getErrorMessages() method does not subtly answer the question "is
- * this safe input?" in the affirmative if it returns an empty list. You must always use the
- * sanitized 'Clean' input and there is no way to be sure the input passed in had no attacks.
+ * As stated in the README, neither the getErrorMessages() nor the getNumberOfErrors() methods
+ * subtly answer the question "is this safe input?" in the affirmative if it returns an empty list.
+ * You must always use the sanitized 'clean' input and there is no way to be sure the input passed
+ * in had no attacks.
  *
  * <p>The serialization and deserialization process that is critical to the effectiveness of the
  * sanitizer is purposefully lossy and will filter out attacks via a number of attack vectors.
@@ -60,8 +61,8 @@ public class CleanResults {
 
   private List<String> errorMessages;
   private Callable<String> cleanHTML;
-  private long startOfScan;
-  private long elapsedScan;
+  private long startOfScan; // Time the scan started in milliseconds since epoch.
+  private long elapsedScan; // Elapsed time for the scan, in milliseconds
 
   /*
    * A DOM object version of the clean HTML String. May be null even if clean HTML is set.
@@ -170,8 +171,8 @@ public class CleanResults {
   /**
    * Return the time elapsed during the scan.
    *
-   * @return A double primitive indicating the amount of time elapsed between the beginning and end
-   *     of the scan in seconds.
+   * @return A double indicating the amount of time elapsed between the beginning and end of the
+   *     scan in seconds.
    */
   public double getScanTime() {
     return elapsedScan / 1000D;
