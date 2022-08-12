@@ -919,7 +919,7 @@ public class AntiSamyTest {
   public void issue29() throws ScanException, PolicyException {
     /* issue #29 - missing quotes around properties with spaces */
     String s =
-        "<style type=\"text/css\"><![CDATA[P {\n	font-family: \"Arial Unicode MS\";\n}\n]]></style>";
+        "<style type=\"text/css\"><![CDATA[P {\n	font-family: 'Arial Unicode MS';\n}\n]]></style>";
     CleanResults cr = as.scan(s, policy, AntiSamy.DOM);
     assertEquals(s, cr.getCleanHTML());
   }
@@ -2575,5 +2575,28 @@ public class AntiSamyTest {
     } catch (Exception ex) {
       fail("Parser should not throw a non-ScanException");
     }
+  }
+
+  @Test
+  public void testQuotesInsideStyles() throws ScanException, PolicyException {
+    // Any quoted (double or single) string identifier in CSS was being enclosed in quotes.
+    // This resulted in quotes enclosed by more quotes in some cases without any kind of escape or
+    // transformation.
+    String input =
+        "<span style=\"font-family: 'comic sans ms', sans-serif; color: #ba372a;\">Text</span>";
+    assertThat(
+        as.scan(input, policy, AntiSamy.DOM).getCleanHTML(),
+        both(containsString("'comic sans ms'")).and(containsString("\"font-family")));
+    assertThat(
+        as.scan(input, policy, AntiSamy.SAX).getCleanHTML(),
+        both(containsString("'comic sans ms'")).and(containsString("\"font-family")));
+
+    input = "<span style='font-family: \"comic sans ms\", sans-serif; color: #ba372a;'>Text</span>";
+    assertThat(
+        as.scan(input, policy, AntiSamy.DOM).getCleanHTML(),
+        both(containsString("'comic sans ms'")).and(containsString("\"font-family")));
+    assertThat(
+        as.scan(input, policy, AntiSamy.SAX).getCleanHTML(),
+        both(containsString("'comic sans ms'")).and(containsString("\"font-family")));
   }
 }
