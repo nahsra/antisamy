@@ -36,10 +36,11 @@ import org.w3c.dom.DocumentFragment;
  * information, like possible error messages and error message counts.
  *
  * <p>WARNING: The ONLY output from the class you can completely rely on is the CleanResults output.
- * As stated in the README, neither the getErrorMessages() nor the getNumberOfErrors() methods
- * subtly answer the question "is this safe input?" in the affirmative if it returns an empty list.
- * You must always use the sanitized 'clean' input and there is no way to be sure the input passed
- * in had no attacks.
+ * As stated in the project <a
+ * href="https://github.com/nahsra/antisamy/blob/main/README.md">README</a> file, neither the {@code
+ * getErrorMessages()} nor the {@code getNumberOfErrors()} methods subtly answer the question "is
+ * this safe input?" in the affirmative if it returns an empty list. You must always use the
+ * sanitized 'clean' input and there is no way to be sure the input passed in had no attacks.
  *
  * <p>The serialization and deserialization process that is critical to the effectiveness of the
  * sanitizer is purposefully lossy and will filter out attacks via a number of attack vectors.
@@ -48,12 +49,14 @@ import org.w3c.dom.DocumentFragment;
  * understand whether their well-intentioned input meets the requirements of the system, not help a
  * developer detect if an attack was present.
  *
- * <p>The list of error messages (<code>errorMessages</code>) will let the user know what, if any
- * HTML errors existed, and what, if any, security or validation-related errors were detected, and
- * what was done about them. NOTE: As just stated, the absence of error messages does NOT mean there
- * were no attacks in the input that was sanitized out. You CANNOT rely on the errorMessages to tell
- * you if the input was dangerous. You MUST use the output of getCleanHTML() to ensure your output
- * is safe.
+ * <p>The list of error messages (avaiable via {@code getErrorMessages()}) will let the user know
+ * what, if any HTML errors existed, and what, when possible, any security or validation-related
+ * errors that were detected, and what was done about them.
+ *
+ * <p><b>WARNING</b>: As just stated, the <i>absence</i> of error messages does NOT mean there were
+ * no attacks in the input that was sanitized out. You CANNOT rely on the {@code getErrorMessages()}
+ * or {@code getNumberOfErrors()} methods to tell you if the input was dangerous. You MUST use the
+ * output of {@code getCleanHTML()} to ensure your output is safe.
  *
  * @author Arshan Dabirsiaghi
  */
@@ -150,9 +153,12 @@ public class CleanResults {
   /**
    * Return a list of error messages -- but an empty list returned does not mean there was no attack
    * present, due to the serialization and deserialization process automatically cleaning up some
-   * attacks. See the README and CleanResults class documentation for more discussion.
+   * attacks. Only the output of the {@code getCleanHTML()} should be considered safe. See the
+   * project README file and {@code CleanResults} class documentation for further discussion.
    *
    * @return An ArrayList object which contains the error messages, if any, after a scan.
+   * @see <a href="https://github.com/nahsra/antisamy/blob/main/README.md">Project README</a>
+   * @see #getCleanHTML()
    */
   public List<String> getErrorMessages() {
     return errorMessages;
@@ -160,9 +166,10 @@ public class CleanResults {
 
   /**
    * Return the number of errors identified, if any, during filtering. Note that 0 errors does NOT
-   * mean the input was safe. Only the output of getCleanHTML() can be considered safe.
+   * mean the input was safe. Only the output of {@code getCleanHTML()} can be considered safe.
    *
    * @return The number of errors encountered during filtering.
+   * @see #getCleanHTML()
    */
   public int getNumberOfErrors() {
     return errorMessages.size();

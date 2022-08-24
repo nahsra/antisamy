@@ -191,9 +191,8 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
   }
 
   /**
-   * Using a SAX parser, this supports Streams for input and output. The use case is a Servlet
-   * filter where the request or response is large and the caller does not need or want the entire
-   * string in memory all at one time.
+   * Using a SAX parser, this supports Streams for input and output. The use case is where the input
+   * is large and the caller does not need or want the entire string in memory all at one time.
    *
    * @param reader A Reader which can feed the SAXParser a little input at a time
    * @param writer A Writer that can take a little output at a time

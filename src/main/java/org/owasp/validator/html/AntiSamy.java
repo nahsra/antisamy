@@ -31,15 +31,20 @@ import org.owasp.validator.html.scan.AntiSamyDOMScanner;
 import org.owasp.validator.html.scan.AntiSamySAXScanner;
 
 /**
- * This is the only class from which the outside world should be calling. The <code>scan()</code>
- * method holds the meat and potatoes of AntiSamy. The file contains a number of ways for <code>
- * scan()</code>'ing depending on the accessibility of the policy file.
+ * This and the {@code CleanResults} class are generally the only classes which the outside world
+ * should be calling. The {@code scan()} method holds the meat and potatoes of AntiSamy. The file
+ * contains a number of ways for {@code scan()}'ing, depending on the accessibility of the policy
+ * file. However, it should be noted that the SAX scan type, which uses a SAX-based parser should be
+ * the preferred way of using AntiSamy as it is much more efficient, and generally faster.
  *
  * @author Arshan Dabirsiaghi
  */
 public class AntiSamy {
 
+  /** Designates DOM scan type which calls the DOM parser. */
   public static final int DOM = 0;
+
+  /** Designates SAX scan type which calls the SAX parser. */
   public static final int SAX = 1;
 
   private Policy policy = null;
@@ -51,8 +56,9 @@ public class AntiSamy {
   }
 
   /**
-   * The meat and potatoes. The <code>scan()</code> family of methods are the only methods the
-   * outside world should be calling to invoke AntiSamy.
+   * The main class for interacting with AntiSamy. The <code>scan()</code> family of methods are the
+   * only methods the outside world should be calling to invoke AntiSamy. This uses the SAX parser
+   * for scanning.
    *
    * @param taintedHTML Untrusted HTML which may contain malicious code.
    * @return A <code>CleanResults</code> object which contains information about the scan (including
@@ -65,7 +71,8 @@ public class AntiSamy {
   }
 
   /**
-   * This method sets <code>scan()</code> to use the specified scan type.
+   * This method sets <code>scan()</code> to use the specified scan type. It uses the specified scan
+   * type for scanning.
    *
    * @param taintedHTML Untrusted HTML which may contain malicious code.
    * @param scanType The type of scan (DOM or SAX).
@@ -80,7 +87,8 @@ public class AntiSamy {
   }
 
   /**
-   * This method wraps <code>scan()</code> using the Policy object passed in.
+   * This method wraps <code>scan()</code> using the Policy object passed in. Uses the DOM parser
+   * for scanning.
    *
    * @param taintedHTML Untrusted HTML which may contain malicious code.
    * @param policy The custom policy to enforce.
@@ -120,9 +128,9 @@ public class AntiSamy {
   }
 
   /**
-   * Use this method if caller has Streams rather than Strings for I/O. Useful for servlets where
-   * the response is very large and we don't validate, simply encode as bytes are consumed from the
-   * stream.
+   * Use this method if caller has Streams rather than Strings for I/O. This uses the SAX parser. It
+   * is useful for when the input being processed is expected to be very large and we don't
+   * validate, but rather simply encode as bytes are consumed from the stream.
    *
    * @param reader Reader that produces the input, possibly a little at a time
    * @param writer Writer that receives the cleaned output, possibly a little at a time
@@ -137,7 +145,8 @@ public class AntiSamy {
   }
 
   /**
-   * This method wraps <code>scan()</code> using the Policy in the specified file.
+   * This method wraps <code>scan()</code> using the Policy in the specified file. Uses the DOM
+   * parser for scanning.
    *
    * @param taintedHTML Untrusted HTML which may contain malicious code.
    * @param filename The file name of the custom policy to enforce.
@@ -155,7 +164,8 @@ public class AntiSamy {
   }
 
   /**
-   * This method wraps <code>scan()</code> using the policy File object passed in.
+   * This method wraps <code>scan()</code> using the policy File object passed in. Uses the DOM
+   * parser for scanning.
    *
    * @param taintedHTML Untrusted HTML which may contain malicious code.
    * @param policyFile The File object of the custom policy to enforce.
