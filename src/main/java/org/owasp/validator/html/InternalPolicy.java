@@ -96,6 +96,8 @@ public class InternalPolicy extends Policy {
     return styleTag;
   }
 
+  /** @deprecated Importing styles feature will be removed and this method along with it. */
+  @Deprecated
   public boolean isEmbedStyleSheets() {
     return embedStyleSheets;
   }

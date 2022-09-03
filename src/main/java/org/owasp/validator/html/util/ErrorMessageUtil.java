@@ -53,10 +53,16 @@ public final class ErrorMessageUtil {
 
   public static final String ERROR_STYLESHEET_NOT_ALLOWED = "error.css.disallowed";
 
-  public static final String ERROR_CSS_IMPORT_DISABLED = "error.css.import.disabled";
-  public static final String ERROR_CSS_IMPORT_EXCEEDED = "error.css.import.exceeded";
-  public static final String ERROR_CSS_IMPORT_FAILURE = "error.css.import.failure";
-  public static final String ERROR_CSS_IMPORT_INPUT_SIZE = "error.css.import.toolarge";
+  /** @deprecated Importing styles feature will be removed and this error message along with it. */
+  @Deprecated public static final String ERROR_CSS_IMPORT_DISABLED = "error.css.import.disabled";
+  /** @deprecated Importing styles feature will be removed and this error message along with it. */
+  @Deprecated public static final String ERROR_CSS_IMPORT_EXCEEDED = "error.css.import.exceeded";
+  /** @deprecated Importing styles feature will be removed and this error message along with it. */
+  @Deprecated public static final String ERROR_CSS_IMPORT_FAILURE = "error.css.import.failure";
+  /** @deprecated Importing styles feature will be removed and this error message along with it. */
+  @Deprecated public static final String ERROR_CSS_IMPORT_INPUT_SIZE = "error.css.import.toolarge";
+  /** @deprecated Importing styles feature will be removed and this error message along with it. */
+  @Deprecated
   public static final String ERROR_CSS_IMPORT_URL_INVALID = "error.css.import.url.invalid";
 
   public static final String ERROR_STYLESHEET_RELATIVE = "error.css.stylesheet.relative";

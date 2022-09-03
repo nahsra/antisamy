@@ -101,13 +101,17 @@ public class Policy {
   private static final String DEFAULT_ONINVALID = "removeAttribute";
 
   public static final int DEFAULT_MAX_INPUT_SIZE = 100000;
-  public static final int DEFAULT_MAX_STYLESHEET_IMPORTS = 1;
+  /** @deprecated Importing styles feature will be removed and this constant along with it. */
+  @Deprecated public static final int DEFAULT_MAX_STYLESHEET_IMPORTS = 1;
 
   public static final String OMIT_XML_DECLARATION = "omitXmlDeclaration";
   public static final String OMIT_DOCTYPE_DECLARATION = "omitDoctypeDeclaration";
   public static final String FORMAT_OUTPUT = "formatOutput";
-  public static final String EMBED_STYLESHEETS = "embedStyleSheets";
-  public static final String CONNECTION_TIMEOUT = "connectionTimeout";
+  /** @deprecated Importing styles feature will be removed and this directive along with it. */
+  @Deprecated public static final String EMBED_STYLESHEETS = "embedStyleSheets";
+  /** @deprecated Importing styles feature will be removed and this directive along with it. */
+  @Deprecated public static final String CONNECTION_TIMEOUT = "connectionTimeout";
+
   public static final String ANCHORS_NOFOLLOW = "nofollowAnchors";
   public static final String ANCHORS_NOOPENER_NOREFERRER = "noopenerAndNoreferrerAnchors";
   public static final String VALIDATE_PARAM_AS_EMBED = "validateParamAsEmbed";
@@ -116,7 +120,8 @@ public class Policy {
   public static final String ENTITY_ENCODE_INTL_CHARS = "entityEncodeIntlChars";
   public static final String ALLOW_DYNAMIC_ATTRIBUTES = "allowDynamicAttributes";
   public static final String MAX_INPUT_SIZE = "maxInputSize";
-  public static final String MAX_STYLESHEET_IMPORTS = "maxStyleSheetImports";
+  /** @deprecated Importing styles feature will be removed and this directive along with it. */
+  @Deprecated public static final String MAX_STYLESHEET_IMPORTS = "maxStyleSheetImports";
 
   public static final String EXTERNAL_GENERAL_ENTITIES =
       "http://xml.org/sax/features/external-general-entities";
