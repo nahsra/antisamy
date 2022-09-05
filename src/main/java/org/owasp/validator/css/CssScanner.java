@@ -110,7 +110,9 @@ public class CssScanner {
    * @param shouldParseImportedStyles Flag to indicate if styles within @import directives should be
    *     imported and parsed in the resulting style sheet. This boolean determines if URLs should be
    *     recognized when parsing styles (i.e., to fetch them or ignore them).
+   * @deprecated Importing styles feature will be removed, the simpler constructor should be used.
    */
+  @Deprecated
   public CssScanner(
       InternalPolicy policy, ResourceBundle messages, boolean shouldParseImportedStyles) {
     this.policy = policy;
