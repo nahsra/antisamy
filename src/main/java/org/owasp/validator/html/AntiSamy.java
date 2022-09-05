@@ -3,23 +3,24 @@
  *
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met:
  *
- * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
- * Neither the name of OWASP nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ * Redistributions of source code must retain the above copyright notice, this list of conditions
+ * and the following disclaimer. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the documentation and/or other
+ * materials provided with the distribution. Neither the name of OWASP nor the names of its
+ * contributors may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.owasp.validator.html;
@@ -31,15 +32,21 @@ import org.owasp.validator.html.scan.AntiSamyDOMScanner;
 import org.owasp.validator.html.scan.AntiSamySAXScanner;
 
 /**
- * This is the only class from which the outside world should be calling. The <code>scan()</code>
- * method holds the meat and potatoes of AntiSamy. The file contains a number of ways for <code>
- * scan()</code>'ing depending on the accessibility of the policy file.
+ * This and the {@code CleanResults} class are generally the only classes which the outside world
+ * should be calling. The {@code scan()} method holds the meat and potatoes of AntiSamy. The file
+ * contains a number of ways for {@code scan()}'ing, depending on the accessibility of the policy
+ * file. However, it should be noted that the SAX scan type, which uses a SAX-based parser should be
+ * the preferred way of using AntiSamy as it is much more efficient, and generally faster, than the
+ * DOM-based parser.
  *
  * @author Arshan Dabirsiaghi
  */
 public class AntiSamy {
 
+  /** Designates DOM scan type which calls the DOM parser. */
   public static final int DOM = 0;
+
+  /** Designates SAX scan type which calls the SAX parser. */
   public static final int SAX = 1;
 
   private Policy policy = null;
@@ -51,8 +58,10 @@ public class AntiSamy {
   }
 
   /**
-   * The meat and potatoes. The <code>scan()</code> family of methods are the only methods the
-   * outside world should be calling to invoke AntiSamy.
+   * The <code>scan()</code> family of methods are the only methods the outside world should be
+   * calling to invoke AntiSamy. This is the primary method that most AntiSamy users should be
+   * using. This method scans the supplied HTML input and produces clean/sanitized results per the
+   * previously configured AntiSamy policy using the SAX parser.
    *
    * @param taintedHTML Untrusted HTML which may contain malicious code.
    * @return A <code>CleanResults</code> object which contains information about the scan (including
@@ -65,7 +74,8 @@ public class AntiSamy {
   }
 
   /**
-   * This method sets <code>scan()</code> to use the specified scan type.
+   * This method scans the supplied HTML input and produces clean/sanitized results per the
+   * previously configured AntiSamy policy using the specified DOM or SAX parser.
    *
    * @param taintedHTML Untrusted HTML which may contain malicious code.
    * @param scanType The type of scan (DOM or SAX).
@@ -80,7 +90,8 @@ public class AntiSamy {
   }
 
   /**
-   * This method wraps <code>scan()</code> using the Policy object passed in.
+   * This method scans the supplied HTML input and produces clean/sanitized results per the supplied
+   * AntiSamy policy using the DOM parser.
    *
    * @param taintedHTML Untrusted HTML which may contain malicious code.
    * @param policy The custom policy to enforce.
@@ -95,8 +106,8 @@ public class AntiSamy {
   }
 
   /**
-   * This method wraps <code>scan()</code> using the Policy object passed in and the specified scan
-   * type.
+   * This method scans the supplied HTML input and produces clean/sanitized results per the supplied
+   * AntiSamy policy using the specified DOM or SAX parser.
    *
    * @param taintedHTML Untrusted HTML which may contain malicious code.
    * @param policy The custom policy to enforce.
@@ -120,9 +131,9 @@ public class AntiSamy {
   }
 
   /**
-   * Use this method if caller has Streams rather than Strings for I/O. Useful for servlets where
-   * the response is very large and we don't validate, simply encode as bytes are consumed from the
-   * stream.
+   * Use this method if caller has Streams rather than Strings for I/O. This uses the SAX parser. It
+   * is useful for when the input being processed is expected to be very large and we don't
+   * validate, but rather simply encode as bytes are consumed from the stream.
    *
    * @param reader Reader that produces the input, possibly a little at a time
    * @param writer Writer that receives the cleaned output, possibly a little at a time
@@ -137,25 +148,27 @@ public class AntiSamy {
   }
 
   /**
-   * This method wraps <code>scan()</code> using the Policy in the specified file.
+   * This method scans the supplied HTML input and produces clean/sanitized results per the supplied
+   * AntiSamy policy file using the DOM parser.
    *
    * @param taintedHTML Untrusted HTML which may contain malicious code.
-   * @param filename The file name of the custom policy to enforce.
+   * @param policyFilename The file name of the custom policy to enforce.
    * @return A <code>CleanResults</code> object which contains information about the scan (including
    *     the results).
    * @throws ScanException When there is a problem encountered while scanning the HTML input.
    * @throws PolicyException When there is a problem validating or parsing the policy file.
    */
-  public CleanResults scan(String taintedHTML, String filename)
+  public CleanResults scan(String taintedHTML, String policyFilename)
       throws ScanException, PolicyException {
 
-    Policy policy = Policy.getInstance(filename);
+    Policy policy = Policy.getInstance(policyFilename);
 
     return this.scan(taintedHTML, policy);
   }
 
   /**
-   * This method wraps <code>scan()</code> using the policy File object passed in.
+   * This method scans the supplied HTML input and produces clean/sanitized results per the supplied
+   * AntiSamy policy file using the DOM parser.
    *
    * @param taintedHTML Untrusted HTML which may contain malicious code.
    * @param policyFile The File object of the custom policy to enforce.

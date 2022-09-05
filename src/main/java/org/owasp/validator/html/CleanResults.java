@@ -3,23 +3,24 @@
  *
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met:
  *
- * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
- * Neither the name of OWASP nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ * Redistributions of source code must retain the above copyright notice, this list of conditions
+ * and the following disclaimer. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the documentation and/or other
+ * materials provided with the distribution. Neither the name of OWASP nor the names of its
+ * contributors may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.owasp.validator.html;
@@ -36,10 +37,11 @@ import org.w3c.dom.DocumentFragment;
  * information, like possible error messages and error message counts.
  *
  * <p>WARNING: The ONLY output from the class you can completely rely on is the CleanResults output.
- * As stated in the README, neither the getErrorMessages() nor the getNumberOfErrors() methods
- * subtly answer the question "is this safe input?" in the affirmative if it returns an empty list.
- * You must always use the sanitized 'clean' input and there is no way to be sure the input passed
- * in had no attacks.
+ * As stated in the project <a
+ * href="https://github.com/nahsra/antisamy/blob/main/README.md">README</a> file, neither the {@code
+ * getErrorMessages()} nor the {@code getNumberOfErrors()} methods subtly answer the question "is
+ * this safe input?" in the affirmative if it returns an empty list. You must always use the
+ * sanitized 'clean' input and there is no way to be sure the input passed in had no attacks.
  *
  * <p>The serialization and deserialization process that is critical to the effectiveness of the
  * sanitizer is purposefully lossy and will filter out attacks via a number of attack vectors.
@@ -48,12 +50,14 @@ import org.w3c.dom.DocumentFragment;
  * understand whether their well-intentioned input meets the requirements of the system, not help a
  * developer detect if an attack was present.
  *
- * <p>The list of error messages (<code>errorMessages</code>) will let the user know what, if any
- * HTML errors existed, and what, if any, security or validation-related errors were detected, and
- * what was done about them. NOTE: As just stated, the absence of error messages does NOT mean there
- * were no attacks in the input that was sanitized out. You CANNOT rely on the errorMessages to tell
- * you if the input was dangerous. You MUST use the output of getCleanHTML() to ensure your output
- * is safe.
+ * <p>The list of error messages (available via {@code getErrorMessages()}) will let the user know
+ * what, if any HTML errors existed, and what, when possible, any security or validation-related
+ * errors that were detected, and what was done about them.
+ *
+ * <p><b>WARNING</b>: As just stated, the <i>absence</i> of error messages does NOT mean there were
+ * no attacks in the input that were sanitized out. You CANNOT rely on the {@code
+ * getErrorMessages()} or {@code getNumberOfErrors()} methods to tell you if the input was
+ * dangerous. You MUST use the output of {@code getCleanHTML()} to ensure your output is safe.
  *
  * @author Arshan Dabirsiaghi
  */
@@ -150,9 +154,12 @@ public class CleanResults {
   /**
    * Return a list of error messages -- but an empty list returned does not mean there was no attack
    * present, due to the serialization and deserialization process automatically cleaning up some
-   * attacks. See the README and CleanResults class documentation for more discussion.
+   * attacks. Only the output of the {@code getCleanHTML()} should be considered safe. See the
+   * project README file and {@code CleanResults} class documentation for further discussion.
    *
    * @return An ArrayList object which contains the error messages, if any, after a scan.
+   * @see <a href="https://github.com/nahsra/antisamy/blob/main/README.md">Project README</a>
+   * @see #getCleanHTML()
    */
   public List<String> getErrorMessages() {
     return errorMessages;
@@ -160,9 +167,10 @@ public class CleanResults {
 
   /**
    * Return the number of errors identified, if any, during filtering. Note that 0 errors does NOT
-   * mean the input was safe. Only the output of getCleanHTML() can be considered safe.
+   * mean the input was safe. Only the output of {@code getCleanHTML()} can be considered safe.
    *
    * @return The number of errors encountered during filtering.
+   * @see #getCleanHTML()
    */
   public int getNumberOfErrors() {
     return errorMessages.size();
