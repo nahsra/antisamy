@@ -152,7 +152,7 @@ public class AntiSamy {
    * AntiSamy policy file using the DOM parser.
    *
    * @param taintedHTML Untrusted HTML which may contain malicious code.
-   * @param filename The file name of the custom policy to enforce.
+   * @param policyFilename The file name of the custom policy to enforce.
    * @return A <code>CleanResults</code> object which contains information about the scan (including
    *     the results).
    * @throws ScanException When there is a problem encountered while scanning the HTML input.
