@@ -37,7 +37,6 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
@@ -86,8 +85,9 @@ public class CssScannerTest {
   }
 
   @Test
-  @Ignore("To be removed when importing styles features is permanently out")
   public void testImportLimiting() throws ScanException {
+    /* To be removed when deprecated importing styles feature is removed. */
+
     final String input =
         "@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/classic.css);\n"
             + "@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/providers.css);\n"

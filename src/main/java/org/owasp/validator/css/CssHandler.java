@@ -214,6 +214,11 @@ public class CssHandler implements DocumentHandler {
   public void importStyle(String uri, SACMediaList media, String defaultNamespaceURI)
       throws CSSException {
 
+    /* The ability to import remote styles is deprecated and will be removed in a future
+     * release. When that is done this method will simply generate the following error
+     * message and return.
+     */
+
     if (!policy.isEmbedStyleSheets()) {
       errorMessages.add(
           ErrorMessageUtil.getMessage(

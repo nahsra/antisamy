@@ -19,6 +19,12 @@ CssHandler had 2 constructors which dropped the LinkedList<URI> embeddedStyleShe
  * XML Schema validation is now required on AntiSamy policy files and cannot be disabled. You must make your policy file schema compliant in order to use it with AntiSamy.
  * The policy directive 'noopenerAndNoreferrerAnchors' is now ON by default. If it is disabled, AntiSamy issues a nag, encouraging you to enable it.
 
+## Deprecating support for external stylesheets
+
+The AntiSamy team has decided that supporting the ability to allow embedded remote CSS is dangerous and so we are deprecating this feature and it will be removed in a future release. It is expected that there are very few, if any, users of this feature.
+
+We have added a log WARNing if this feature is invoked. If you are, please disable/remove this feature by switching to the primary CssScanner() constructor that does not enable this feature.
+
 ## How to Use
 
 ### 1. Import the dependency

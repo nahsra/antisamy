@@ -96,7 +96,12 @@ public class InternalPolicy extends Policy {
     return styleTag;
   }
 
-  /** @deprecated Importing styles feature will be removed and this method along with it. */
+  /**
+   * Returns whether remote CSS can be imported. NOTE: This is dangerous and should not be enabled.
+   *
+   * @return True if remote CSS is allowed, false otherwise.
+   * @deprecated Remote styles import feature to be removed and along with this error message.
+   */
   @Deprecated
   public boolean isEmbedStyleSheets() {
     return embedStyleSheets;

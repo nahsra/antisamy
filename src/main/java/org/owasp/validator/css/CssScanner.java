@@ -59,6 +59,8 @@ import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.util.ErrorMessageUtil;
 import org.owasp.validator.html.util.HTMLEntityEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.css.sac.InputSource;
 
 /**
@@ -71,6 +73,8 @@ import org.w3c.css.sac.InputSource;
  * @author Jason Li
  */
 public class CssScanner {
+
+  protected static final Logger logger = LoggerFactory.getLogger(CssScanner.class);
 
   protected static final Timeout DEFAULT_TIMEOUT = Timeout.ofMilliseconds(1000);
 
@@ -110,7 +114,8 @@ public class CssScanner {
    * @param shouldParseImportedStyles Flag to indicate if styles within @import directives should be
    *     imported and parsed in the resulting style sheet. This boolean determines if URLs should be
    *     recognized when parsing styles (i.e., to fetch them or ignore them).
-   * @deprecated Importing styles feature will be removed, the simpler constructor should be used.
+   * @deprecated Support for remote import of styles will be removed as that is a dangerous
+   *     practice. The simpler constructor should be used which defaults to disallow such imports.
    */
   @Deprecated
   public CssScanner(
@@ -118,6 +123,12 @@ public class CssScanner {
     this.policy = policy;
     this.messages = messages;
     this.shouldParseImportedStyles = shouldParseImportedStyles;
+    if (shouldParseImportedStyles) {
+      logger.warn(
+          "Allowing CSS imports from external URLs is a dangerous practice. It is recommended you "
+              + "disable this feature. Support for this feature in AntiSamy is deprecated and will "
+              + "be removed in a future release.");
+    }
   }
 
   /**
@@ -230,7 +241,9 @@ public class CssScanner {
    * @param errorMessages the list of error messages to append to
    * @param sizeLimit the limit on the total size in bites of any imported stylesheets
    * @throws ScanException if an error occurs during scanning
+   * @deprecated Support for remote import of styles will be removed as that is dangerous.
    */
+  @Deprecated
   private void parseImportedStylesheets(
       LinkedList<URI> stylesheets, List<String> errorMessages, int sizeLimit) throws ScanException {
     // if stylesheets were imported by the inline style declaration,
@@ -313,7 +326,11 @@ public class CssScanner {
 
         try {
           String responseBody = httpClient.execute(new HttpGet(stylesheetUri), responseHandler);
-          // pull down stylesheet, observing size limit
+          // pull down stylesheet, observing size limit.
+          // Note: There is a SpotBugs warning on the next line: "Found reliance on default encoding
+          // in org.owasp.validator.css.CssScanner.parseImportedStylesheets(LinkedList, List, int):
+          // String.getBytes()" but since this method is deprecated, not going to address it as it
+          // will 'go away' eventually.
           stylesheet = responseBody.getBytes();
           if (stylesheet != null && stylesheet.length > sizeLimit) {
             errorMessages.add(
