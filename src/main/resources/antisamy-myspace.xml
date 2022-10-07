@@ -16,6 +16,7 @@
         <directive name="embedStyleSheets" value="false" />
         <directive name="connectionTimeout" value="5000" />
         <directive name="maxStyleSheetImports" value="3" />
+        <directive name="noopenerAndNoreferrerAnchors" value="true" />
 
     </directives>
 
