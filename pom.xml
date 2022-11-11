@@ -71,17 +71,12 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.1.3</version>
+            <version>5.2</version>
             <exclusions>
                 <!-- exclude this old version of slf4j-api as newer can be used -->
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
-                </exclusion>
-                <!-- exclude an old version of this as newer one is imported directly below -->
-                <exclusion>
-                    <groupId>org.apache.httpcomponents.core5</groupId>
-                    <artifactId>httpcore5</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
