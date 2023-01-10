@@ -66,7 +66,9 @@
         <dependency>
             <groupId>net.sourceforge.htmlunit</groupId>
             <artifactId>neko-htmlunit</artifactId>
-            <version>2.69.0</version>
+            <!-- Upgrading to 2.68.0 causes the error org.owasp.validator.html.scan.MagicSAXFilter is not abstract and does not override abstract 
+                method getDocumentSource() in org.apache.xerces.xni.XMLDocumentHandler for some reason. -->
+            <version>2.67.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
