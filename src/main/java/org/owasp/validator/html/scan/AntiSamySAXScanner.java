@@ -40,7 +40,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import net.sourceforge.htmlunit.cyberneko.parsers.SAXParser;
-import org.apache.xerces.xni.parser.XMLDocumentFilter;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
@@ -97,7 +96,7 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
       this.transformer = transformer;
       this.saxParser = saxParser;
       this.magicSAXFilter = magicSAXFilter;
-      XMLDocumentFilter[] filters = {magicSAXFilter};
+      MagicSAXFilter[] filters = {magicSAXFilter};
       try {
         saxParser.setProperty("http://cyberneko.org/html/properties/filters", filters);
       } catch (SAXNotRecognizedException | SAXNotSupportedException e) {

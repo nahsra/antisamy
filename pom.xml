@@ -66,9 +66,7 @@
         <dependency>
             <groupId>net.sourceforge.htmlunit</groupId>
             <artifactId>neko-htmlunit</artifactId>
-            <!-- Upgrading to 2.68.0 causes the error org.owasp.validator.html.scan.MagicSAXFilter is not abstract and does not override abstract 
-                method getDocumentSource() in org.apache.xerces.xni.XMLDocumentHandler for some reason. -->
-            <version>2.67.0</version>
+            <version>2.69.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
@@ -130,6 +128,14 @@
         <!-- While Java 7+ includes Xerces in the JRE, it apparently doesn't provide all the features we use that are in the 3rd party version. 
             So we import it directly. -->
         <dependency>
+            <!-- NOTE: Upgrading to neko-htmlunit:2.68.0+ introduces a replacement for most of Xerces, which hasn't been maintained in years.. 
+                To use the 'new' Xerces I had to replace all import org.apache.xerces.* with: import net.sourceforge.htmlunit.xerces.*. However, we can't yet 
+                drop this Xerces import because AntiSamy still uses org.apache.xml.serialize, which is provided by Xerces as mentioned here: https://github.com/HtmlUnit/htmlunit-neko/issues/17. 
+                Some advice from the Neko maintainer on how to get rid of this dependency is: "The tricky part is the use of org.apache.xml.serialize.HTMLSerializer 
+                and org.apache.xml.serialize.HTMLSerializer. This is Xerces core functionality directly used by your application - nothing that neko ever has 
+                provided. So you have to find your own replacement. Regarding HTMLSerializer there is a hint in the javadoc - This class was deprecated in Xerces 
+                2.6.2. It is recommended that new applications use JAXP's Transformation API for XML (TrAX) for serializing HTML. See the Xerces documentation 
+                for more information." -->
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
             <version>2.12.2</version>
