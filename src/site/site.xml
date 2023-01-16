@@ -9,6 +9,8 @@
     <skin>
         <groupId>org.apache.maven.skins</groupId>
         <artifactId>maven-fluido-skin</artifactId>
+        <!-- NOTE: The version has to be specified here as it apparently is NOT inherited from the pom file. -->
+        <version>1.11.1</version>
     </skin>
     <custom>
         <fluidoSkin>
