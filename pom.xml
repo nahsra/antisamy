@@ -42,6 +42,7 @@
     </scm>
 
     <properties>
+        <fluido.version>1.11.1</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2022-11-18T14:32:45Z</project.build.outputTimestamp>
@@ -404,8 +405,7 @@
             <plugin>
                 <groupId>org.apache.maven.skins</groupId>
                 <artifactId>maven-fluido-skin</artifactId>
-                <!-- Must ALSO update this version in src/site/site.xml file as that file doesn't inherit from this pom! -->
-                <version>1.11.1</version>
+                <version>${fluido.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
