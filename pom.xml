@@ -401,11 +401,14 @@
                 <version>4.0.0-M3</version>
                 <!-- version>4.0.0-M4</version - Upgrading to this version breaks the tables in many of the generated pages for some reason but 
                     4.0.0-M3 works fine. -->
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.skins</groupId>
-                <artifactId>maven-fluido-skin</artifactId>
-                <version>${fluido.version}</version>
+                <dependencies>
+                    <!-- Allow versions plugin and library bots to update this -->
+                    <dependency>
+                        <groupId>org.apache.maven.skins</groupId>
+                        <artifactId>maven-fluido-skin</artifactId>
+                        <version>${fluido.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
