@@ -398,9 +398,9 @@
                     being used is documented here, but unforunately it has to be specified in the site.xml specifically. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>4.0.0-M3</version>
+                <version>4.0.0-M4</version>
                 <!-- version>4.0.0-M4</version - Upgrading to this version breaks the tables in many of the generated pages for some reason but 
-                    4.0.0-M3 works fine. -->
+                    4.0.0-M4 works fine. -->
                 <dependencies>
                     <!-- Allow versions plugin and library bots to update this -->
                     <dependency>
