@@ -42,6 +42,7 @@
     </scm>
 
     <properties>
+        <fluido.version>1.11.1</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2022-11-18T14:32:45Z</project.build.outputTimestamp>
@@ -400,12 +401,14 @@
                 <version>4.0.0-M3</version>
                 <!-- version>4.0.0-M4</version - Upgrading to this version breaks the tables in many of the generated pages for some reason but 
                     4.0.0-M3 works fine. -->
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.skins</groupId>
-                <artifactId>maven-fluido-skin</artifactId>
-                <!-- Must ALSO update this version in src/site/site.xml file as that file doesn't inherit from this pom! -->
-                <version>1.11.1</version>
+                <dependencies>
+                    <!-- Allow versions plugin and library bots to update this -->
+                    <dependency>
+                        <groupId>org.apache.maven.skins</groupId>
+                        <artifactId>maven-fluido-skin</artifactId>
+                        <version>${fluido.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
