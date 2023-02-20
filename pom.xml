@@ -395,8 +395,6 @@
                 <version>3.3.0</version>
             </plugin>
             <plugin>
-                <!-- Note: This plugin uses the maven-fluido-skin version specified in src/site/site.xml. We also include below so the version 
-                    being used is documented here, but unforunately it has to be specified in the site.xml specifically. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>4.0.0-M3</version>
@@ -404,7 +402,8 @@
                     4.0.0-M3 works fine. Various reporting plugins have to be upgraded to be compatible with the new site/fluido setup. The holdout is versions-maven-plugin 
                     I believe. Once that plugin is upgraded to be compatible, we can upgrade everything. -->
                 <dependencies>
-                    <!-- Allow versions plugin and library bots to update this -->
+                    <!-- Explicitly declare these dependencies so the versions plugin and library bots will flag available updates. The fluido-skin 
+                        plugin is referenced in src/site/site.xml using the same fluido version property. -->
                     <dependency>
                         <groupId>org.apache.maven.skins</groupId>
                         <artifactId>maven-fluido-skin</artifactId>
