@@ -43,7 +43,7 @@
 
     <properties>
         <!-- Can't upgrade to 1.11.2 or better yet 2.0.0-M3 until maven-site-plugin is upgraded to 4.0.0-M4+. -->
-        <fluido.version>1.11.1</fluido.version>
+        <fluido.version>1.11.2</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2022-11-18T14:32:45Z</project.build.outputTimestamp>
