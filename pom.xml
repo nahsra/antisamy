@@ -42,6 +42,7 @@
     </scm>
 
     <properties>
+        <!-- Can't upgrade to 1.11.2 or better yet 2.0.0-M3 until maven-site-plugin is upgraded to 4.0.0-M4+. -->
         <fluido.version>1.11.1</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -400,7 +401,8 @@
                 <artifactId>maven-site-plugin</artifactId>
                 <version>4.0.0-M3</version>
                 <!-- version>4.0.0-M4</version - Upgrading to this version breaks the tables in many of the generated pages for some reason but 
-                    4.0.0-M3 works fine. -->
+                    4.0.0-M3 works fine. Various reporting plugins have to be upgraded to be compatible with the new site/fluido setup. The holdout is versions-maven-plugin 
+                    I believe. Once that plugin is upgraded to be compatible, we can upgrade everything. -->
                 <dependencies>
                     <!-- Allow versions plugin and library bots to update this -->
                     <dependency>
@@ -493,6 +495,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
+                <!-- This is the last version that supports Java 8. 2.31.0+ requires Java 11. -->
                 <version>2.30.0</version>
                 <configuration>
                     <!-- optional: limit format enforcement to just the files changed by this feature branch -->
