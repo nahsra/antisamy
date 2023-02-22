@@ -399,8 +399,8 @@
                 <artifactId>maven-site-plugin</artifactId>
                 <version>4.0.0-M3</version>
                 <!-- version>4.0.0-M4</version - Upgrading to this version breaks the tables in many of the generated pages for some reason but 
-                    4.0.0-M3 works fine. Various reporting plugins have to be upgraded to be compatible with the new site/fluido setup. The holdout is versions-maven-plugin 
-                    I believe. Once that plugin is upgraded to be compatible, we can upgrade everything. -->
+                    4.0.0-M3 works fine. Various reporting plugins have to be upgraded to be compatible with the new site/fluido setup. The last holdout is the spotbugs 
+                    maven-plugin. Once that plugin is upgraded to be compatible, we can upgrade everything. -->
                 <dependencies>
                     <!-- Explicitly declare these dependencies so the versions plugin and library bots will flag available updates. The fluido-skin 
                         plugin is referenced in src/site/site.xml using the same fluido version property. -->
@@ -433,7 +433,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
-                <version>2.14.2</version>
+                <version>2.15.0</version>
             </plugin>
             <plugin>
                 <groupId>org.cyclonedx</groupId>
