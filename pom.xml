@@ -1,10 +1,12 @@
 <project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
     <version>1.7.3-SNAPSHOT</version>
+
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -19,7 +21,7 @@
     <name>OWASP AntiSamy</name>
     <description>A library for performing fast, configurable cleansing of HTML coming from untrusted sources.</description>
     <url>https://github.com/nahsra/antisamy</url>
-
+    <inceptionYear>2010</inceptionYear>
     <developers>
         <developer>
             <id>nahsra</id>
@@ -27,6 +29,11 @@
             <email>arshan.dabirsiaghi@gmail.com</email>
         </developer>
     </developers>
+
+    <organization>
+        <name>OWASP Foundation</name>
+        <url>https://owasp.org/</url>
+    </organization>
 
     <licenses>
         <license>
@@ -197,7 +204,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.4.2</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
