@@ -49,8 +49,7 @@
     </scm>
 
     <properties>
-        <!-- Can't upgrade to 1.11.2 or better yet 2.0.0-M3 until maven-site-plugin is upgraded to 4.0.0-M4+. -->
-        <fluido.version>1.11.1</fluido.version>
+        <fluido.version>2.0.0-M3</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2022-11-18T14:32:45Z</project.build.outputTimestamp>
@@ -58,7 +57,7 @@
         <version.findsecbugs>1.12.0</version.findsecbugs>
         <version.io>2.11.0</version.io>
         <version.slf4j>2.0.6</version.slf4j>
-        <version.spotbugs.maven>4.7.3.0</version.spotbugs.maven>
+        <version.spotbugs.maven>4.7.3.1</version.spotbugs.maven>
         <version.spotbugs>4.7.3</version.spotbugs>
     </properties>
 
@@ -404,10 +403,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>4.0.0-M3</version>
-                <!-- version>4.0.0-M4</version - Upgrading to this version breaks the tables in many of the generated pages for some reason but 
-                    4.0.0-M3 works fine. Various reporting plugins have to be upgraded to be compatible with the new site/fluido setup. The last holdout is the spotbugs 
-                    maven-plugin. Once that plugin is upgraded to be compatible, we can upgrade everything. -->
+                <version>4.0.0-M5</version>
                 <dependencies>
                     <!-- Explicitly declare these dependencies so the versions plugin and library bots will flag available updates. The fluido-skin 
                         plugin is referenced in src/site/site.xml using the same fluido version property. -->
