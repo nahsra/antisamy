@@ -57,7 +57,7 @@
         <version.findsecbugs>1.12.0</version.findsecbugs>
         <version.io>2.11.0</version.io>
         <version.slf4j>2.0.6</version.slf4j>
-        <version.spotbugs.maven>4.7.3.1</version.spotbugs.maven>
+        <version.spotbugs.maven>4.7.3.2</version.spotbugs.maven>
         <version.spotbugs>4.7.3</version.spotbugs>
     </properties>
 
@@ -243,7 +243,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.11.0</version>
                 <configuration>
                     <source>${project.java.target}</source>
                     <target>${project.java.target}</target>
