@@ -56,7 +56,7 @@
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.12.0</version.findsecbugs>
         <version.io>2.11.0</version.io>
-        <version.slf4j>2.0.6</version.slf4j>
+        <version.slf4j>2.0.7</version.slf4j>
         <version.spotbugs.maven>4.7.3.2</version.spotbugs.maven>
         <version.spotbugs>4.7.3</version.spotbugs>
     </properties>
@@ -229,7 +229,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.0.0-M7</version>
+                    <version>3.0.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -285,7 +285,7 @@
                         <configuration>
                             <rules>
                                 <enforceBytecodeVersion>
-                                    <maxJdkVersion>1.8</maxJdkVersion>
+                                    <maxJdkVersion>${project.java.target}</maxJdkVersion>
                                     <ignoreOptionals>true</ignoreOptionals>
                                     <ignoredScopes>test</ignoredScopes>
                                     <message>Dependencies shouldn't require Java 9+.</message>
@@ -306,7 +306,7 @@
                             <rules>
                                 <requireJavaVersion>
                                     <version>${project.java.target}</version>
-                                    <message>AntiSamy source code is written to support Java 8+.</message>
+                                    <message>AntiSamy source code shouldn't require Java 9+.</message>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -431,7 +431,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M9</version>
+                <version>3.0.0</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
