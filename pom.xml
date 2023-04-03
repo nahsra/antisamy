@@ -49,7 +49,7 @@
     </scm>
 
     <properties>
-        <fluido.version>2.0.0-M3</fluido.version>
+        <fluido.version>2.0.0-M5</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2022-11-18T14:32:45Z</project.build.outputTimestamp>
