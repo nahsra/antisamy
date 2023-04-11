@@ -223,13 +223,6 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
     parser.setFeature("http://cyberneko.org/html/features/scanner/style/strip-cdata-delims", false);
     parser.setFeature("http://cyberneko.org/html/features/scanner/cdata-sections", true);
-
-    try {
-      parser.setFeature("http://cyberneko.org/html/features/enforce-strict-attribute-names", true);
-    } catch (SAXNotRecognizedException se) {
-      // this indicates that the patched nekohtml is not on the
-      // classpath
-    }
     return parser;
   }
 
