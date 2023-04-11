@@ -190,9 +190,9 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
           // "text/css");
           // start the CSS element
 
-          super.startElement(element, cssAttributes, null);
+          super.startElement(element, cssAttributes, augs);
           // send the cleaned content
-          super.characters(new XMLStringBuffer(results.getCleanHTML()), null);
+          super.characters(new XMLStringBuffer(results.getCleanHTML()), augs);
           // end the CSS element
           super.endElement(element, augs);
         }
