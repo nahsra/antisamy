@@ -39,7 +39,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
-import net.sourceforge.htmlunit.cyberneko.parsers.SAXParser;
+import org.htmlunit.cyberneko.parsers.SAXParser;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
@@ -267,8 +267,6 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
       parser.setFeature("http://xml.org/sax/features/namespaces", false);
       parser.setFeature("http://cyberneko.org/html/features/balance-tags/document-fragment", true);
       parser.setFeature("http://cyberneko.org/html/features/scanner/cdata-sections", true);
-      parser.setFeature("http://apache.org/xml/features/scanner/notify-char-refs", true);
-      parser.setFeature("http://apache.org/xml/features/scanner/notify-builtin-refs", true);
 
       parser.setProperty("http://cyberneko.org/html/properties/names/elems", "lower");
       return parser;

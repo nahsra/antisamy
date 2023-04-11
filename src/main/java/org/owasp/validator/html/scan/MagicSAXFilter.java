@@ -26,16 +26,15 @@ package org.owasp.validator.html.scan;
 
 import java.util.*;
 import java.util.regex.Pattern;
-import net.sourceforge.htmlunit.cyberneko.filters.DefaultFilter;
-import net.sourceforge.htmlunit.xerces.util.AugmentationsImpl;
-import net.sourceforge.htmlunit.xerces.util.XMLAttributesImpl;
-import net.sourceforge.htmlunit.xerces.util.XMLStringBuffer;
-import net.sourceforge.htmlunit.xerces.xni.Augmentations;
-import net.sourceforge.htmlunit.xerces.xni.QName;
-import net.sourceforge.htmlunit.xerces.xni.XMLAttributes;
-import net.sourceforge.htmlunit.xerces.xni.XMLString;
-import net.sourceforge.htmlunit.xerces.xni.XNIException;
-import net.sourceforge.htmlunit.xerces.xni.parser.XMLDocumentFilter;
+import org.htmlunit.cyberneko.filters.DefaultFilter;
+import org.htmlunit.cyberneko.xerces.util.XMLAttributesImpl;
+import org.htmlunit.cyberneko.xerces.util.XMLStringBuffer;
+import org.htmlunit.cyberneko.xerces.xni.Augmentations;
+import org.htmlunit.cyberneko.xerces.xni.QName;
+import org.htmlunit.cyberneko.xerces.xni.XMLAttributes;
+import org.htmlunit.cyberneko.xerces.xni.XMLString;
+import org.htmlunit.cyberneko.xerces.xni.XNIException;
+import org.htmlunit.cyberneko.xerces.xni.parser.XMLDocumentFilter;
 import org.owasp.validator.css.CssScanner;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.InternalPolicy;
@@ -191,9 +190,9 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
           // "text/css");
           // start the CSS element
 
-          super.startElement(element, cssAttributes, new AugmentationsImpl());
+          super.startElement(element, cssAttributes, null);
           // send the cleaned content
-          super.characters(new XMLStringBuffer(results.getCleanHTML()), new AugmentationsImpl());
+          super.characters(new XMLStringBuffer(results.getCleanHTML()), null);
           // end the CSS element
           super.endElement(element, augs);
         }
