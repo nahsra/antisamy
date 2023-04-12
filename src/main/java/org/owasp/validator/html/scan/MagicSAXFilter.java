@@ -1,41 +1,41 @@
 /*
- * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2023, Arshan Dabirsiaghi, Jason Li
  *
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met:
  *
- * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
- * Neither the name of OWASP nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ * Redistributions of source code must retain the above copyright notice, this list of conditions
+ * and the following disclaimer. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the documentation and/or other
+ * materials provided with the distribution. Neither the name of OWASP nor the names of its
+ * contributors may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.owasp.validator.html.scan;
 
 import java.util.*;
 import java.util.regex.Pattern;
-import net.sourceforge.htmlunit.cyberneko.filters.DefaultFilter;
-import net.sourceforge.htmlunit.xerces.util.AugmentationsImpl;
-import net.sourceforge.htmlunit.xerces.util.XMLAttributesImpl;
-import net.sourceforge.htmlunit.xerces.util.XMLStringBuffer;
-import net.sourceforge.htmlunit.xerces.xni.Augmentations;
-import net.sourceforge.htmlunit.xerces.xni.QName;
-import net.sourceforge.htmlunit.xerces.xni.XMLAttributes;
-import net.sourceforge.htmlunit.xerces.xni.XMLString;
-import net.sourceforge.htmlunit.xerces.xni.XNIException;
-import net.sourceforge.htmlunit.xerces.xni.parser.XMLDocumentFilter;
+import org.htmlunit.cyberneko.filters.DefaultFilter;
+import org.htmlunit.cyberneko.xerces.util.XMLAttributesImpl;
+import org.htmlunit.cyberneko.xerces.util.XMLStringBuffer;
+import org.htmlunit.cyberneko.xerces.xni.Augmentations;
+import org.htmlunit.cyberneko.xerces.xni.QName;
+import org.htmlunit.cyberneko.xerces.xni.XMLAttributes;
+import org.htmlunit.cyberneko.xerces.xni.XMLString;
+import org.htmlunit.cyberneko.xerces.xni.XNIException;
+import org.htmlunit.cyberneko.xerces.xni.parser.XMLDocumentFilter;
 import org.owasp.validator.css.CssScanner;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.InternalPolicy;
@@ -191,9 +191,9 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
           // "text/css");
           // start the CSS element
 
-          super.startElement(element, cssAttributes, new AugmentationsImpl());
+          super.startElement(element, cssAttributes, augs);
           // send the cleaned content
-          super.characters(new XMLStringBuffer(results.getCleanHTML()), new AugmentationsImpl());
+          super.characters(new XMLStringBuffer(results.getCleanHTML()), augs);
           // end the CSS element
           super.endElement(element, augs);
         }

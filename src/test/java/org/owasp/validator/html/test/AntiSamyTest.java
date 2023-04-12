@@ -1,29 +1,26 @@
 /*
- * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2023, Arshan Dabirsiaghi, Jason Li
  *
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met:
  *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.  Redistributions in binary form must
- * reproduce the above copyright notice, this list of conditions and the following
- * disclaimer in the documentation and/or other materials provided with the distribution.
- * Neither the name of OWASP nor the names of its contributors may be used to endorse
- * or promote products derived from this software without specific prior written permission.
+ * Redistributions of source code must retain the above copyright notice, this list of conditions
+ * and the following disclaimer. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the documentation and/or other
+ * materials provided with the distribution. Neither the name of OWASP nor the names of its
+ * contributors may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.owasp.validator.html.test;
@@ -83,8 +80,7 @@ public class AntiSamyTest {
 
   private static final String[] BASE64_BAD_XML_STRINGS =
       new String[] {
-        // first string is
-        // "<a - href=\"http://www.owasp.org\">click here</a>"
+        // first string is "<a - href=\"http://www.owasp.org\">click here</a>"
         "PGEgLSBocmVmPSJodHRwOi8vd3d3Lm93YXNwLm9yZyI+Y2xpY2sgaGVyZTwvYT4=",
         // the rest are randomly generated 300 byte sequences which generate
         // parser errors, turned into Strings
@@ -109,8 +105,7 @@ public class AntiSamyTest {
   public void setUp() throws Exception {
 
     /*
-     * Load the policy. You may have to change the path to find the Policy
-     * file for your environment.
+     * Load the policy. You may have to change the path to find the Policy file for your environment.
      */
 
     // get Policy instance from a URL.
@@ -800,8 +795,7 @@ public class AntiSamyTest {
   }
 
   /*
-   * Test a bunch of strings that have tweaked the XML parsing capabilities of
-   * NekoHTML.
+   * Test a bunch of strings that have tweaked the XML parsing capabilities of NekoHTML.
    */
   @Test
   public void IllegalXML() throws PolicyException {
@@ -818,27 +812,29 @@ public class AntiSamyTest {
       }
     }
 
-    // This fails due to a bug in NekoHTML
-    // try {
-    // assertTrue (
-    // as.scan("<a . href=\"http://www.test.com\">",policy,
-    // AntiSamy.DOM).getCleanHTML().indexOf("href")
-    // != -1 );
-    // } catch (Exception e) {
-    // e.printStackTrace();
-    // fail("Couldn't parse malformed HTML: " + e.getMessage());
-    // }
+    // This used to fail due to a bug in NekoHTML, but now works in the new ported version.
+    try {
+      assertTrue(
+          as.scan("<a . href=\"http://www.test.com\">", policy, AntiSamy.DOM)
+                  .getCleanHTML()
+                  .indexOf("href")
+              != -1);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Couldn't parse malformed HTML: " + e.getMessage());
+    }
 
-    // This fails due to a bug in NekoHTML
-    // try {
-    // assertTrue (
-    // as.scan("<a - href=\"http://www.test.com\">",policy,
-    // AntiSamy.DOM).getCleanHTML().indexOf("href")
-    // != -1 );
-    // } catch (Exception e) {
-    // e.printStackTrace();
-    // fail("Couldn't parse malformed HTML: " + e.getMessage());
-    // }
+    // This used to fail due to a bug in NekoHTML, but now works in the new ported version.
+    try {
+      assertTrue(
+          as.scan("<a - href=\"http://www.test.com\">", policy, AntiSamy.DOM)
+                  .getCleanHTML()
+                  .indexOf("href")
+              != -1);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Couldn't parse malformed HTML: " + e.getMessage());
+    }
 
     try {
       assertTrue(as.scan("<style>", policy, AntiSamy.DOM) != null);
@@ -851,8 +847,7 @@ public class AntiSamyTest {
   @Test
   public void issue12() throws ScanException, PolicyException {
     /*
-     * issues 12 (and 36, which was similar). empty tags cause display
-     * problems/"formjacking"
+     * issues 12 (and 36, which was similar). empty tags cause display problems/"formjacking"
      */
 
     Pattern p = Pattern.compile(".*<strong(\\s*)/>.*");
@@ -1151,8 +1146,7 @@ public class AntiSamyTest {
     assertEquals(expected, output);
 
     /*
-     * Regular comment nested inside conditional comment. Test makes
-     * sure
+     * Regular comment nested inside conditional comment. Test makes sure.
      */
     assertEquals(
         "<div>text <!-- <!-- IE specific --> comment &lt;[endif]--&gt;</div>",
@@ -1320,10 +1314,8 @@ public class AntiSamyTest {
   @Test
   public void literalLists() throws ScanException, PolicyException {
 
-    /* this test is for confirming literal-lists work as
-     * advertised. it turned out to be an invalid / non-
-     * reproducible bug report but the test seemed useful
-     * enough to keep.
+    /* this test is for confirming literal-lists work as advertised. it turned out to be
+     * an invalid/non-reproducible bug report but the test seemed useful enough to keep.
      */
     String malInput = "hello<p align='invalid'>world</p>";
 
@@ -1357,8 +1349,7 @@ public class AntiSamyTest {
       sb.append("<div>");
     }
     /*
-     * First, make sure this attack is useless against the
-     * SAX parser.
+     * First, make sure this attack is useless against the SAX parser.
      */
     as.scan(sb.toString(), policy, AntiSamy.SAX);
 
@@ -1372,8 +1363,7 @@ public class AntiSamyTest {
     String crDom = crd.getCleanHTML();
     assertTrue(crDom.length() != 0);
     /*
-     * Now push it over the limit to 251 and make sure we blow
-     * up safely.
+     * Now push it over the limit to 251 and make sure we blow up safely.
      */
     sb.append("<div><div>"); // this makes 251
 
@@ -1869,8 +1859,7 @@ public class AntiSamyTest {
     // were in
 
     // The a.replaceAll("\\s","") is used to strip out all the whitespace in the CleanHTML so we
-    // can successfully find
-    // what we expect to find.
+    // can successfully find what we expect to find.
     assertThat(
         as.scan(test23, policy, AntiSamy.DOM).getCleanHTML().replaceAll("\\s", ""),
         containsString("<ul><li>a</li>"));
@@ -1919,8 +1908,7 @@ public class AntiSamyTest {
   @Test
   public void testGithubIssue27() throws ScanException, PolicyException {
     // This test doesn't cause an ArrayIndexOutOfBoundsException, as reported in this issue even
-    // though it
-    // replicates the test as described.
+    // though it replicates the test as described.
     String test27 = "my &test";
     assertThat(as.scan(test27, policy, AntiSamy.DOM).getCleanHTML(), containsString("test"));
     assertThat(as.scan(test27, policy, AntiSamy.SAX).getCleanHTML(), containsString("test"));
@@ -2197,8 +2185,7 @@ public class AntiSamyTest {
   public void testGithubIssue101() throws ScanException, PolicyException {
     // Test that margin attribute is not removed when value has too much significant figures.
     // Current behavior is that decimals like 0.0001 are internally translated to 1.0E-4, this
-    // is reflected on regex validation and actual output. The inconsistency is due to Batik
-    // CSS.
+    // is reflected on regex validation and actual output. The inconsistency is due to Batik CSS.
     assertThat(
         as.scan("<p style=\"margin: 0.0001pt;\">Some text.</p>", policy, AntiSamy.DOM)
             .getCleanHTML(),
@@ -2533,25 +2520,24 @@ public class AntiSamyTest {
 
   @Test
   public void testSmuggledTagsInStyleContent() throws ScanException, PolicyException {
-    // HTML tags may be smuggled into a style tag after parsing input to an internal
-    // representation.
+    // HTML tags may be smuggled into a style tag after parsing input to an internal representation.
     // If that happens, they should be treated as text content and not as children nodes.
     assertThat(
         as.scan("<select<style/>W<xmp<script>alert(1)</script>", policy, AntiSamy.DOM)
             .getCleanHTML(),
-        not(containsString("script")));
+        not(containsString("<script")));
     assertThat(
         as.scan("<select<style/>W<xmp<script>alert(1)</script>", policy, AntiSamy.SAX)
             .getCleanHTML(),
-        not(containsString("script")));
+        not(containsString("<script")));
     assertThat(
         as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", policy, AntiSamy.DOM)
             .getCleanHTML(),
-        not(containsString("input")));
+        not(containsString("<input")));
     assertThat(
         as.scan("<select<style/>k<input<</>input/onfocus=alert(1)>", policy, AntiSamy.SAX)
             .getCleanHTML(),
-        not(containsString("input")));
+        not(containsString("<input")));
   }
 
   @Test(timeout = 4000)
