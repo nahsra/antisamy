@@ -5,7 +5,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.3-SNAPSHOT</version>
+    <version>1.7.3</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -52,7 +52,7 @@
         <fluido.version>2.0.0-M5</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2022-11-18T14:32:45Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2022-04-12T11:03:14Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.12.0</version.findsecbugs>
         <version.io>2.11.0</version.io>
@@ -74,17 +74,21 @@
         <dependency>
             <groupId>org.htmlunit</groupId>
             <artifactId>neko-htmlunit</artifactId>
-            <version>3.1.0-SNAPSHOT</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
             <version>5.2.1</version>
             <exclusions>
-                <!-- exclude this old version of slf4j-api as newer can be used -->
+                <!-- exclude old versions of slf4j-api and httpcore5 as newer versions can be used -->
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents.core5</groupId>
+                    <artifactId>httpcore5</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -403,7 +407,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>4.0.0-M6</version>
+                <version>4.0.0-M7</version>
                 <dependencies>
                     <!-- Explicitly declare these dependencies so the versions plugin and library bots will flag available updates. The fluido-skin 
                         plugin is referenced in src/site/site.xml using the same fluido version property. -->

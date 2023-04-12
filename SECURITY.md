@@ -37,3 +37,4 @@ These are the known CVEs reported for AntiSamy:
 CVEs in AntiSamy dependencies:
 * AntiSamy prior to 1.6.6 used the old CyberNeko HTML library v1.9.22, which is subject to https://www.cvedetails.com/cve/CVE-2022-28366 and no longer maintained. AntiSamy 1.6.6 upgraded to an active fork of CyberNeko called HtmlUnit-Neko which fixed this CVE in v2.27 of that library. AntiSamy 1.6.6 upgraded to version 2.60.0 of HtmlUnit-Neko.
 * AntiSamy 1.6.8 upgraded to HtmlUnit-Neko v2.61.0 because v2.60.0 is subject to https://www.cvedetails.com/cve/CVE-2022-29546
+* AntiSamy 1.7.3 upgraded to HtmlUnit-Neko v3.1.0 because all versions prior to 3.0.0 are subject to https://www.cvedetails.com/cve/CVE-2023-26119
