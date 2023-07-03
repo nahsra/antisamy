@@ -273,7 +273,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
       // we also remove all child elements of a style element
       this.operations.push(Ops.REMOVE);
     } else if ((tag == null && policy.isEncodeUnknownTag())
-        || (tag != null && tag.isAction("encode"))) {
+        || (tag != null && tag.isAction(Policy.ACTION_ENCODE))) {
       String name = "<" + element.localpart + ">";
       super.characters(new XMLString(name.toCharArray(), 0, name.length()), augs);
       this.operations.push(Ops.ENCODE);
@@ -282,7 +282,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
           ErrorMessageUtil.ERROR_TAG_NOT_IN_POLICY,
           new Object[] {HTMLEntityEncoder.htmlEntityEncode(element.localpart)});
       this.operations.push(Ops.FILTER);
-    } else if (tag.isAction("filter")) {
+    } else if (tag.isAction(Policy.ACTION_FILTER)) {
       addError(
           ErrorMessageUtil.ERROR_TAG_FILTERED,
           new Object[] {HTMLEntityEncoder.htmlEntityEncode(element.localpart)});
@@ -440,7 +440,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
         this.operations.push(Ops.KEEP);
       }
 
-    } else if (tag.isAction("truncate")) {
+    } else if (tag.isAction(Policy.ACTION_TRUNCATE)) {
       this.operations.push(Ops.TRUNCATE);
     } else {
       // no options left, so the tag will be removed

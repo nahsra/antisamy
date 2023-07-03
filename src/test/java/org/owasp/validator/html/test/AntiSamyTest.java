@@ -946,7 +946,7 @@ public class AntiSamyTest {
   public void issue31() throws ScanException, PolicyException {
 
     String test = "<b><u><g>foo</g></u></b>";
-    Policy revised = policy.cloneWithDirective("onUnknownTag", "encode");
+    Policy revised = policy.cloneWithDirective("onUnknownTag", Policy.ACTION_ENCODE);
     CleanResults cr = as.scan(test, revised, AntiSamy.DOM);
     String s = cr.getCleanHTML();
     assertFalse(!s.contains("&lt;g&gt;"));
@@ -955,7 +955,7 @@ public class AntiSamyTest {
     assertFalse(!s.contains("&lt;g&gt;"));
     assertFalse(!s.contains("&lt;/g&gt;"));
 
-    Tag tag = policy.getTagByLowercaseName("b").mutateAction("encode");
+    Tag tag = policy.getTagByLowercaseName("b").mutateAction(Policy.ACTION_ENCODE);
     Policy policy1 = policy.mutateTag(tag);
 
     cr = as.scan(test, policy1, AntiSamy.DOM);
