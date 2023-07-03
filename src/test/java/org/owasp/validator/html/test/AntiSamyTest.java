@@ -2519,7 +2519,7 @@ public class AntiSamyTest {
   }
 
   @Test
-  public void testSmuggledTagsInStyleContent() throws ScanException, PolicyException {
+  public void testSmuggledTagsInStyleContentCase1() throws ScanException, PolicyException {
     // HTML tags may be smuggled into a style tag after parsing input to an internal representation.
     // If that happens, they should be treated as text content and not as children nodes.
     assertThat(
@@ -2584,5 +2584,19 @@ public class AntiSamyTest {
     assertThat(
         as.scan(input, policy, AntiSamy.SAX).getCleanHTML(),
         both(containsString("'comic sans ms'")).and(containsString("\"font-family")));
+  }
+
+  @Test
+  public void testSmuggledTagsInStyleContentCase2() throws ScanException, PolicyException {
+    // Style tag processing was not handling correctly the value set to its child node that should
+    // be only text. On some mutation scenarios due to filtering tags by default, content was being
+    // smuggled and not properly sanitized by the output serializer.
+    String input = "<style/><listing/>]]><noembed></style><img src=x onerror=mxss(1)></noembed>";
+    assertThat(as.scan(input, policy, AntiSamy.DOM).getCleanHTML(), not(containsString("mxss")));
+    assertThat(as.scan(input, policy, AntiSamy.SAX).getCleanHTML(), not(containsString("mxss")));
+
+    input = "<style/><math>'<noframes ></style><img src=x onerror=mxss(1)></noframes>'";
+    assertThat(as.scan(input, policy, AntiSamy.DOM).getCleanHTML(), not(containsString("mxss")));
+    assertThat(as.scan(input, policy, AntiSamy.SAX).getCleanHTML(), not(containsString("mxss")));
   }
 }
