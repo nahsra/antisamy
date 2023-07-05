@@ -67,6 +67,13 @@ WARNING: AntiSamy's use of slf4j-simple, without any configuration file, logs me
 ### 3. Tailoring the policy file
 You may want to deploy AntiSamy in a default configuration, but it’s equally likely that a site may want to have strict, business-driven rules for what users can allow. The discussion that decides the tailoring should also consider attack surface - which grows in relative proportion to the policy file.
 
+Example policies can be adapted and tested based on the requirements for each tag. The supported tag actions that can be specified are:
+- `filter`: remove tags, but keep content.
+- `validate`: keep content as long as it passes rules.
+- `remove`: remove tag and contents.
+- `truncate`: remove tag attributes and all child tags except por its text content if any.
+- `encode`: similar to filter but it encodes the tag for HTML to preserve it as raw text and its children are moved up one level in the hierarchy.
+
 ### 4. Calling the AntiSamy API
 Using AntiSamy is easy. Here is an example of invoking AntiSamy with a policy file:
 
