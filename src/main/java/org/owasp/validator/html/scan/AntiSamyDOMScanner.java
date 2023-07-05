@@ -288,7 +288,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     }
 
     if ((tagRule == null && policy.isEncodeUnknownTag())
-        || (tagRule != null && tagRule.isAction("encode"))) {
+        || (tagRule != null && tagRule.isAction(Policy.ACTION_ENCODE))) {
       encodeTag(currentStackDepth, ele, tagName, eleChildNodes);
     } else if (tagRule == null || tagRule.isAction(Policy.ACTION_FILTER)) {
       actionFilter(currentStackDepth, ele, tagName, tagRule, eleChildNodes);
@@ -473,7 +473,17 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         String cleanHTML = cr.getCleanHTML();
         cleanHTML = cleanHTML == null || cleanHTML.equals("") ? "/* */" : cleanHTML;
 
-        ele.getFirstChild().setNodeValue(cleanHTML);
+        /*
+         * First node present may not be Text and setNodeValue will not work.
+         * If not a Text node, create one at the beginning before removal of the rest, if any.
+         */
+        Node firstChild = ele.getFirstChild();
+        if (firstChild instanceof Text) firstChild.setNodeValue(cleanHTML);
+        else {
+          ele.insertBefore(document.createTextNode(cleanHTML), firstChild);
+          childNodesCount++;
+        }
+
         /*
          * Remove every other node after cleaning CSS, there will
          * be only one node in the end, as it always should have.

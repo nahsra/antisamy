@@ -136,6 +136,7 @@ public class Policy {
   public static final String ACTION_VALIDATE = "validate";
   public static final String ACTION_FILTER = "filter";
   public static final String ACTION_TRUNCATE = "truncate";
+  public static final String ACTION_ENCODE = "encode";
 
   private final Map<String, AntiSamyPattern> commonRegularExpressions;
   protected final Map<String, Tag> tagRules;

@@ -43,7 +43,7 @@ public class InternalPolicy extends Policy {
     this.entityEncodeIntlCharacters = isTrue(Policy.ENTITY_ENCODE_INTL_CHARS);
     this.embedTag = getTagByLowercaseName("embed");
     this.onUnknownTag = getDirective("onUnknownTag");
-    this.isEncodeUnknownTag = "encode".equals(onUnknownTag);
+    this.isEncodeUnknownTag = Policy.ACTION_ENCODE.equals(onUnknownTag);
     this.preserveComments = isTrue(Policy.PRESERVE_COMMENTS);
     this.styleTag = getTagByLowercaseName("style");
     this.embedStyleSheets = isTrue(Policy.EMBED_STYLESHEETS);
@@ -74,7 +74,7 @@ public class InternalPolicy extends Policy {
     this.entityEncodeIntlCharacters = isTrue(Policy.ENTITY_ENCODE_INTL_CHARS);
     this.embedTag = getTagByLowercaseName("embed");
     this.onUnknownTag = getDirective("onUnknownTag");
-    this.isEncodeUnknownTag = "encode".equals(onUnknownTag);
+    this.isEncodeUnknownTag = Policy.ACTION_ENCODE.equals(onUnknownTag);
     this.preserveComments = isTrue(Policy.PRESERVE_COMMENTS);
     this.styleTag = getTagByLowercaseName("style");
     this.embedStyleSheets = isTrue(Policy.EMBED_STYLESHEETS);
