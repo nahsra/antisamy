@@ -8,22 +8,22 @@ Another way of saying that could be: It's an API that helps you make sure that c
 
 Throughout the development of the 1.6.x series, we have identified and deprecated a number of features and APIs. All of these deprecated items have been removed in the 1.7.0 release. These changes were all tracked in ticket: https://github.com/nahsra/antisamy/issues/195. Each of the changes are described below:
 
-CssHandler had 2 constructors which dropped the LinkedList<URI> embeddedStyleSheets parameter. Both constructors now create an empty internal LinkedList<URI> and the method getImportedStylesheetsURIList() can be used to get a reference to it, if needed. This feature is rarely used, and in fact direct invocation of these constructors is also rare, so this change is unlikely to affect most users of AntiSamy. When used, normally an empty list is passed in as this parameter value and that list is never used again.
+`CssHandler` had 2 constructors which dropped the `LinkedList<URI> embeddedStyleSheets` parameter. Both constructors now create an empty internal `LinkedList<URI>` and the method `getImportedStylesheetsURIList()` can be used to get a reference to it, if needed. This feature is rarely used, and in fact direct invocation of these constructors is also rare, so this change is unlikely to affect most users of AntiSamy. When used, normally an empty list is passed in as this parameter value and that list is never used again.
 
- * The CssHandler(Policy, LinkedList\<URI\>, List\<String\>, ResourceBundle) was dropped
-   * It was replaced with: CssHandler(Policy, List\<String\>, ResourceBundle)
- * The CssHandler(Policy, LinkedList\<URI\>, List\<String\>, String, ResourceBundle) was dropped
-   * It was replaced with: CssHandler(Policy, List\<String\>, ResourceBundle, String). NOTE: The order of the last 2 parameters to this method was reversed.
+ * The `CssHandler(Policy, LinkedList\<URI\>, List\<String\>, ResourceBundle)` signature was dropped
+   * It was replaced with: `CssHandler(Policy, List\<String\>, ResourceBundle)`
+ * The `CssHandler(Policy, LinkedList\<URI\>, List\<String\>, String, ResourceBundle)` signature was dropped
+   * It was replaced with: `CssHandler(Policy, List\<String\>, ResourceBundle, String)`. NOTE: The order of the last 2 parameters to this method was reversed.
 
  * Support for XHTML was dropped. AntiSamy now only supports HTML. As we believe this was a rarely used feature, we don't expect this to affect many AntiSamy users.
  * XML Schema validation is now required on AntiSamy policy files and cannot be disabled. You must make your policy file schema compliant in order to use it with AntiSamy.
- * The policy directive 'noopenerAndNoreferrerAnchors' is now ON by default. If it is disabled, AntiSamy issues a nag, encouraging you to enable it.
+ * The policy directive `noopenerAndNoreferrerAnchors` is now ON by default. If it is disabled, AntiSamy issues a nag, encouraging you to enable it.
 
 ## Deprecating support for external stylesheets
 
 The AntiSamy team has decided that supporting the ability to allow embedded remote CSS is dangerous and so we are deprecating this feature and it will be removed in a future release. It is expected that there are very few, if any, users of this feature.
 
-We have added a log WARNing if this feature is invoked. If you are, please disable/remove this feature by switching to the primary CssScanner() constructor that does not enable this feature.
+We have added a log WARNing if this feature is invoked. If you are, please disable/remove this feature by switching to the primary `CssScanner` constructor that does not enable this feature.
 
 ## How to Use
 
@@ -39,7 +39,7 @@ First, add the dependency from Maven:
 ```
 
 ### 2. Choosing a base policy file
-Chances are that your site’s use case for AntiSamy is at least roughly comparable to one of the predefined policy files. They each represent a “typical” scenario for allowing users to provide HTML (and possibly CSS) formatting information. Let’s look into the different policy files:
+Chances are that your site’s use case for AntiSamy is at least roughly comparable to one of the predefined policy files. They each represent a "typical" scenario for allowing users to provide HTML (and possibly CSS) formatting information. Let’s look into the different policy files:
 
 1) antisamy-slashdot.xml
 
@@ -62,7 +62,7 @@ We don’t know of a possible use case for this policy file. If you wanted to al
 ### Logging
 AntiSamy now includes the slf4j-simple library for its logging, but AntiSamy users can import and use an alternate slf4j compatible logging library if they prefer. They can also then exclude slf4j-simple if they want to.
 
-WARNING: AntiSamy's use of slf4j-simple, without any configuration file, logs messages in a buffered manner to standard output. As such, some or all of these log messages may get lost if an Exception, such as a PolicyException is thrown. This can likely be rectified by configuring slf4j-simple to log to standard error instead, or use an alternate slf4j logger that does so.
+WARNING: AntiSamy's use of slf4j-simple, without any configuration file, logs messages in a buffered manner to standard output. As such, some or all of these log messages may get lost if an `Exception`, such as a `PolicyException` is thrown. This can likely be rectified by configuring slf4j-simple to log to standard error instead, or use an alternate slf4j logger that does so.
 
 ### 3. Tailoring the policy file
 You may want to deploy AntiSamy in a default configuration, but it’s equally likely that a site may want to have strict, business-driven rules for what users can allow. The discussion that decides the tailoring should also consider attack surface - which grows in relative proportion to the policy file.
