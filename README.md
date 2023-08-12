@@ -10,10 +10,10 @@ Throughout the development of the 1.6.x series, we have identified and deprecate
 
 `CssHandler` had 2 constructors which dropped the `LinkedList<URI> embeddedStyleSheets` parameter. Both constructors now create an empty internal `LinkedList<URI>` and the method `getImportedStylesheetsURIList()` can be used to get a reference to it, if needed. This feature is rarely used, and in fact direct invocation of these constructors is also rare, so this change is unlikely to affect most users of AntiSamy. When used, normally an empty list is passed in as this parameter value and that list is never used again.
 
- * The `CssHandler(Policy, LinkedList\<URI\>, List\<String\>, ResourceBundle)` signature was dropped
-   * It was replaced with: `CssHandler(Policy, List\<String\>, ResourceBundle)`
- * The `CssHandler(Policy, LinkedList\<URI\>, List\<String\>, String, ResourceBundle)` signature was dropped
-   * It was replaced with: `CssHandler(Policy, List\<String\>, ResourceBundle, String)`. NOTE: The order of the last 2 parameters to this method was reversed.
+ * The `CssHandler(Policy, LinkedList<URI>, List<String>, ResourceBundle)` signature was dropped
+   * It was replaced with: `CssHandler(Policy, List<String>, ResourceBundle)`
+ * The `CssHandler(Policy, LinkedList<URI>, List<String>, String, ResourceBundle)` signature was dropped
+   * It was replaced with: `CssHandler(Policy, List<String>, ResourceBundle, String)`. NOTE: The order of the last 2 parameters to this method was reversed.
 
  * Support for XHTML was dropped. AntiSamy now only supports HTML. As we believe this was a rarely used feature, we don't expect this to affect many AntiSamy users.
  * XML Schema validation is now required on AntiSamy policy files and cannot be disabled. You must make your policy file schema compliant in order to use it with AntiSamy.
