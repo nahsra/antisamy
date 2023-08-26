@@ -2599,4 +2599,26 @@ public class AntiSamyTest {
     assertThat(as.scan(input, policy, AntiSamy.DOM).getCleanHTML(), not(containsString("mxss")));
     assertThat(as.scan(input, policy, AntiSamy.SAX).getCleanHTML(), not(containsString("mxss")));
   }
+
+  @Test
+  public void testRawTextProcessingWhenPreservingComments() throws ScanException, PolicyException {
+    // Concern is that when preserving comments, certain tags would get their content badly parsed
+    // due to mutation XSS.
+    String[] payloads = {
+      "<noscript><!--</noscript><img src=x onerror=mxss(1)>-->",
+      "<textarea/><!--</textarea><img src=x onerror=mxss(1)>-->",
+      "<xmp/><!--</xmp><img src=x onerror=mxss(1)>-->"
+    };
+
+    TestPolicy revised = policy.cloneWithDirective(Policy.PRESERVE_COMMENTS, "true");
+    Tag tag = new Tag("xmp", Collections.<String, Attribute>emptyMap(), Policy.ACTION_VALIDATE);
+    revised = revised.addTagRule(tag);
+
+    for (String payload : payloads) {
+      assertThat(
+          as.scan(payload, revised, AntiSamy.DOM).getCleanHTML(), not(containsString("mxss")));
+      assertThat(
+          as.scan(payload, revised, AntiSamy.SAX).getCleanHTML(), not(containsString("mxss")));
+    }
+  }
 }
