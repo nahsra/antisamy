@@ -267,6 +267,7 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
       parser.setFeature("http://xml.org/sax/features/namespaces", false);
       parser.setFeature("http://cyberneko.org/html/features/balance-tags/document-fragment", true);
       parser.setFeature("http://cyberneko.org/html/features/scanner/cdata-sections", true);
+      parser.setFeature("http://cyberneko.org/html/features/parse-noscript-content", false);
 
       parser.setProperty("http://cyberneko.org/html/properties/names/elems", "lower");
       return parser;

@@ -225,6 +225,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
     parser.setFeature("http://cyberneko.org/html/features/scanner/style/strip-cdata-delims", false);
     parser.setFeature("http://cyberneko.org/html/features/scanner/cdata-sections", true);
+    parser.setFeature("http://cyberneko.org/html/features/parse-noscript-content", false);
 
     return parser;
   }
