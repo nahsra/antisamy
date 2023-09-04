@@ -55,7 +55,7 @@
         <project.build.outputTimestamp>2023-04-21T10:00:00Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.12.0</version.findsecbugs>
-        <version.slf4j>2.0.7</version.slf4j>
+        <version.slf4j>2.0.9</version.slf4j>
         <version.spotbugs.maven>4.7.3.5</version.spotbugs.maven>
         <version.spotbugs>4.7.3</version.spotbugs>
     </properties>
