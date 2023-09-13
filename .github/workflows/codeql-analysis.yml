@@ -33,7 +33,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         # Change from default script: Perform a deep clone so origin/main can be found.
         fetch-depth: 0
