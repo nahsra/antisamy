@@ -5,7 +5,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.4-SNAPSHOT</version>
+    <version>1.7.4</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -52,7 +52,7 @@
         <fluido.version>2.0.0-M7</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2023-04-21T10:00:00Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2023-10-06T21:08:34Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.12.0</version.findsecbugs>
         <version.slf4j>2.0.9</version.slf4j>
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>org.htmlunit</groupId>
             <artifactId>neko-htmlunit</artifactId>
-            <version>3.5.0</version>
+            <version>3.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
@@ -116,7 +116,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.13.0</version>
+            <version>2.14.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

@@ -33,8 +33,11 @@ These are the known CVEs reported for AntiSamy:
 * AntiSamy CVE #3 - CVE-2021-35043: XSS via HTML attributes using &#00058 as replacement for : character before v1.6.4 - https://www.cvedetails.com/cve/CVE-2021-35043
 * AntiSamy CVE #4 - CVE-2022-28367: AntiSamy before 1.6.6 allows XSS via HTML tag smuggling on STYLE content. https://www.cvedetails.com/cve/CVE-2022-28367. NOTE: This release only included a PARTIAL fix.
 * AntiSamy CVE #5 - CVE-2022-29577: AntiSamy before 1.6.7 allows XSS via HTML tag smuggling on STYLE content. - https://www.cvedetails.com/cve/CVE-2022-29577. This is the complete fix to the previous CVE.
+* AntiSamy CVE #6 - CVE-2023-43643: AntiSamy before 1.7.4 subject to mXSS when preserving comments. - https://www.cvedetails.com/cve/CVE-2023-43643
 
 CVEs in AntiSamy dependencies:
 * AntiSamy prior to 1.6.6 used the old CyberNeko HTML library v1.9.22, which is subject to https://www.cvedetails.com/cve/CVE-2022-28366 and no longer maintained. AntiSamy 1.6.6 upgraded to an active fork of CyberNeko called HtmlUnit-Neko which fixed this CVE in v2.27 of that library. AntiSamy 1.6.6 upgraded to version 2.60.0 of HtmlUnit-Neko.
 * AntiSamy 1.6.8 upgraded to HtmlUnit-Neko v2.61.0 because v2.60.0 is subject to https://www.cvedetails.com/cve/CVE-2022-29546
 * AntiSamy 1.7.3 upgraded to HtmlUnit-Neko v3.1.0 because all versions prior to 3.0.0 are subject to https://www.cvedetails.com/cve/CVE-2023-26119
+* AntiSamy 1.7.4 upgraded to batik-css v1.17 because batik-css:1.16 is subject to https://www.cvedetails.com/cve/CVE-2022-44729
+
