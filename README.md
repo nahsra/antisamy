@@ -19,6 +19,8 @@ Throughout the development of the 1.6.x series, we have identified and deprecate
  * XML Schema validation is now required on AntiSamy policy files and cannot be disabled. You must make your policy file schema compliant in order to use it with AntiSamy.
  * The policy directive `noopenerAndNoreferrerAnchors` is now ON by default. If it is disabled, AntiSamy issues a nag, encouraging you to enable it.
 
+**Note**: _Since 1.7.4 some outputs may differ due to upgrading the HTML parser dependency, consider this if you were using previous versions and get different outputs._
+
 ## Deprecating support for external stylesheets
 
 The AntiSamy team has decided that supporting the ability to allow embedded remote CSS is dangerous and so we are deprecating this feature and it will be removed in a future release. It is expected that there are very few, if any, users of this feature.
