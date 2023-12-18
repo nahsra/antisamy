@@ -28,16 +28,15 @@ can understand what needs to be done to fix it.
 
 These are the known CVEs reported for AntiSamy:
 
-* AntiSamy CVE #1 - CVE-2016-10006: XSS Bypass in AntiSamy before v1.5.5 - https://www.cvedetails.com/cve/CVE-2016-10006
-* AntiSamy CVE #2 - CVE-2017-14735: XSS via HTML5 Entities in AntiSamy before v1.5.7 - https://www.cvedetails.com/cve/CVE-2017-14735
-* AntiSamy CVE #3 - CVE-2021-35043: XSS via HTML attributes using &#00058 as replacement for : character before v1.6.4 - https://www.cvedetails.com/cve/CVE-2021-35043
-* AntiSamy CVE #4 - CVE-2022-28367: AntiSamy before 1.6.6 allows XSS via HTML tag smuggling on STYLE content. https://www.cvedetails.com/cve/CVE-2022-28367. NOTE: This release only included a PARTIAL fix.
-* AntiSamy CVE #5 - CVE-2022-29577: AntiSamy before 1.6.7 allows XSS via HTML tag smuggling on STYLE content. - https://www.cvedetails.com/cve/CVE-2022-29577. This is the complete fix to the previous CVE.
-* AntiSamy CVE #6 - CVE-2023-43643: AntiSamy before 1.7.4 subject to mXSS when preserving comments. - https://www.cvedetails.com/cve/CVE-2023-43643
+* AntiSamy CVE #1 - CVE-2016-10006: AntiSamy before 1.5.5 allows XSS Bypass - https://nvd.nist.gov/vuln/detail/CVE-2016-10006
+* AntiSamy CVE #2 - CVE-2017-14735: AntiSamy before 1.5.7 allows XSS via HTML5 Entities - https://nvd.nist.gov/vuln/detail/CVE-2017-14735
+* AntiSamy CVE #3 - CVE-2021-35043: AntiSamy before 1.6.4 allows XSS via HTML attributes using &#00058 as replacement for : character - https://nvd.nist.gov/vuln/detail/CVE-2021-35043
+* AntiSamy CVE #4 - CVE-2022-28367: AntiSamy before 1.6.6 allows XSS via HTML tag smuggling on STYLE content - https://nvd.nist.gov/vuln/detail/CVE-2022-28367. NOTE: This release only included a PARTIAL fix.
+* AntiSamy CVE #5 - CVE-2022-29577: AntiSamy before 1.6.7 allows XSS via HTML tag smuggling on STYLE content - https://nvd.nist.gov/vuln/detail/CVE-2022-29577. This is the complete fix to the previous CVE.
+* AntiSamy CVE #6 - CVE-2023-43643: AntiSamy before 1.7.4 subject to mXSS when preserving comments - https://nvd.nist.gov/vuln/detail/CVE-2023-43643
 
 CVEs in AntiSamy dependencies:
-* AntiSamy prior to 1.6.6 used the old CyberNeko HTML library v1.9.22, which is subject to https://www.cvedetails.com/cve/CVE-2022-28366 and no longer maintained. AntiSamy 1.6.6 upgraded to an active fork of CyberNeko called HtmlUnit-Neko which fixed this CVE in v2.27 of that library. AntiSamy 1.6.6 upgraded to version 2.60.0 of HtmlUnit-Neko.
-* AntiSamy 1.6.8 upgraded to HtmlUnit-Neko v2.61.0 because v2.60.0 is subject to https://www.cvedetails.com/cve/CVE-2022-29546
-* AntiSamy 1.7.3 upgraded to HtmlUnit-Neko v3.1.0 because all versions prior to 3.0.0 are subject to https://www.cvedetails.com/cve/CVE-2023-26119
-* AntiSamy 1.7.4 upgraded to batik-css v1.17 because batik-css:1.16 is subject to https://www.cvedetails.com/cve/CVE-2022-44729
-
+* AntiSamy before 1.6.6 used the old CyberNeko HTML library net.sourceforge.nekohtml:nekohtml:1.9.22, which is subject to https://nvd.nist.gov/vuln/detail/CVE-2022-28366 and no longer maintained. AntiSamy 1.6.6 upgraded to an active fork of CyberNeko at net.sourceforge.htmlunit:neko-htmlunit which fixed this CVE in v2.27 of that library. AntiSamy 1.6.6 upgraded to net.sourceforge.htmlunit:neko-htmlunit:2.60.0
+* AntiSamy 1.6.8 upgraded to net.sourceforge.htmlunit:neko-htmlunit:2.61.0 because v2.60.0 is subject to https://nvd.nist.gov/vuln/detail/CVE-2022-29546
+* AntiSamy 1.7.3 upgraded to org.htmlunit:neko-htmlunit:3.1.0 because all versions of net.sourceforge.htmlunit:neko-htmlunit prior to 3.0.0 are subject to https://nvd.nist.gov/vuln/detail/CVE-2023-26119 (Note the group name change for neko-htmlunit starting with v3.0.0)
+* AntiSamy 1.7.4 upgraded to batik-css v1.17 because batik-css:1.16 is subject to https://nvd.nist.gov/vuln/detail/CVE-2022-44729

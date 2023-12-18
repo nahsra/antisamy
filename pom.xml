@@ -5,7 +5,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.4</version>
+    <version>1.7.5-SNAPSHOT</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -52,12 +52,12 @@
         <fluido.version>2.0.0-M8</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2023-10-06T21:08:34Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2023-12-18T21:08:34Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.12.0</version.findsecbugs>
         <version.slf4j>2.0.9</version.slf4j>
         <version.spotbugs.maven>4.8.2.0</version.spotbugs.maven>
-        <version.spotbugs>4.8.2</version.spotbugs>
+        <version.spotbugs>4.8.3</version.spotbugs>
     </properties>
 
     <profiles>
@@ -406,7 +406,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>4.0.0-M12</version>
+                <version>4.0.0-M13</version>
                 <dependencies>
                     <!-- Explicitly declare these dependencies so the versions plugin and library bots will flag available updates. The fluido-skin 
                         plugin is referenced in src/site/site.xml using the same fluido version property. -->
@@ -434,7 +434,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.2.3</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
