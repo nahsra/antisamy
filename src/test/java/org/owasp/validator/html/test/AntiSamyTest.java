@@ -2621,4 +2621,20 @@ public class AntiSamyTest {
           as.scan(payload, revised, AntiSamy.SAX).getCleanHTML(), not(containsString("mxss")));
     }
   }
+
+  @Test
+  public void testRegexStackOverflow() throws ScanException, PolicyException {
+    try {
+      String input =
+          "<img border=\"0\" width=\"320\" height=\"200\" style=\"width:3.368in;height:2.0486in\" id=\"id_123\" src=\"/url/uri\" alt=\"";
+      for (int i = 0; i < 2500; i++) {
+        input += "SampleText ";
+      }
+      input += "!\\\">";
+      as.scan(input, policy, AntiSamy.DOM).getCleanHTML();
+      as.scan(input, policy, AntiSamy.SAX).getCleanHTML();
+    } catch (StackOverflowError e) {
+      fail("Parser should not throw a stack overflow error");
+    }
+  }
 }
