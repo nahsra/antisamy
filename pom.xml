@@ -27,6 +27,27 @@
             <id>nahsra</id>
             <name>Arshan Dabirsiaghi</name>
             <email>arshan.dabirsiaghi@gmail.com</email>
+            <roles>
+                <role>Project Creator</role>
+                <role>Original Project Leader</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>davewichers</id>
+            <name>Dave Wichers</name>
+            <email>dave.wichers@owasp.org</email>
+            <roles>
+                <role>Primary Maintainer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>spassarop</id>
+            <name>Sebastian Passaro</name>
+            <email>sebastian.passaro@owasp.org</email>
+            <roles>
+                <role>XSS Technical Expert</role>
+                <role>Committer</role>
+            </roles>
         </developer>
     </developers>
 
@@ -246,7 +267,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.12.0</version>
+                <version>3.12.1</version>
                 <configuration>
                     <source>${project.java.target}</source>
                     <target>${project.java.target}</target>
