@@ -98,6 +98,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     inCdata = false;
   }
 
+  @Override
   public void characters(XMLString text, Augmentations augs) throws XNIException {
 
     Ops topOp = peekTop();
@@ -121,6 +122,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
   private static final Pattern conditionalDirectives =
       Pattern.compile("<?!?\\[\\s*(?:end)?if[^]]*\\]>?");
 
+  @Override
   public void comment(XMLString text, Augmentations augs) throws XNIException {
 
     if (preserveComments) {
@@ -134,11 +136,13 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     }
   }
 
+  @Override
   public void doctypeDecl(String root, String publicId, String systemId, Augmentations augs)
       throws XNIException {
     // user supplied doctypes are ignored
   }
 
+  @Override
   public void emptyElement(QName element, XMLAttributes attributes, Augmentations augs)
       throws XNIException {
     this.startElement(element, attributes, augs);
@@ -154,6 +158,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     return new XMLString(endTag.toCharArray(), 0, endTag.length());
   }
 
+  @Override
   public void endElement(QName element, Augmentations augs) throws XNIException {
     Ops topOp = peekTop();
     if (Ops.REMOVE == topOp) {
@@ -224,21 +229,25 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     return cssScanner;
   }
 
+  @Override
   public void processingInstruction(String target, XMLString data, Augmentations augs)
       throws XNIException {
     // processing instructions are being removed
   }
 
+  @Override
   public void startCDATA(Augmentations augs) throws XNIException {
     inCdata = true;
     super.startCDATA(augs);
   }
 
+  @Override
   public void endCDATA(Augmentations augs) throws XNIException {
     inCdata = false;
     super.endCDATA(augs);
   }
 
+  @Override
   public void startElement(QName element, XMLAttributes attributes, Augmentations augs)
       throws XNIException {
     // see if we have a policy for this tag.

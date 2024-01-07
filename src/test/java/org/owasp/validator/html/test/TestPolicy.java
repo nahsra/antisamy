@@ -74,6 +74,7 @@ public class TestPolicy extends InternalPolicy {
     return new TestPolicy(getParseContext(getTopLevelElement(url), url));
   }
 
+  @Override
   public TestPolicy cloneWithDirective(String name, String value) {
     Map<String, String> directives = new HashMap<String, String>(this.directives);
     directives.put(name, value);
