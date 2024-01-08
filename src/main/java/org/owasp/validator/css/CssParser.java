@@ -41,6 +41,7 @@ public class CssParser extends org.apache.batik.css.parser.Parser {
      * @param inSheet Specifies if the style to parse is inside a sheet or the sheet itself.
      * @throws CSSException Thrown if there are parsing errors in CSS
      */
+    @Override
     protected void parseStyleDeclaration(final boolean inSheet) throws CSSException {
         boolean leadingDash = false;
         for (;;) {

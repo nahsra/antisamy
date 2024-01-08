@@ -20,12 +20,14 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
     this.encodeAllPossibleEntities = policy.isEntityEncodeIntlCharacters();
   }
 
+  @Override
   protected String getEntityRef(int charToPrint) {
     if (encodeAllPossibleEntities || Constants.big5CharsToEncode.indexOf(charToPrint) != -1)
       return super.getEntityRef(charToPrint);
     return null;
   }
 
+  @Override
   public void endElementIO(String namespaceURI, String localName, String rawName)
       throws IOException {
 

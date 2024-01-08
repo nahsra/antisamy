@@ -182,6 +182,7 @@ public class AntiSamySAXScanner extends AbstractAntiSamyScanner {
     final String tainted = html;
     Callable<String> cleanCallable =
         new Callable<String>() {
+          @Override
           public String call() throws Exception {
             return trim(tainted, out.toString());
           }

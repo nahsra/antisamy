@@ -1070,19 +1070,23 @@ public class Policy {
 
     final NodeList nodes = parent.getElementsByTagName(tagName);
     return new Iterable<Element>() {
+      @Override
       public Iterator<Element> iterator() {
         return new Iterator<Element>() {
           int pos = 0;
           int len = nodes.getLength();
 
+          @Override
           public boolean hasNext() {
             return pos < len;
           }
 
+          @Override
           public Element next() {
             return (Element) nodes.item(pos++);
           }
 
+          @Override
           public void remove() {
             throw new UnsupportedOperationException("Cant remove");
           }

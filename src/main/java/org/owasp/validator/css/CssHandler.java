@@ -171,6 +171,7 @@ public class CssHandler implements DocumentHandler {
    *
    * @see org.w3c.css.sac.DocumentHandler#comment(java.lang.String)
    */
+  @Override
   public void comment(String text) throws CSSException {
     errorMessages.add(
         ErrorMessageUtil.getMessage(
@@ -184,6 +185,7 @@ public class CssHandler implements DocumentHandler {
    *
    * @see org.w3c.css.sac.DocumentHandler#ignorableAtRule(java.lang.String)
    */
+  @Override
   public void ignorableAtRule(String atRule) throws CSSException {
     // this method is called when the parser hits an unrecognized @-rule. Like the page/media/font
     // declarations, this is CSS2+ stuff
@@ -211,6 +213,7 @@ public class CssHandler implements DocumentHandler {
    * @see org.w3c.css.sac.DocumentHandler#importStyle(java.lang.String,
    *      org.w3c.css.sac.SACMediaList, java.lang.String)
    */
+  @Override
   public void importStyle(String uri, SACMediaList media, String defaultNamespaceURI)
       throws CSSException {
 
@@ -292,6 +295,7 @@ public class CssHandler implements DocumentHandler {
    * @see org.w3c.css.sac.DocumentHandler#namespaceDeclaration(java.lang.String,
    *      java.lang.String)
    */
+  @Override
   public void namespaceDeclaration(String prefix, String uri) throws CSSException {
     // CSS3 - Namespace declaration - ignore for now
   }
@@ -301,6 +305,7 @@ public class CssHandler implements DocumentHandler {
    *
    * @see org.w3c.css.sac.DocumentHandler#startDocument(org.w3c.css.sac.InputSource)
    */
+  @Override
   public void startDocument(InputSource arg0) throws CSSException {
     // no-op
   }
@@ -310,6 +315,7 @@ public class CssHandler implements DocumentHandler {
    *
    * @see org.w3c.css.sac.DocumentHandler#endDocument(org.w3c.css.sac.InputSource)
    */
+  @Override
   public void endDocument(InputSource source) throws CSSException {
     // no-op
   }
@@ -319,6 +325,7 @@ public class CssHandler implements DocumentHandler {
    *
    * @see org.w3c.css.sac.DocumentHandler#startFontFace()
    */
+  @Override
   public void startFontFace() throws CSSException {
     // CSS2 Font Face declaration - ignore this for now
   }
@@ -328,6 +335,7 @@ public class CssHandler implements DocumentHandler {
    *
    * @see org.w3c.css.sac.DocumentHandler#endFontFace()
    */
+  @Override
   public void endFontFace() throws CSSException {
     // CSS2 Font Face declaration - ignore this for now
   }
@@ -337,6 +345,7 @@ public class CssHandler implements DocumentHandler {
    *
    * @see org.w3c.css.sac.DocumentHandler#startMedia(org.w3c.css.sac.SACMediaList)
    */
+  @Override
   public void startMedia(SACMediaList media) throws CSSException {
     // CSS2 Media declaration - ignore this for now
   }
@@ -346,6 +355,7 @@ public class CssHandler implements DocumentHandler {
    *
    * @see org.w3c.css.sac.DocumentHandler#endMedia(org.w3c.css.sac.SACMediaList)
    */
+  @Override
   public void endMedia(SACMediaList media) throws CSSException {
     // CSS2 Media declaration - ignore this for now
   }
@@ -356,6 +366,7 @@ public class CssHandler implements DocumentHandler {
    * @see org.w3c.css.sac.DocumentHandler#startPage(java.lang.String,
    *      java.lang.String)
    */
+  @Override
   public void startPage(String name, String pseudoPage) throws CSSException {
     // CSS2 Page declaration - ignore this for now
   }
@@ -366,6 +377,7 @@ public class CssHandler implements DocumentHandler {
    * @see org.w3c.css.sac.DocumentHandler#endPage(java.lang.String,
    *      java.lang.String)
    */
+  @Override
   public void endPage(String name, String pseudoPage) throws CSSException {
     // CSS2 Page declaration - ignore this for now
   }
@@ -375,6 +387,7 @@ public class CssHandler implements DocumentHandler {
    *
    * @see org.w3c.css.sac.DocumentHandler#startSelector(org.w3c.css.sac.SelectorList)
    */
+  @Override
   public void startSelector(SelectorList selectors) throws CSSException {
 
     // keep track of number of valid selectors from this rule
@@ -455,6 +468,7 @@ public class CssHandler implements DocumentHandler {
    *
    * @see org.w3c.css.sac.DocumentHandler#endSelector(org.w3c.css.sac.SelectorList)
    */
+  @Override
   public void endSelector(SelectorList selectors) throws CSSException {
     // if we are in a state within a selector, close brace
     if (selectorOpen) {
@@ -472,6 +486,7 @@ public class CssHandler implements DocumentHandler {
    * @see org.w3c.css.sac.DocumentHandler#property(java.lang.String,
    *      org.w3c.css.sac.LexicalUnit, boolean)
    */
+  @Override
   public void property(String name, LexicalUnit value, boolean important) throws CSSException {
     // only bother validating and building if we are either inline or within a selector tag
 

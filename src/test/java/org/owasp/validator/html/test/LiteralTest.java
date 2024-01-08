@@ -43,6 +43,7 @@ public class LiteralTest extends TestCase {
 
   private Policy policy = null;
 
+  @Override
   protected void setUp() throws Exception {
 
     /*
