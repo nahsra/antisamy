@@ -322,7 +322,8 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
         if ("style".equalsIgnoreCase(name)) {
           CssScanner styleScanner = makeCssScanner();
           try {
-            CleanResults cr = styleScanner.scanInlineStyle(value, element.getLocalpart(), maxInputSize);
+            CleanResults cr =
+                styleScanner.scanInlineStyle(value, element.getLocalpart(), maxInputSize);
             attributes.setValue(i, cr.getCleanHTML());
             validattributes.addAttribute(makeSimpleQname(name), "CDATA", cr.getCleanHTML());
             errorMessages.addAll(cr.getErrorMessages());
