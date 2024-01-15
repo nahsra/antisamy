@@ -35,63 +35,65 @@ import org.w3c.css.sac.LexicalUnit;
 
 public class CssParser extends org.apache.batik.css.parser.Parser {
 
-    /**
-     * This implementation is a workaround to solve leading dash errors on property names.
-     * @see <code>https://issues.apache.org/jira/browse/BATIK-1112</code>
-     * @param inSheet Specifies if the style to parse is inside a sheet or the sheet itself.
-     * @throws CSSException Thrown if there are parsing errors in CSS
-     */
-    protected void parseStyleDeclaration(final boolean inSheet) throws CSSException {
-        boolean leadingDash = false;
-        for (;;) {
-            switch (current) {
-                case LexicalUnits.EOF:
-                    if (inSheet) {
-                        throw createCSSParseException("eof");
-                    }
-                    return;
-                case LexicalUnits.RIGHT_CURLY_BRACE:
-                    if (!inSheet) {
-                        throw createCSSParseException("eof.expected");
-                    }
-                    nextIgnoreSpaces();
-                    return;
-                case LexicalUnits.SEMI_COLON:
-                    nextIgnoreSpaces();
-                    continue;
-                case LexicalUnits.MINUS:
-                    leadingDash = true;
-                    next();
-                    break;
-                default:
-                    throw createCSSParseException("identifier");
-                case LexicalUnits.IDENTIFIER:
-            }
+  /**
+   * This implementation is a workaround to solve leading dash errors on property names.
+   *
+   * @see <code>https://issues.apache.org/jira/browse/BATIK-1112</code>
+   * @param inSheet Specifies if the style to parse is inside a sheet or the sheet itself.
+   * @throws CSSException Thrown if there are parsing errors in CSS
+   */
+  @Override
+  protected void parseStyleDeclaration(final boolean inSheet) throws CSSException {
+    boolean leadingDash = false;
+    for (; ; ) {
+      switch (current) {
+        case LexicalUnits.EOF:
+          if (inSheet) {
+            throw createCSSParseException("eof");
+          }
+          return;
+        case LexicalUnits.RIGHT_CURLY_BRACE:
+          if (!inSheet) {
+            throw createCSSParseException("eof.expected");
+          }
+          nextIgnoreSpaces();
+          return;
+        case LexicalUnits.SEMI_COLON:
+          nextIgnoreSpaces();
+          continue;
+        case LexicalUnits.MINUS:
+          leadingDash = true;
+          next();
+          break;
+        default:
+          throw createCSSParseException("identifier");
+        case LexicalUnits.IDENTIFIER:
+      }
 
-            final String name = (leadingDash ? "-" : "") + scanner.getStringValue();
-            leadingDash = false;
+      final String name = (leadingDash ? "-" : "") + scanner.getStringValue();
+      leadingDash = false;
 
-            if (nextIgnoreSpaces() != LexicalUnits.COLON) {
-                throw createCSSParseException("colon");
-            }
-            nextIgnoreSpaces();
+      if (nextIgnoreSpaces() != LexicalUnits.COLON) {
+        throw createCSSParseException("colon");
+      }
+      nextIgnoreSpaces();
 
-            LexicalUnit exp = null;
+      LexicalUnit exp = null;
 
-            try {
-                exp = parseExpression(false);
-            } catch (final CSSParseException e) {
-                reportError(e);
-            }
+      try {
+        exp = parseExpression(false);
+      } catch (final CSSParseException e) {
+        reportError(e);
+      }
 
-            if (exp != null) {
-                boolean important = false;
-                if (current == LexicalUnits.IMPORTANT_SYMBOL) {
-                    important = true;
-                    nextIgnoreSpaces();
-                }
-                documentHandler.property(name, exp, important);
-            }
+      if (exp != null) {
+        boolean important = false;
+        if (current == LexicalUnits.IMPORTANT_SYMBOL) {
+          important = true;
+          nextIgnoreSpaces();
         }
+        documentHandler.property(name, exp, important);
+      }
     }
+  }
 }

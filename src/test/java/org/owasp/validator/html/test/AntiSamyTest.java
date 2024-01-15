@@ -1307,8 +1307,8 @@ public class AntiSamyTest {
     assertTrue(crd.getErrorMessages().size() > 0);
     assertTrue(crs.getErrorMessages().size() > 0);
 
-    assertTrue(crSax.contains("&lt;script") && !crDom.contains("<script"));
-    assertTrue(crDom.contains("&lt;script") && !crDom.contains("<script"));
+    assertThat(crDom, both(not(containsString("script"))).and(not(containsString("alert"))));
+    assertThat(crSax, both(not(containsString("script"))).and(not(containsString("alert"))));
   }
 
   @Test
@@ -2636,5 +2636,34 @@ public class AntiSamyTest {
     } catch (StackOverflowError e) {
       fail("Parser should not throw a stack overflow error");
     }
+  }
+
+  @Test
+  public void testBangCommentsWhenPreservingComments() throws ScanException, PolicyException {
+    // Concern is that when preserving comments, certain endings of comments would be
+    // misinterpreted.
+    TestPolicy revised = policy.cloneWithDirective(Policy.PRESERVE_COMMENTS, "true");
+    assertThat(
+        as.scan("<!--<div/>--!><img src=x onerror=mxss(1)> <li>--></p>", revised, AntiSamy.DOM)
+            .getCleanHTML(),
+        not(containsString("mxss")));
+    assertThat(
+        as.scan("<!--<div/>--!><img src=x onerror=mxss(1)> <li>--></p>", revised, AntiSamy.SAX)
+            .getCleanHTML(),
+        not(containsString("mxss")));
+    assertThat(
+        as.scan(
+                "<!--<div/>--><img src=x onerror=mxss(1)> <li>--></p><input/>",
+                revised,
+                AntiSamy.DOM)
+            .getCleanHTML(),
+        not(containsString("mxss")));
+    assertThat(
+        as.scan(
+                "<!--<div/>--><img src=x onerror=mxss(1)> <li>--></p><input/>",
+                revised,
+                AntiSamy.SAX)
+            .getCleanHTML(),
+        not(containsString("mxss")));
   }
 }

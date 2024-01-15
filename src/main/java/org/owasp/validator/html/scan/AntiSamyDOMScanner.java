@@ -200,6 +200,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
 
       Callable<String> cleanHtml =
           new Callable<String>() {
+            @Override
             public String call() throws Exception {
               return trimmed;
             }

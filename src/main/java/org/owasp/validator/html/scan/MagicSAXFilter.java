@@ -98,6 +98,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     inCdata = false;
   }
 
+  @Override
   public void characters(XMLString text, Augmentations augs) throws XNIException {
 
     Ops topOp = peekTop();
@@ -121,6 +122,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
   private static final Pattern conditionalDirectives =
       Pattern.compile("<?!?\\[\\s*(?:end)?if[^]]*\\]>?");
 
+  @Override
   public void comment(XMLString text, Augmentations augs) throws XNIException {
 
     if (preserveComments) {
@@ -134,11 +136,13 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     }
   }
 
+  @Override
   public void doctypeDecl(String root, String publicId, String systemId, Augmentations augs)
       throws XNIException {
     // user supplied doctypes are ignored
   }
 
+  @Override
   public void emptyElement(QName element, XMLAttributes attributes, Augmentations augs)
       throws XNIException {
     this.startElement(element, attributes, augs);
@@ -154,6 +158,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     return new XMLString(endTag.toCharArray(), 0, endTag.length());
   }
 
+  @Override
   public void endElement(QName element, Augmentations augs) throws XNIException {
     Ops topOp = peekTop();
     if (Ops.REMOVE == topOp) {
@@ -166,7 +171,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
       // if encoding this element, insert closing tag: super.characters will encode the string
       // buffer
       operations.pop();
-      super.characters(makeEndTag(element.rawname), augs);
+      super.characters(makeEndTag(element.getRawname()), augs);
     } else if (Ops.CSS == topOp) {
       operations.pop();
       // now scan the CSS.
@@ -224,25 +229,29 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     return cssScanner;
   }
 
+  @Override
   public void processingInstruction(String target, XMLString data, Augmentations augs)
       throws XNIException {
     // processing instructions are being removed
   }
 
+  @Override
   public void startCDATA(Augmentations augs) throws XNIException {
     inCdata = true;
     super.startCDATA(augs);
   }
 
+  @Override
   public void endCDATA(Augmentations augs) throws XNIException {
     inCdata = false;
     super.endCDATA(augs);
   }
 
+  @Override
   public void startElement(QName element, XMLAttributes attributes, Augmentations augs)
       throws XNIException {
     // see if we have a policy for this tag.
-    String tagNameLowerCase = element.localpart.toLowerCase();
+    String tagNameLowerCase = element.getLocalpart().toLowerCase();
     Tag tag = policy.getTagByLowercaseName(tagNameLowerCase);
 
     /*
@@ -275,22 +284,22 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
       this.operations.push(Ops.REMOVE);
     } else if ((tag == null && policy.isEncodeUnknownTag())
         || (tag != null && tag.isAction(Policy.ACTION_ENCODE))) {
-      String name = "<" + element.localpart + ">";
+      String name = "<" + element.getLocalpart() + ">";
       super.characters(new XMLString(name.toCharArray(), 0, name.length()), augs);
       this.operations.push(Ops.ENCODE);
     } else if (tag == null) {
       addError(
           ErrorMessageUtil.ERROR_TAG_NOT_IN_POLICY,
-          new Object[] {HTMLEntityEncoder.htmlEntityEncode(element.localpart)});
+          new Object[] {HTMLEntityEncoder.htmlEntityEncode(element.getLocalpart())});
       this.operations.push(Ops.FILTER);
     } else if (tag.isAction(Policy.ACTION_FILTER)) {
       addError(
           ErrorMessageUtil.ERROR_TAG_FILTERED,
-          new Object[] {HTMLEntityEncoder.htmlEntityEncode(element.localpart)});
+          new Object[] {HTMLEntityEncoder.htmlEntityEncode(element.getLocalpart())});
       this.operations.push(Ops.FILTER);
     } else if (tag.isAction("validate")) {
 
-      boolean isStyle = "style".endsWith(element.localpart);
+      boolean isStyle = "style".endsWith(element.getLocalpart());
 
       // validate all attributes, we need to do this now to find out
       // how to deal with the element
@@ -313,14 +322,15 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
         if ("style".equalsIgnoreCase(name)) {
           CssScanner styleScanner = makeCssScanner();
           try {
-            CleanResults cr = styleScanner.scanInlineStyle(value, element.localpart, maxInputSize);
+            CleanResults cr =
+                styleScanner.scanInlineStyle(value, element.getLocalpart(), maxInputSize);
             attributes.setValue(i, cr.getCleanHTML());
             validattributes.addAttribute(makeSimpleQname(name), "CDATA", cr.getCleanHTML());
             errorMessages.addAll(cr.getErrorMessages());
           } catch (ScanException e) {
             addError(
                 ErrorMessageUtil.ERROR_CSS_ATTRIBUTE_MALFORMED,
-                new Object[] {element.localpart, HTMLEntityEncoder.htmlEntityEncode(value)});
+                new Object[] {element.getLocalpart(), HTMLEntityEncoder.htmlEntityEncode(value)});
           }
         } else if (attribute != null) {
           // validate the values against the policy
@@ -378,7 +388,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
           addError(
               ErrorMessageUtil.ERROR_ATTRIBUTE_NOT_IN_POLICY,
               new Object[] {
-                element.localpart,
+                element.getLocalpart(),
                 HTMLEntityEncoder.htmlEntityEncode(name),
                 HTMLEntityEncoder.htmlEntityEncode(value)
               });
@@ -399,7 +409,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
         this.operations.push(Ops.FILTER);
       } else {
 
-        if ("a".equals(element.localpart)) {
+        if ("a".equals(element.getLocalpart())) {
           boolean addNofollow = isNofollowAnchors;
           boolean addNoopenerAndNoreferrer = false;
 
@@ -447,7 +457,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
       // no options left, so the tag will be removed
       addError(
           ErrorMessageUtil.ERROR_TAG_DISALLOWED,
-          new Object[] {HTMLEntityEncoder.htmlEntityEncode(element.localpart)});
+          new Object[] {HTMLEntityEncoder.htmlEntityEncode(element.getLocalpart())});
       this.operations.push(Ops.REMOVE);
     }
     // now we know exactly what to do, let's do it

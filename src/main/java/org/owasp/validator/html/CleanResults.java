@@ -98,6 +98,7 @@ public class CleanResults {
     this(
         startOfScan,
         new Callable<String>() {
+          @Override
           public String call() throws Exception {
             return cleanHTML;
           }
