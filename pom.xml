@@ -76,8 +76,8 @@
         <project.build.outputTimestamp>2023-12-18T21:08:34Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.12.0</version.findsecbugs>
-        <version.slf4j>2.0.9</version.slf4j>
-        <version.spotbugs.maven>4.8.2.0</version.spotbugs.maven>
+        <version.slf4j>2.0.11</version.slf4j>
+        <version.spotbugs.maven>4.8.3.0</version.spotbugs.maven>
         <version.spotbugs>4.8.3</version.spotbugs>
     </properties>
 
@@ -94,7 +94,7 @@
         <dependency>
             <groupId>org.htmlunit</groupId>
             <artifactId>neko-htmlunit</artifactId>
-            <version>3.10.0-SNAPSHOT</version>
+            <version>3.10.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
@@ -407,7 +407,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.3.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -455,7 +455,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.3</version>
+                <version>3.2.5</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
