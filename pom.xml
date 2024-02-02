@@ -5,7 +5,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.5-SNAPSHOT</version>
+    <version>1.7.5</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -73,7 +73,7 @@
         <fluido.version>2.0.0-M8</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2023-12-18T21:08:34Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2024-02-02T15:23:04Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.12.0</version.findsecbugs>
         <version.slf4j>2.0.11</version.slf4j>
@@ -92,55 +92,50 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.htmlunit</groupId>
-            <artifactId>neko-htmlunit</artifactId>
-            <version>3.11.0</version>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.15.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
             <version>5.3.1</version>
+            <exclusions>
+                <!-- exclude this old version as we directly import a newer one -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.core5</groupId>
+            <artifactId>httpcore5</artifactId>
+            <version>5.2.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-css</artifactId>
             <version>1.17</version>
             <exclusions>
-                <!-- exclude this old version of commons-io as newer can be used -->
+                <!-- exclude this old version as we directly import a newer one -->
                 <exclusion>
                     <groupId>commons-io</groupId>
                     <artifactId>commons-io</artifactId>
                 </exclusion>
-                <!-- exclude this as batik-css has a dependency that uses an older commons-logging and we want to eliminate the convergence mismatch -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.15.1</version>
+            <groupId>org.htmlunit</groupId>
+            <artifactId>neko-htmlunit</artifactId>
+            <version>3.11.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${version.slf4j}</version>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>${version.slf4j}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- without this import you get: SLF4J: Defaulting to no-operation (NOP) logger implementation -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${version.slf4j}</version>
-            <scope>test</scope>
-        </dependency>
+
         <!-- While Java 7+ includes Xerces in the JRE, it apparently doesn't provide all the features we use that are in the 3rd party version. 
             So we import it directly. -->
         <dependency>
@@ -199,6 +194,19 @@
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
             <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${version.slf4j}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- without this import you get: SLF4J: Defaulting to no-operation (NOP) logger implementation -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${version.slf4j}</version>
             <scope>test</scope>
         </dependency>
 
