@@ -128,7 +128,7 @@
         <dependency>
             <groupId>org.htmlunit</groupId>
             <artifactId>neko-htmlunit</artifactId>
-            <version>3.11.1</version>
+            <version>3.11.2</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
