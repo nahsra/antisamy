@@ -73,7 +73,7 @@
         <fluido.version>2.0.0-M8</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2024-03-11T10:51:23Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2024-03-18T10:51:23Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.13.0</version.findsecbugs>
         <version.slf4j>2.0.12</version.slf4j>
@@ -352,7 +352,7 @@
             <plugin> <!-- This plugin is disabled by default. Invoke the release profile (-Prelease) to enable it. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
