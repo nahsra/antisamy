@@ -76,7 +76,7 @@
         <project.build.outputTimestamp>2024-03-18T10:51:23Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.13.0</version.findsecbugs>
-        <version.slf4j>2.0.12</version.slf4j>
+        <version.slf4j>2.0.13</version.slf4j>
         <version.spotbugs.maven>4.8.4.0</version.spotbugs.maven>
         <version.spotbugs>4.8.4</version.spotbugs>
     </properties>
