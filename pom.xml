@@ -17,6 +17,20 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+    <repositories>
+        <repository>
+            <!-- this repo is used for the neko-htmlunit snapshots -->
+            <id>OSS Sonatype snapshots</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
 
     <name>OWASP AntiSamy</name>
     <description>A library for performing fast, configurable cleansing of HTML coming from untrusted sources.</description>
