@@ -73,7 +73,7 @@
         <fluido.version>2.0.0-M9</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2024-03-18T10:51:23Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2024-06-05T13:24:41Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.13.0</version.findsecbugs>
         <version.slf4j>2.0.13</version.slf4j>
@@ -128,7 +128,7 @@
         <dependency>
             <groupId>org.htmlunit</groupId>
             <artifactId>neko-htmlunit</artifactId>
-            <version>4.2.0</version>
+            <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
