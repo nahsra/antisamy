@@ -2666,4 +2666,40 @@ public class AntiSamyTest {
             .getCleanHTML(),
         not(containsString("mxss")));
   }
+
+  @Test
+  public void testGithubIssue453() throws ScanException, PolicyException {
+    String test453 =
+        "<html lang=\"en\">\n"
+            + "<head>\n"
+            + "</head>\n"
+            + "<table>\n"
+            + "<SELECT NAME=\"Lang\">\n"
+            + "<OPTION VALUE=\"da\">Dansk</OPTION>\n"
+            + "<OPTION VALUE=\"en\" selected=selected>English</OPTION>\n"
+            + "</SELECT>\n"
+            + "</table>\n"
+            + "</html>";
+    String cleaned = as.scan(test453, policy, AntiSamy.SAX).getCleanHTML();
+    cleaned = cleaned.replaceAll("\r?\n", "");
+    cleaned = cleaned.replaceAll("\\s\\s+", " ");
+
+    assertThat(
+        cleaned,
+        containsString(
+            "<body> <table> "
+                + "<select name=\"Lang\"> "
+                + "<option value=\"da\">Dansk</option> "));
+
+    cleaned = as.scan(test453, policy, AntiSamy.DOM).getCleanHTML();
+    cleaned = cleaned.replaceAll("\r?\n", "");
+    cleaned = cleaned.replaceAll("\\s\\s+", " ");
+
+    assertThat(
+        cleaned,
+        containsString(
+            "<body> <table> "
+                + "<select name=\"Lang\"> "
+                + "<option value=\"da\">Dansk</option> "));
+  }
 }
