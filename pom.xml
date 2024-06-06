@@ -79,8 +79,6 @@
         <version.slf4j>2.0.13</version.slf4j>
         <version.spotbugs.maven>4.8.5.0</version.spotbugs.maven>
         <version.spotbugs>4.8.5</version.spotbugs>
-
-        <version.nekohtmlunit>4.2.1</version.nekohtmlunit>
     </properties>
 
     <profiles>
@@ -130,7 +128,7 @@
         <dependency>
             <groupId>org.htmlunit</groupId>
             <artifactId>neko-htmlunit</artifactId>
-            <version>${version.nekohtmlunit}</version>
+            <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
