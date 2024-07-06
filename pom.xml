@@ -5,7 +5,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.6-SNAPSHOT</version>
+    <version>1.7.6</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -73,11 +73,11 @@
         <fluido.version>2.0.0-M9</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2024-06-05T13:24:41Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2024-07-06T14:59:07Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.13.0</version.findsecbugs>
         <version.slf4j>2.0.13</version.slf4j>
-        <version.spotbugs.maven>4.8.6.1</version.spotbugs.maven>
+        <version.spotbugs.maven>4.8.6.2</version.spotbugs.maven>
         <version.spotbugs>4.8.6</version.spotbugs>
     </properties>
 
@@ -105,6 +105,11 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <!-- exclude this slightly older version as we directly import a newer one -->
+                <exclusion>
+                    <groupId>org.apache.httpcomponents.core5</groupId>
+                    <artifactId>httpcore5</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
