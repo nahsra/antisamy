@@ -2702,4 +2702,19 @@ public class AntiSamyTest {
                 + "<select name=\"Lang\"> "
                 + "<option value=\"da\">Dansk</option> "));
   }
+
+  @Test
+  public void issue484() throws ScanException, PolicyException {
+    String s = "<p>this is para data</p><br/><p>this is para data 2</p>";
+    CleanResults crDom = as.scan(s, policy, AntiSamy.DOM);
+    CleanResults crSax = as.scan(s, policy, AntiSamy.SAX);
+    String domValue = crDom.getCleanHTML();
+    String saxValue = crSax.getCleanHTML();
+    assertEquals("<p>this is para data</p>\n"
+            + "<br>\n"
+            + "<p>this is para data 2</p>", domValue);
+    assertEquals("<p>this is para data</p>\n"
+            + "<br/>\n"
+            + "<p>this is para data 2</p>", saxValue);
+  }
 }
