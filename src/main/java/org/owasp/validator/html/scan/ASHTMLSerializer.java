@@ -6,6 +6,7 @@ import org.apache.xml.serialize.ElementState;
 import org.apache.xml.serialize.HTMLdtd;
 import org.apache.xml.serialize.OutputFormat;
 import org.owasp.validator.html.InternalPolicy;
+import org.owasp.validator.html.TagMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +15,13 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
 
   private static final Logger logger = LoggerFactory.getLogger(ASHTMLSerializer.class);
   private boolean encodeAllPossibleEntities;
+  private final TagMatcher allowedEmptyTags;
+  private final TagMatcher requireClosingTags;
 
   public ASHTMLSerializer(Writer w, OutputFormat format, InternalPolicy policy) {
     super(w, format);
+    this.allowedEmptyTags = policy.getAllowedEmptyTags();
+    this.requireClosingTags = policy.getRequiresClosingTags();
     this.encodeAllPossibleEntities = policy.isEntityEncodeIntlCharacters();
   }
 
@@ -38,17 +43,21 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
     _printer.unindent();
     state = getElementState();
 
-    if (state.empty) _printer.printText('>');
-    // This element is not empty and that last content was another element, so print a line break
-    // before that last element and this element's closing tag. [keith] Provided this is not an
-    // anchor. HTML: some elements do not print closing tag (e.g. LI)
-    if (rawName == null || !HTMLdtd.isOnlyOpening(rawName) || HTMLdtd.isOptionalClosing(rawName)) {
-      if (_indenting && !state.preserveSpace && state.afterElement) _printer.breakLine();
-      // Must leave CData section first (Illegal in HTML, but still)
-      if (state.inCData) _printer.printText("]]>");
-      _printer.printText("</");
-      _printer.printText(state.rawName);
-      _printer.printText('>');
+    if (state.empty && isAllowedEmptyTag(rawName) && !requiresClosingTag(rawName)) { //
+      _printer.printText("/>");
+    } else {
+      if(state.empty) _printer.printText('>');
+      // This element is not empty and that last content was another element, so print a line break
+      // before that last element and this element's closing tag. [keith] Provided this is not an
+      // anchor. HTML: some elements do not print closing tag (e.g. LI)
+      if (rawName == null || !HTMLdtd.isOnlyOpening(rawName) || HTMLdtd.isOptionalClosing(rawName)) {
+        if (_indenting && !state.preserveSpace && state.afterElement) _printer.breakLine();
+        // Must leave CData section first (Illegal in HTML, but still)
+        if (state.inCData) _printer.printText("]]>");
+        _printer.printText("</");
+        _printer.printText(state.rawName);
+        _printer.printText('>');
+      }
     }
 
     // Leave the element state and update that of the parent (if we're not root) to not empty and
@@ -75,5 +84,13 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
       logger.error("URI escaping failed for value: " + uri);
     }
     return "";
+  }
+
+  private boolean requiresClosingTag(String tagName) {
+    return requireClosingTags.matches(tagName);
+  }
+
+  private boolean isAllowedEmptyTag(String tagName) {
+    return "head".equals(tagName) || allowedEmptyTags.matches( tagName);
   }
 }
