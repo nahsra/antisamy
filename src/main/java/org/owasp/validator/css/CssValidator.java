@@ -361,10 +361,23 @@ public class CssValidator {
         return "inherit";
       case LexicalUnit.SAC_OPERATOR_COMMA:
         return ",";
+      case LexicalUnit.SAC_FUNCTION:
+        final StringBuffer builder = new StringBuffer();
+        builder.append(lu.getFunctionName());
+        builder.append("(");
+        LexicalUnit params = lu.getParameters();
+        while (params != null) {
+          builder.append(lexicalValueToString(params));
+          params = params.getNextLexicalUnit();
+          if (params != null) {
+            builder.append(", ");
+          }
+        }
+        builder.append(")");
+        return builder.toString();
       case LexicalUnit.SAC_ATTR:
       case LexicalUnit.SAC_COUNTER_FUNCTION:
       case LexicalUnit.SAC_COUNTERS_FUNCTION:
-      case LexicalUnit.SAC_FUNCTION:
       case LexicalUnit.SAC_RECT_FUNCTION:
       case LexicalUnit.SAC_SUB_EXPRESSION:
       case LexicalUnit.SAC_UNICODERANGE:
