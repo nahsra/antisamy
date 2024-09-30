@@ -333,13 +333,20 @@ public class CssValidator {
         return String.valueOf(lu.getFloatValue());
       case LexicalUnit.SAC_STRING_VALUE:
       case LexicalUnit.SAC_IDENT:
-        // just a string/identifier
+        // Ensure that JavaScript URLs are not allowed
         String stringValue = lu.getStringValue();
+        if (stringValue == null || stringValue.toLowerCase().startsWith("javascript:")) {
+          return null;
+        }
         if (stringValue.indexOf(" ") != -1) stringValue = "'" + stringValue + "'";
         return stringValue;
       case LexicalUnit.SAC_URI:
-        // this is a URL
-        return "url(" + lu.getStringValue() + ")";
+        // Ensure that JavaScript URLs are not allowed
+        String url = lu.getStringValue();
+        if (url == null || url.toLowerCase().startsWith("javascript:")) {
+          return null;
+        }
+        return "url(" + url + ")";
       case LexicalUnit.SAC_RGBCOLOR:
         // this is a rgb encoded color
         StringBuffer sb = new StringBuffer("rgb(");
@@ -362,17 +369,34 @@ public class CssValidator {
       case LexicalUnit.SAC_OPERATOR_COMMA:
         return ",";
       case LexicalUnit.SAC_FUNCTION:
-        final StringBuffer builder = new StringBuffer();
-        builder.append(lu.getFunctionName());
-        builder.append("(");
+        StringBuilder builder = new StringBuilder();
+
+        // Append the function name, e.g., "var"
+        builder.append(lu.getFunctionName()).append("(");
+
         LexicalUnit params = lu.getParameters();
         while (params != null) {
-          builder.append(lexicalValueToString(params));
+          String paramsValue = lexicalValueToString(params);
+          if (paramsValue == null) {
+            return null;
+          }
+          builder.append(paramsValue);
           params = params.getNextLexicalUnit();
           if (params != null) {
             builder.append(", ");
           }
         }
+
+        // Check for fallback (some functions like "var" have fallback values)
+        LexicalUnit fallback = lu.getPreviousLexicalUnit();
+        if (fallback != null) {
+          String fallbackValue = lexicalValueToString(fallback);
+          if (fallbackValue == null) {
+            return null;
+          }
+          builder.append(", ").append(fallbackValue);
+        }
+
         builder.append(")");
         return builder.toString();
       case LexicalUnit.SAC_ATTR:
