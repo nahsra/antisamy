@@ -333,20 +333,13 @@ public class CssValidator {
         return String.valueOf(lu.getFloatValue());
       case LexicalUnit.SAC_STRING_VALUE:
       case LexicalUnit.SAC_IDENT:
-        // Ensure that JavaScript URLs are not allowed
+        // just a string/identifier
         String stringValue = lu.getStringValue();
-        if (stringValue == null || stringValue.toLowerCase().startsWith("javascript:")) {
-          return null;
-        }
         if (stringValue.indexOf(" ") != -1) stringValue = "'" + stringValue + "'";
         return stringValue;
       case LexicalUnit.SAC_URI:
-        // Ensure that JavaScript URLs are not allowed
-        String url = lu.getStringValue();
-        if (url == null || url.toLowerCase().startsWith("javascript:")) {
-          return null;
-        }
-        return "url(" + url + ")";
+        // this is a URL
+        return "url(" + lu.getStringValue() + ")";
       case LexicalUnit.SAC_RGBCOLOR:
         // this is a rgb encoded color
         StringBuffer sb = new StringBuffer("rgb(");

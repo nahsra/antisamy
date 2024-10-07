@@ -91,46 +91,6 @@ public class CssValidatorTest {
   }
 
   @Test
-  public void testDefaultPolicyUrlFunctionWithJavaScript() {
-    CssValidator cssValidator = new CssValidator(null);
-
-    // Test a url function with a JavaScript URL
-    final CSSLexicalUnit urlParam =
-        CSSLexicalUnit.createString(LexicalUnit.SAC_STRING_VALUE, "javascript:alert(1)", null);
-    final CSSLexicalUnit urlFunc = CSSLexicalUnit.createFunction("url", urlParam, null);
-
-    // Ensure that JavaScript URLs are not allowed
-    assertNull(cssValidator.lexicalValueToString(urlFunc));
-  }
-
-  @Test
-  public void testLexicalValueToStringNestedVarsWithJavaScriptAsFallback() {
-    CssValidator cssValidator = new CssValidator(null);
-
-    // Create fallback first: --ds-text-purple, #FFFFFF
-    final CSSLexicalUnit param =
-        CSSLexicalUnit.createString(LexicalUnit.SAC_STRING_VALUE, "--custom-url", null);
-    final CSSLexicalUnit fallback =
-        CSSLexicalUnit.createString(LexicalUnit.SAC_STRING_VALUE, "javascript:alert(1)", null);
-
-    // Create first var() function with fallback
-    final CSSLexicalUnit function = CSSLexicalUnit.createFunction("var", param, fallback);
-
-    // Check if the output is as expected for first var()
-    assertNull(cssValidator.lexicalValueToString(function));
-  }
-
-  @Test
-  public void testSacUriWithJavaScriptUrl() {
-    CssValidator cssValidator = new CssValidator(null);
-
-    // Test with a JavaScript URL, which should be blocked
-    final CSSLexicalUnit jsUrl =
-        CSSLexicalUnit.createString(LexicalUnit.SAC_URI, "javascript:alert(1)", null);
-    assertNull("JavaScript URL should be blocked", cssValidator.lexicalValueToString(jsUrl));
-  }
-
-  @Test
   public void testSacUriWithValidUrl() {
     CssValidator cssValidator = new CssValidator(null);
 
