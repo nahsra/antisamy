@@ -199,13 +199,13 @@ public class CssValidator {
             policy.getCommonRegularExpressions("cssIDSelector"),
             policy.getCommonRegularExpressions("cssIDExclusion"));
       case Condition.SAC_PSEUDO_CLASS_CONDITION:
-        // this is a basic psuedo element condition; compare condition
+        // this is a basic pseudo-element condition; compare condition
         // against valid pattern and is not blacklisted by exclusion pattern
 
         return validateCondition(
             (AttributeCondition) condition,
             policy.getCommonRegularExpressions("cssPseudoElementSelector"),
-            policy.getCommonRegularExpressions("cssPsuedoElementExclusion"));
+            policy.getCommonRegularExpressions("cssPseudoElementExclusion"));
       case Condition.SAC_BEGIN_HYPHEN_ATTRIBUTE_CONDITION:
       case Condition.SAC_ONE_OF_ATTRIBUTE_CONDITION:
       case Condition.SAC_ATTRIBUTE_CONDITION:
