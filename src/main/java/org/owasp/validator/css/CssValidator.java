@@ -344,15 +344,15 @@ public class CssValidator {
         // this is a rgb encoded color
         StringBuffer sb = new StringBuffer("rgb(");
         LexicalUnit param = lu.getParameters();
-        sb.append(param.getIntegerValue()); // R value
+        sb.append(getColorIntValue(param)); // R value
         sb.append(',');
         param = param.getNextLexicalUnit(); // comma
         param = param.getNextLexicalUnit(); // G value
-        sb.append(param.getIntegerValue());
+        sb.append(getColorIntValue(param));
         sb.append(',');
         param = param.getNextLexicalUnit(); // comma
         param = param.getNextLexicalUnit(); // B value
-        sb.append(param.getIntegerValue());
+        sb.append(getColorIntValue(param));
         sb.append(')');
 
         return sb.toString();
@@ -402,6 +402,22 @@ public class CssValidator {
         // these are properties that shouldn't be necessary for most run
         // of the mill HTML/CSS
         return null;
+    }
+  }
+
+  /**
+   * Returns color value as int.
+   * Maps percentages to values between 0 and 255.
+   * Negative percentages are mapped to 0, values bigger than 100% to 255.
+   *
+   * @param param LexicalUnit
+   * @return color value as int
+   */
+  private int getColorIntValue(LexicalUnit param) {
+    if (param.getLexicalUnitType() == LexicalUnit.SAC_PERCENTAGE) {
+      return Math.min(0xff, Math.max(0, (int) (0xff * (param.getFloatValue() / 100.0))));
+    } else {
+      return param.getIntegerValue();
     }
   }
 }

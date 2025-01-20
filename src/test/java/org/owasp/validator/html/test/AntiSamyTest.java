@@ -2725,4 +2725,21 @@ public class AntiSamyTest {
     assertEquals("<p>this is para data</p>\n" + "<br/>\n" + "<p>this is para data 2</p>", domValue);
     assertEquals("<p>this is para data</p>\n" + "<br/>\n" + "<p>this is para data 2</p>", saxValue);
   }
+
+  @Test
+  public void testGithubIssue546() throws ScanException, PolicyException {
+    //Given
+    String taintedHtml = "<style>.cl { color: rgb(50%, -20%, 150%); }</style>";
+
+    //When
+    CleanResults crDom = as.scan(taintedHtml, policy, AntiSamy.DOM);
+    CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
+
+    //Then
+    String expectedCleanHtml = "<style>*.cl {\n\tcolor: rgb(127,0,255);\n}\n</style>";
+    assertEquals(0, crDom.getNumberOfErrors());
+    assertEquals(0, crSax.getNumberOfErrors());
+    assertEquals(expectedCleanHtml, crDom.getCleanHTML());
+    assertEquals(expectedCleanHtml, crSax.getCleanHTML());
+  }
 }
