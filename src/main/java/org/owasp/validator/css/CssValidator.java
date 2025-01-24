@@ -28,6 +28,7 @@
  */
 package org.owasp.validator.css;
 
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 import org.owasp.validator.html.Policy;
@@ -344,15 +345,15 @@ public class CssValidator {
         // this is a rgb encoded color
         StringBuffer sb = new StringBuffer("rgb(");
         LexicalUnit param = lu.getParameters();
-        sb.append(getColorIntValue(param)); // R value
+        sb.append(getColorValue(param)); // R value
         sb.append(',');
         param = param.getNextLexicalUnit(); // comma
         param = param.getNextLexicalUnit(); // G value
-        sb.append(getColorIntValue(param));
+        sb.append(getColorValue(param));
         sb.append(',');
         param = param.getNextLexicalUnit(); // comma
         param = param.getNextLexicalUnit(); // B value
-        sb.append(getColorIntValue(param));
+        sb.append(getColorValue(param));
         sb.append(')');
 
         return sb.toString();
@@ -413,11 +414,11 @@ public class CssValidator {
    * @param param LexicalUnit
    * @return color value as int
    */
-  private int getColorIntValue(LexicalUnit param) {
+  private static String getColorValue(LexicalUnit param) {
     if (param.getLexicalUnitType() == LexicalUnit.SAC_PERCENTAGE) {
-      return Math.min(0xff, Math.max(0, (int) (0xff * (param.getFloatValue() / 100.0))));
+      return new DecimalFormat("0.#").format(param.getFloatValue()) + "%";
     } else {
-      return param.getIntegerValue();
+      return "" + param.getIntegerValue();
     }
   }
 }
