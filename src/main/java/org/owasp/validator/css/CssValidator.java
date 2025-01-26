@@ -28,6 +28,7 @@
  */
 package org.owasp.validator.css;
 
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 import org.owasp.validator.html.Policy;
@@ -344,15 +345,15 @@ public class CssValidator {
         // this is a rgb encoded color
         StringBuffer sb = new StringBuffer("rgb(");
         LexicalUnit param = lu.getParameters();
-        sb.append(param.getIntegerValue()); // R value
+        sb.append(getColorValue(param)); // R value
         sb.append(',');
         param = param.getNextLexicalUnit(); // comma
         param = param.getNextLexicalUnit(); // G value
-        sb.append(param.getIntegerValue());
+        sb.append(getColorValue(param));
         sb.append(',');
         param = param.getNextLexicalUnit(); // comma
         param = param.getNextLexicalUnit(); // B value
-        sb.append(param.getIntegerValue());
+        sb.append(getColorValue(param));
         sb.append(')');
 
         return sb.toString();
@@ -402,6 +403,22 @@ public class CssValidator {
         // these are properties that shouldn't be necessary for most run
         // of the mill HTML/CSS
         return null;
+    }
+  }
+
+  /**
+   * Returns color value as int.
+   * Maps percentages to values between 0 and 255.
+   * Negative percentages are mapped to 0, values bigger than 100% to 255.
+   *
+   * @param param LexicalUnit
+   * @return color value as int
+   */
+  private static String getColorValue(LexicalUnit param) {
+    if (param.getLexicalUnitType() == LexicalUnit.SAC_PERCENTAGE) {
+      return new DecimalFormat("0.#").format(param.getFloatValue()) + "%";
+    } else {
+      return "" + param.getIntegerValue();
     }
   }
 }
