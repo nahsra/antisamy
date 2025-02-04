@@ -2755,6 +2755,9 @@
             <category-list>
                 <category value="mediafeature"/>
             </category-list>
+            <literal-list>
+                <literal value=""/>
+            </literal-list>
             <regexp-list>
                 <regexp name="integer"/>
             </regexp-list>
