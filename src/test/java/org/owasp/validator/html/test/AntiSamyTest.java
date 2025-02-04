@@ -34,6 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -67,6 +68,7 @@ import org.owasp.validator.html.model.Attribute;
 import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.model.Tag;
 import org.owasp.validator.html.scan.Constants;
+import org.w3c.css.sac.CSSParseException;
 
 /**
  * This class tests AntiSamy functionality and the basic policy file which should be immune to XSS
@@ -2752,6 +2754,42 @@ public class AntiSamyTest {
 
     //Then
     String expectedCleanHtml = "<style>*.cl {\n}\n</style>";
+    assertEquals(expectedCleanHtml, crDom.getCleanHTML());
+    assertEquals(expectedCleanHtml, crSax.getCleanHTML());
+  }
+
+  @Test
+  public void testGithubIssue552() throws ScanException, PolicyException {
+    checkStyleTag("@media screen {}",
+                  "@media screen {\n}\n");
+
+    checkStyleTag("@media screen,print {}",
+                  "@media screen, print {\n}\n");
+
+    checkStyleTag("@media only screen and (max-width: 639px) and (min-width: 300px) {}",
+                  "@media only screen and (max-width: 639.0px) and (min-width: 300.0px) {\n}\n");
+
+    checkStyleTag("@media not screen, screen and (color), print and (orientation: portrait) {}",
+                  "@media not screen, screen and (color), print and (orientation: portrait) {\n}\n");
+
+    checkStyleTag("@media not screen, print and (orientation: doesNotExist), all {}",
+                  "@media not screen, all {\n}\n");
+
+    assertThrows(CSSParseException.class, () -> checkStyleTag("@media notValid screen {}", ""));
+
+    assertThrows(CSSParseException.class, () -> checkStyleTag("@media doesNotExist {}", ""));
+  }
+
+  private void checkStyleTag(String input, String expected) throws ScanException, PolicyException {
+    //Given
+    String taintedHtml = "<style>" + input + "</style>";
+    String expectedCleanHtml = "<style>" + expected + "</style>";
+
+    //When
+    CleanResults crDom = as.scan(taintedHtml, policy, AntiSamy.DOM);
+    CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
+
+    //Then
     assertEquals(expectedCleanHtml, crDom.getCleanHTML());
     assertEquals(expectedCleanHtml, crSax.getCleanHTML());
   }

@@ -35,6 +35,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import org.owasp.validator.css.media.CssMediaFeature;
+import org.owasp.validator.css.media.CssMediaQuery;
+import org.owasp.validator.css.media.CssMediaQueryList;
 import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
@@ -95,6 +98,10 @@ public class CssHandler implements DocumentHandler {
    * and an close selector tag
    */
   private boolean selectorOpen = false;
+
+  private MediaState mediaState = MediaState.OUTSIDE;
+
+  private enum MediaState {INSIDE, OUTSIDE, DENIED}
 
   /**
    * Constructs a handler for stylesheets using the given policy. The List of embedded stylesheets
@@ -343,26 +350,6 @@ public class CssHandler implements DocumentHandler {
   /*
    * (non-Javadoc)
    *
-   * @see org.w3c.css.sac.DocumentHandler#startMedia(org.w3c.css.sac.SACMediaList)
-   */
-  @Override
-  public void startMedia(SACMediaList media) throws CSSException {
-    // CSS2 Media declaration - ignore this for now
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.w3c.css.sac.DocumentHandler#endMedia(org.w3c.css.sac.SACMediaList)
-   */
-  @Override
-  public void endMedia(SACMediaList media) throws CSSException {
-    // CSS2 Media declaration - ignore this for now
-  }
-
-  /*
-   * (non-Javadoc)
-   *
    * @see org.w3c.css.sac.DocumentHandler#startPage(java.lang.String,
    *      java.lang.String)
    */
@@ -537,5 +524,53 @@ public class CssHandler implements DocumentHandler {
                 HTMLEntityEncoder.htmlEntityEncode(validator.lexicalValueToString(value))
               }));
     }
+  }
+
+  @Override
+  public void startMedia(SACMediaList media) throws CSSException {
+    CssMediaQueryList mediaQueryList = (CssMediaQueryList) media;
+
+    boolean first = true;
+    for (CssMediaQuery query : mediaQueryList.getMediaQueries()) {
+      if (!validator.isValidMediaQuery(query)) {
+        continue;
+      }
+      if (first) {
+        styleSheet.append("@media ");
+        first = false;
+      } else {
+        styleSheet.append(", ");
+      }
+      if (query.getLogicalOperator() != null) {
+        styleSheet.append(query.getLogicalOperator()).append(' ');
+      }
+      styleSheet.append(query.getMediaType());
+      for (CssMediaFeature feature : query.getMediaFeatures()) {
+        styleSheet.append(" and (");
+        styleSheet.append(feature.getName());
+        if (feature.getExpression() != null) {
+          styleSheet.append(": ");
+          styleSheet.append(validator.lexicalValueToString(feature.getExpression()));
+        }
+        styleSheet.append(')');
+      }
+    }
+
+    if (!first) {
+      styleSheet.append(" {");
+      styleSheet.append('\n');
+      mediaState = MediaState.INSIDE;
+    } else {
+      mediaState = MediaState.DENIED;
+    }
+  }
+
+  @Override
+  public void endMedia(SACMediaList media) throws CSSException {
+    if (mediaState == MediaState.INSIDE) {
+      styleSheet.append('}');
+      styleSheet.append('\n');
+    }
+    mediaState = MediaState.OUTSIDE;
   }
 }

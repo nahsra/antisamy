@@ -31,9 +31,13 @@ package org.owasp.validator.css;
 import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.regex.Pattern;
+import org.apache.batik.css.parser.CSSLexicalUnit;
+import org.owasp.validator.css.media.CssMediaFeature;
+import org.owasp.validator.css.media.CssMediaQuery;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.model.AntiSamyPattern;
+import org.owasp.validator.html.model.Attribute;
 import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.util.HTMLEntityEncoder;
 import org.w3c.css.sac.AttributeCondition;
@@ -55,6 +59,8 @@ import org.w3c.css.sac.SimpleSelector;
  * @author Jason Li
  */
 public class CssValidator {
+
+  private static final LexicalUnit EMPTYSTRINGLEXICALUNIT = CSSLexicalUnit.createString(LexicalUnit.SAC_STRING_VALUE, "", null);
 
   private final Policy policy;
 
@@ -404,6 +410,41 @@ public class CssValidator {
         // of the mill HTML/CSS
         return null;
     }
+  }
+
+  /**
+   * Returns whether the given {@link CssMediaQuery} is valid
+   *
+   * @param mediaQuery mediaQuery
+   * @return valid mediaQuery?
+   */
+  public boolean isValidMediaQuery(CssMediaQuery mediaQuery) {
+    // check mediaType against allowed media-HTML-Attribute
+    Attribute mediaAttribute = policy.getTagByLowercaseName("style").getAttributeByName("media");
+    if (mediaAttribute == null) {
+      return false;
+    }
+
+    String mediaTypeString = mediaQuery.getMediaType().toString().toLowerCase();
+    boolean isValidMediaType = mediaAttribute.containsAllowedValue(mediaTypeString) || mediaAttribute.matchesAllowedExpression(mediaTypeString);
+    if (!isValidMediaType) {
+      return false;
+    }
+
+    for (CssMediaFeature feature : mediaQuery.getMediaFeatures()) {
+      LexicalUnit expression = feature.getExpression();
+      if (expression == null) {
+        expression = EMPTYSTRINGLEXICALUNIT;
+      }
+      if (!isValidMediaFeature(feature.getName(), expression)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean isValidMediaFeature(String name, LexicalUnit lu) {
+    return isValidProperty("_mediafeature_" + name, lu);
   }
 
   /**
