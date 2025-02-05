@@ -362,6 +362,8 @@ public class CssValidator {
         return "inherit";
       case LexicalUnit.SAC_OPERATOR_COMMA:
         return ",";
+      case LexicalUnit.SAC_OPERATOR_SLASH:
+        return "/";
       case LexicalUnit.SAC_FUNCTION:
         StringBuilder builder = new StringBuilder();
 
