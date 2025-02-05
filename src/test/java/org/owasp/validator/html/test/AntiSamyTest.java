@@ -2775,6 +2775,21 @@ public class AntiSamyTest {
     checkStyleTag("@media not screen, print and (orientation: doesNotExist), all {}",
                   "@media not screen, all {\n}\n");
 
+    checkStyleTag("@media (min-width: 500.0px) {\n}\n",
+                  "@media all and (min-width: 500.0px) {\n}\n");
+
+    checkStyleTag("@media (grid) {\n}\n",
+                  "@media all and (grid) {\n}\n");
+
+    checkStyleTag("@media (monochrome) {\n}\n",
+                  "@media all and (monochrome) {\n}\n");
+
+    checkStyleTag("@media (monochrome: 2) {\n}\n",
+                  "@media all and (monochrome: 2) {\n}\n");
+
+    checkStyleTag("@media (color-index) {\n}\n",
+                  "@media all and (color-index) {\n}\n");
+
     assertThrows(CSSParseException.class, () -> checkStyleTag("@media notValid screen {}", ""));
 
     assertThrows(CSSParseException.class, () -> checkStyleTag("@media doesNotExist {}", ""));

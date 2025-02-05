@@ -2794,6 +2794,9 @@
             <category-list>
                 <category value="mediafeature"/>
             </category-list>
+            <literal-list>
+                <literal value=""/>
+            </literal-list>
             <regexp-list>
                 <regexp name="integer"/>
             </regexp-list>
@@ -2914,6 +2917,8 @@
                 <category value="mediafeature"/>
             </category-list>
             <literal-list>
+                <literal value=""/>
+                <literal value="-0"/>
                 <literal value="0"/>
                 <literal value="1"/>
             </literal-list>
@@ -2968,6 +2973,9 @@
             <category-list>
                 <category value="mediafeature"/>
             </category-list>
+            <literal-list>
+                <literal value=""/>
+            </literal-list>
             <regexp-list>
                 <regexp name="integer"/>
             </regexp-list>
