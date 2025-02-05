@@ -2755,4 +2755,28 @@ public class AntiSamyTest {
     assertEquals(expectedCleanHtml, crDom.getCleanHTML());
     assertEquals(expectedCleanHtml, crSax.getCleanHTML());
   }
+
+  @Test
+  public void testGithubIssue554() throws ScanException, PolicyException {
+    checkInlineStyle("font: bold italic large Palatino, serif", "font: bold italic large Palatino , serif;");
+    checkInlineStyle("font: 12pt/14pt sans-serif", "font: 12.0pt / 14.0pt sans-serif;");
+    checkInlineStyle("font: 12.0pt / 14.0pt sans-serif;", "font: 12.0pt / 14.0pt sans-serif;");
+    checkInlineStyle("font: 12.25pt sans-serif;", "font: 12.25pt sans-serif;");
+    checkInlineStyle("font: 14px/20px Tahoma, Geneva, Arial, Verdana, sans-serif",
+                     "font: 14.0px / 20.0px Tahoma , Geneva , Arial , Verdana , sans-serif;");
+  }
+
+  private void checkInlineStyle(String inline, String expected) throws ScanException, PolicyException {
+    //Given
+    String taintedHtml = "<html><head/><body><p style=\"" + inline + "\">test</p></body></html>";
+    String expectedCleanHtml = "<html>\n  <head/>\n  <body>\n    <p style=\"" + expected + "\">test</p>\n  </body>\n</html>";
+
+    //When
+    CleanResults crDom = as.scan(taintedHtml, policy, AntiSamy.DOM);
+    CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
+
+    //Then
+    assertEquals(expectedCleanHtml, crDom.getCleanHTML());
+    assertEquals(expectedCleanHtml, crSax.getCleanHTML());
+  }
 }
