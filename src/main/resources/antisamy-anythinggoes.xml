@@ -97,6 +97,8 @@
         <regexp name="positiveLength" value="((\+)?0|(\+)?([0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?)(rem|vw|vh|em|ex|px|in|cm|mm|pt|pc))" />
         <regexp name="percentage" value="(-|\+)?([0-9]+(\.[0-9]+)?)%" />
         <regexp name="positivePercentage" value="(\+)?([0-9]+(\.[0-9]+)?)%" />
+        <regexp name="ratio" value="[0-9]+/[0-9]+"/>
+        <regexp name="resolution" value="((\+)?0|(\+)?([0-9]+(\.[0-9]+)?)(dpi|dpcm|dppx|x))"/>
 
         <regexp name="absolute-size" value="(xx-small|x-small|small|medium|large|x-large|xx-large)" />
         <regexp name="relative-size" value="(larger|smaller)" />
@@ -2611,6 +2613,470 @@
                 <literal value="child" />
                 <literal value="inherit" />
             </literal-list>
+        </property>
+
+        <property name="_mediafeature_any-hover" description="Does any available input mechanism allow the user to hover over elements?">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="none"/>
+                <literal value="hover"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_any-pointer" description="Is any available input mechanism a pointing device, and if so, how accurate is it?">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="none"/>
+                <literal value="coarse"/>
+                <literal value="fine"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_aspect-ratio" description="Width-to-height aspect ratio of the viewport.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="ratio"/>
+                <regexp name="number"/>
+            </regexp-list>
+        </property>
+
+        <property name="_mediafeature_color" description="Number of bits per color component of the output device, or zero if the device isn't color.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value=""/>
+            </literal-list>
+            <regexp-list>
+                <regexp name="integer"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_min-color" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="integer"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_max-color" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="integer"/>
+            </regexp-list>
+        </property>
+
+        <property name="_mediafeature_color-gamut" description="Approximate range of colors that are supported by the user agent and output device.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="srgb"/>
+                <literal value="p3"/>
+                <literal value="rec2020"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_color-index" description="Number of entries in the output device's color lookup table, or zero if the device does not use such a table.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value=""/>
+            </literal-list>
+            <regexp-list>
+                <regexp name="integer"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_min-color-index" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="integer"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_max-color-index" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="integer"/>
+            </regexp-list>
+        </property>
+
+        <property name="_mediafeature_device-aspect-ratio" description="Width-to-height aspect ratio of the output device. Deprecated in Media Queries Level 4.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="ratio"/>
+                <regexp name="number"/>
+            </regexp-list>
+        </property>
+
+        <property name="_mediafeature_device-height" description="Height of the rendering surface of the output device. Deprecated in Media Queries Level 4.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="positiveLength"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_min-device-height" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="positiveLength"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_max-device-height" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="positiveLength"/>
+            </regexp-list>
+        </property>
+
+        <property name="_mediafeature_device-width" description="Width of the rendering surface of the output device. Deprecated in Media Queries Level 4.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="positiveLength"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_min-device-width" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="positiveLength"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_max-device-width" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="positiveLength"/>
+            </regexp-list>
+        </property>
+
+        <property name="_mediafeature_display-mode" description="The mode in which an application is being displayed: for example, fullscreen or picture-in-picture mode. Added in Media Queries Level 5.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="browser"/>
+                <literal value="fullscreen"/>
+                <literal value="minimal-ui"/>
+                <literal value="picture-in-picture"/>
+                <literal value="standalone"/>
+                <literal value="window-controls-overlay"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_dynamic-range" description="Combination of brightness, contrast ratio, and color depth that are supported by the user agent and the output device. Added in Media Queries Level 5.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="standard"/>
+                <literal value="high"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_forced-colors" description="Detect whether user agent restricts color palette. Added in Media Queries Level 5.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="none"/>
+                <literal value="active"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_grid" description="Does the device use a grid or bitmap screen?">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value=""/>
+                <literal value="-0"/>
+                <literal value="0"/>
+                <literal value="1"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_height" description="Height of the viewport.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="positiveLength"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_min-height" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="positiveLength"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_max-height" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="positiveLength"/>
+            </regexp-list>
+        </property>
+
+        <property name="_mediafeature_hover" description="Does the primary input mechanism allow the user to hover over elements?">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="none"/>
+                <literal value="hover"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_inverted-colors" description="Is the user agent or underlying OS inverting colors? Added in Media Queries Level 5.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="none"/>
+                <literal value="inverted"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_monochrome" description="Bits per pixel in the output device's monochrome frame buffer, or zero if the device isn't monochrome.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value=""/>
+            </literal-list>
+            <regexp-list>
+                <regexp name="integer"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_min-monochrome" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="integer"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_max-monochrome" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="integer"/>
+            </regexp-list>
+        </property>
+
+        <property name="_mediafeature_orientation" description="Orientation of the viewport.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="portrait"/>
+                <literal value="landscape"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_overflow-block" description="How does the output device handle content that overflows the viewport along the block axis?">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="none"/>
+                <literal value="scroll"/>
+                <literal value="optional-paged"/>
+                <literal value="paged"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_overflow-inline" description="Can content that overflows the viewport along the inline axis be scrolled?">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="none"/>
+                <literal value="scroll"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_pointer" description="Is the primary input mechanism a pointing device, and if so, how accurate is it?">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="none"/>
+                <literal value="coarse"/>
+                <literal value="fine"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_prefers-color-scheme" description="Detect if the user prefers a light or dark color scheme. Added in Media Queries Level 5.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="light"/>
+                <literal value="dark"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_prefers-contrast" description="Detects if the user has requested the system increase or decrease the amount of contrast between adjacent colors. Added in Media Queries Level 5.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="no-preference"/>
+                <literal value="more"/>
+                <literal value="less"/>
+                <literal value="custom"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_prefers-reduced-motion" description="Detects if the user has requested the web content that consumes less internet traffic.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="no-preference"/>
+                <literal value="reduce"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_prefers-reduced-transparency" description="The user prefers less motion on the page. Added in Media Queries Level 5.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="no-preference"/>
+                <literal value="reduce"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_resolution" description="Detects if a user has enabled a setting on their device to reduce the transparent or translucent layer effects used on the device.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="resolution"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_min-resolution" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="resolution"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_max-resolution" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="resolution"/>
+            </regexp-list>
+        </property>
+
+        <property name="_mediafeature_scan" description="Whether display output is progressive or interlaced.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="interlace"/>
+                <literal value="progressive"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_scripting" description="Detects whether scripting (i.e. JavaScript) is available. Added in Media Queries Level 5.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="none"/>
+                <literal value="initial-only"/>
+                <literal value="enabled"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_shape" description="Detects the shape of the device to distinguish rectangular and round displays.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="rect"/>
+                <literal value="round"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_update" description="How frequently the output device can modify the appearance of content.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="none"/>
+                <literal value="slow"/>
+                <literal value="fast"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_video-dynamic-range" description="Combination of brightness, contrast ratio, and color depth that are supported by the video plane of user agent and the output device. Added in Media Queries Level 5.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <literal-list>
+                <literal value="standard"/>
+                <literal value="high"/>
+            </literal-list>
+        </property>
+
+        <property name="_mediafeature_width" description="Width of the viewport including width of scrollbar.">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="positiveLength"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_min-width" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="positiveLength"/>
+            </regexp-list>
+        </property>
+        <property name="_mediafeature_max-width" description="">
+            <category-list>
+                <category value="mediafeature"/>
+            </category-list>
+            <regexp-list>
+                <regexp name="positiveLength"/>
+            </regexp-list>
         </property>
         <!-- end manual properties -->
     </css-rules>
