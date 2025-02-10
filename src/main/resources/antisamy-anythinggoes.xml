@@ -2625,6 +2625,15 @@
             </literal-list>
         </property>
 
+        <property name="_mediatype" description="Describes the general category of a device">
+            <literal-list>
+                <literal value="all"/>
+                <literal value="print"/>
+                <literal value="screen"/>
+                <literal value=""/>
+            </literal-list>
+        </property>
+
         <property name="_mediafeature_any-pointer" description="Is any available input mechanism a pointing device, and if so, how accurate is it?">
             <category-list>
                 <category value="mediafeature"/>

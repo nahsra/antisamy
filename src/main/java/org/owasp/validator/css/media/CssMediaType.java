@@ -1,18 +1,25 @@
 package org.owasp.validator.css.media;
 
 public enum CssMediaType {
-    ALL, PRINT, SCREEN;
+    ALL("all"), PRINT("print"), SCREEN("screen"), IMPLIED_ALL("");
+
+    public final String label;
+
+    CssMediaType(String label) {
+        this.label = label;
+    }
 
     @Override
     public String toString() {
-        return super.toString().toLowerCase();
+        return label;
     }
 
     public static CssMediaType parse(String mediaType) {
-        try {
-            return CssMediaType.valueOf(mediaType.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return null;
+        for (CssMediaType element : values()) {
+            if (element.toString().equalsIgnoreCase(mediaType)) {
+                return element;
+            }
         }
+        return null;
     }
 }

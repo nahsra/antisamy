@@ -38,6 +38,7 @@ import java.util.ResourceBundle;
 import org.owasp.validator.css.media.CssMediaFeature;
 import org.owasp.validator.css.media.CssMediaQuery;
 import org.owasp.validator.css.media.CssMediaQueryList;
+import org.owasp.validator.css.media.CssMediaType;
 import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
@@ -546,7 +547,11 @@ public class CssHandler implements DocumentHandler {
       }
       styleSheet.append(query.getMediaType());
       for (CssMediaFeature feature : query.getMediaFeatures()) {
-        styleSheet.append(" and (");
+        if (feature == query.getMediaFeatures().get(0) && query.getMediaType() == CssMediaType.IMPLIED_ALL) {
+          styleSheet.append("(");
+        } else {
+          styleSheet.append(" and (");
+        }
         styleSheet.append(feature.getName());
         if (feature.getExpression() != null) {
           styleSheet.append(": ");

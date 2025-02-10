@@ -29,6 +29,7 @@
 package org.owasp.validator.css;
 
 import static org.owasp.validator.css.media.CssMediaQueryLogicalOperator.AND;
+import static org.owasp.validator.css.media.CssMediaQueryLogicalOperator.OR;
 
 import org.apache.batik.css.parser.CSSSACMediaList;
 import org.apache.batik.css.parser.LexicalUnits;
@@ -110,7 +111,7 @@ public class CssParser extends org.apache.batik.css.parser.Parser {
     CssMediaQueryList mediaList = new CssMediaQueryList();
 
     mediaList.append(parseMediaQuery());
-    while (current == LexicalUnits.COMMA) {
+    while (hasAnotherMediaQuery()) {
       nextIgnoreSpaces();
       mediaList.append(parseMediaQuery());
     }
@@ -118,30 +119,46 @@ public class CssParser extends org.apache.batik.css.parser.Parser {
     return mediaList;
   }
 
+  private boolean hasAnotherMediaQuery() {
+    return current == LexicalUnits.COMMA || (current == LexicalUnits.IDENTIFIER && scanner.getStringValue().equals(OR.toString()));
+  }
+
   protected CssMediaQuery parseMediaQuery() {
     CssMediaQuery query = new CssMediaQuery();
+    CssMediaType mediaType = null;
+    CssMediaQueryLogicalOperator logicalOperator = null;
     switch (current) {
       case LexicalUnits.LEFT_BRACE:
-        query.setMediaType(CssMediaType.ALL);
-        query.addMediaFeature(parseMediaFeature());
+        mediaType = CssMediaType.IMPLIED_ALL;
         break;
       case LexicalUnits.IDENTIFIER:
-        final CssMediaQueryLogicalOperator logicalOperator = CssMediaQueryLogicalOperator.parse(scanner.getStringValue());
+        logicalOperator = CssMediaQueryLogicalOperator.parse(scanner.getStringValue());
         if (logicalOperator != null) {
-          query.setLogicalOperator(logicalOperator);
-          if (nextIgnoreSpaces() != LexicalUnits.IDENTIFIER) {
-            throw createCSSParseException("identifier");
+          switch (logicalOperator) {
+            case ONLY:
+              parseLogicalOperatorOnly();
+              mediaType = parseMediaType();
+              break;
+            case NOT:
+              mediaType = parseLogicalOperatorNot();
+              break;
+            case AND:
+            case OR:
+            case COMMA:
+              throw createCSSParseException("identifier");
           }
+        } else {
+          mediaType = parseMediaType();
         }
-        final CssMediaType mediaType = CssMediaType.parse(scanner.getStringValue());
-        if (mediaType == null) {
-          throw createCSSParseException("identifier");
-        }
-        query.setMediaType(mediaType);
-        nextIgnoreSpaces();
         break;
       default:
         throw createCSSParseException("identifier");
+    }
+    query.setMediaType(mediaType);
+    query.setLogicalOperator(logicalOperator);
+
+    if (mediaType == CssMediaType.IMPLIED_ALL) {
+      query.addMediaFeature(parseMediaFeature());
     }
 
     while (current == LexicalUnits.IDENTIFIER && CssMediaQueryLogicalOperator.parse(scanner.getStringValue()) == AND) {
@@ -149,6 +166,32 @@ public class CssParser extends org.apache.batik.css.parser.Parser {
       query.addMediaFeature(parseMediaFeature());
     }
     return query;
+  }
+
+  private CssMediaType parseMediaType() {
+    CssMediaType mediaType;
+    mediaType = CssMediaType.parse(scanner.getStringValue());
+    if (mediaType == null) {
+      throw createCSSParseException("identifier");
+    }
+    nextIgnoreSpaces();
+    return mediaType;
+  }
+
+  private CssMediaType parseLogicalOperatorNot() {
+    CssMediaType mediaType;
+    if (nextIgnoreSpaces() == LexicalUnits.IDENTIFIER) {
+      mediaType = parseMediaType();
+    } else {
+      mediaType = CssMediaType.IMPLIED_ALL;
+    }
+    return mediaType;
+  }
+
+  private void parseLogicalOperatorOnly() {
+    if (nextIgnoreSpaces() != LexicalUnits.IDENTIFIER) {
+      throw createCSSParseException("identifier");
+    }
   }
 
   protected CssMediaFeature parseMediaFeature() {
@@ -172,7 +215,7 @@ public class CssParser extends org.apache.batik.css.parser.Parser {
       exp = parseTerm(null);
     }
     if (current != LexicalUnits.RIGHT_BRACE) {
-      throw createCSSParseException("right.brace");
+      throw createCSSParseException("')' expected.");
     }
     nextIgnoreSpaces();
 

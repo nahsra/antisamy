@@ -37,7 +37,6 @@ import org.owasp.validator.css.media.CssMediaQuery;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.model.AntiSamyPattern;
-import org.owasp.validator.html.model.Attribute;
 import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.util.HTMLEntityEncoder;
 import org.w3c.css.sac.AttributeCondition;
@@ -420,13 +419,17 @@ public class CssValidator {
    */
   public boolean isValidMediaQuery(CssMediaQuery mediaQuery) {
     // check mediaType against allowed media-HTML-Attribute
-    Attribute mediaAttribute = policy.getTagByLowercaseName("style").getAttributeByName("media");
-    if (mediaAttribute == null) {
+    Property mediatype = policy.getPropertyByName("_mediatype");
+    if (mediatype == null) {
       return false;
     }
 
     String mediaTypeString = mediaQuery.getMediaType().toString().toLowerCase();
-    boolean isValidMediaType = mediaAttribute.containsAllowedValue(mediaTypeString) || mediaAttribute.matchesAllowedExpression(mediaTypeString);
+    boolean isValidMediaType = mediatype.getAllowedValues()
+                                        .contains(mediaTypeString) || mediatype.getAllowedRegExp()
+                                                                               .stream()
+                                                                               .anyMatch(pattern -> pattern.matcher(mediaTypeString)
+                                                                                                           .matches());
     if (!isValidMediaType) {
       return false;
     }

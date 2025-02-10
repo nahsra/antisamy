@@ -1,18 +1,25 @@
 package org.owasp.validator.css.media;
 
 public enum CssMediaQueryLogicalOperator {
-    AND, NOT, ONLY, OR;
+    AND("and"), NOT("not"), ONLY("only"), OR("or"), COMMA(",");
+
+    public final String label;
+
+    CssMediaQueryLogicalOperator(String label) {
+        this.label = label;
+    }
 
     @Override
     public String toString() {
-        return super.toString().toLowerCase();
+        return label;
     }
 
     public static CssMediaQueryLogicalOperator parse(String operator) {
-        try {
-            return CssMediaQueryLogicalOperator.valueOf(operator.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return null;
+        for (CssMediaQueryLogicalOperator element : values()) {
+            if (element.label.equalsIgnoreCase(operator)) {
+                return element;
+            }
         }
+        return null;
     }
 }

@@ -2762,6 +2762,12 @@ public class AntiSamyTest {
   public void testGithubIssue552() throws ScanException, PolicyException {
     Pattern positiveLength = Pattern.compile("((\\+)?0|(\\+)?([0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?)(rem|vw|vh|em|ex|px|in|cm|mm|pt|pc))");
     Pattern integer = Pattern.compile("([-+])?[0-9]+");
+    Property mediaType = new Property("_mediatype",
+                                      Collections.emptyList(),
+                                      Arrays.asList("", "all", "print", "screen"),
+                                      Collections.emptyList(),
+                                      "",
+                                      "remove");
     Property minWidth = new Property("_mediafeature_min-width",
                                      Collections.singletonList(positiveLength),
                                      Collections.emptyList(),
@@ -2801,39 +2807,63 @@ public class AntiSamyTest {
 
     checkStyleTag("@media screen {}",
                   "@media screen {\n}\n",
-                  policy);
+                  policy.addCssProperty(mediaType));
 
     checkStyleTag("@media screen,print {}",
                   "@media screen, print {\n}\n",
-                  policy);
+                  policy.addCssProperty(mediaType));
 
     checkStyleTag("@media only screen and (max-width: 639px) and (min-width: 300px) {}",
                   "@media only screen and (max-width: 639.0px) and (min-width: 300.0px) {\n}\n",
-                  this.policy.addCssProperty(minWidth).addCssProperty(maxWidth));
+                  policy.addCssProperty(mediaType).addCssProperty(minWidth).addCssProperty(maxWidth));
 
     checkStyleTag("@media not screen, screen and (color), print and (orientation: portrait) {}",
                   "@media not screen, screen and (color), print and (orientation: portrait) {\n}\n",
-                  policy.addCssProperty(color).addCssProperty(orientation));
+                  policy.addCssProperty(mediaType).addCssProperty(color).addCssProperty(orientation));
 
     checkStyleTag("@media not screen, print and (orientation: doesNotExist), all {}",
                   "@media not screen, all {\n}\n",
-                  policy.addCssProperty(orientation));
+                  policy.addCssProperty(mediaType).addCssProperty(orientation));
 
-    checkStyleTag("@media (min-width: 500.0px) {\n}\n",
-                  "@media all and (min-width: 500.0px) {\n}\n",
-                  policy.addCssProperty(minWidth));
+    checkStyleTag("@media (min-width: 500.0px) {}",
+                  "@media (min-width: 500.0px) {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(minWidth));
 
-    checkStyleTag("@media (grid) {\n}\n",
-                  "@media all and (grid) {\n}\n",
-                  policy.addCssProperty(grid));
+    checkStyleTag("@media (grid) {}",
+                  "@media (grid) {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(grid));
 
-    checkStyleTag("@media (monochrome) {\n}\n",
-                  "@media all and (monochrome) {\n}\n",
-                  policy.addCssProperty(monochrome));
+    checkStyleTag("@media (monochrome) {}",
+                  "@media (monochrome) {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(monochrome));
 
-    checkStyleTag("@media (monochrome: 2) {\n}\n",
-                  "@media all and (monochrome: 2) {\n}\n",
-                  policy.addCssProperty(monochrome));
+    checkStyleTag("@media (monochrome: 2) {}",
+                  "@media (monochrome: 2) {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(monochrome));
+
+    checkStyleTag("@media screen and (max-width: 639px) or only print {}",
+                  "@media screen and (max-width: 639.0px), only print {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+
+    checkStyleTag("@media print or (max-width: 639px) or only print {}",
+                  "@media print, (max-width: 639.0px), only print {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+
+    checkStyleTag("@media print or not (max-width: 639px), not print {}",
+                  "@media print, not (max-width: 639.0px), not print {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+
+    checkStyleTag("@media only print or not (max-width: 639px) and (min-width: 500px), not print {}",
+                  "@media only print, not (max-width: 639.0px) and (min-width: 500.0px), not print {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(maxWidth).addCssProperty(minWidth));
+
+    checkStyleTag("@media only print or not (max-width: 639px) and (min-width: 500px), not screen {}",
+                  "@media only print, not screen {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+
+    checkStyleTag("@media screen {*{color: red;notAllowed: nope}}",
+                  "@media screen {\n* {\n\tcolor: red;\n}\n}\n",
+                  policy.addCssProperty(mediaType));
 
     assertThrows(CSSParseException.class, () -> checkStyleTag("@media notValid screen {}", "", policy));
     assertThrows(CSSParseException.class, () -> checkStyleTag("@media doesNotExist {}", "", policy));
