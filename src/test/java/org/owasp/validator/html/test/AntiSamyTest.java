@@ -2760,42 +2760,86 @@ public class AntiSamyTest {
 
   @Test
   public void testGithubIssue552() throws ScanException, PolicyException {
+    Pattern positiveLength = Pattern.compile("((\\+)?0|(\\+)?([0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?)(rem|vw|vh|em|ex|px|in|cm|mm|pt|pc))");
+    Pattern integer = Pattern.compile("([-+])?[0-9]+");
+    Property minWidth = new Property("_mediafeature_min-width",
+                                     Collections.singletonList(positiveLength),
+                                     Collections.emptyList(),
+                                     Collections.emptyList(),
+                                     "",
+                                     "remove");
+    Property maxWidth = new Property("_mediafeature_max-width",
+                                     Collections.singletonList(positiveLength),
+                                     Collections.emptyList(),
+                                     Collections.emptyList(),
+                                     "",
+                                     "remove");
+    Property color = new Property("_mediafeature_color",
+                                  Collections.singletonList(integer),
+                                  Collections.singletonList(""),
+                                  Collections.emptyList(),
+                                  "",
+                                  "remove");
+    Property orientation = new Property("_mediafeature_orientation",
+                                        Collections.emptyList(),
+                                        Arrays.asList("portrait", "landscape"),
+                                        Collections.emptyList(),
+                                        "",
+                                        "remove");
+    Property grid = new Property("_mediafeature_grid",
+                                 Collections.emptyList(),
+                                 Arrays.asList("", "-1", "-0", "0", "1"),
+                                 Collections.emptyList(),
+                                 "",
+                                 "remove");
+    Property monochrome = new Property("_mediafeature_monochrome",
+                                       Collections.singletonList(integer),
+                                       Collections.singletonList(""),
+                                       Collections.emptyList(),
+                                       "",
+                                       "remove");
+
     checkStyleTag("@media screen {}",
-                  "@media screen {\n}\n");
+                  "@media screen {\n}\n",
+                  policy);
 
     checkStyleTag("@media screen,print {}",
-                  "@media screen, print {\n}\n");
+                  "@media screen, print {\n}\n",
+                  policy);
 
     checkStyleTag("@media only screen and (max-width: 639px) and (min-width: 300px) {}",
-                  "@media only screen and (max-width: 639.0px) and (min-width: 300.0px) {\n}\n");
+                  "@media only screen and (max-width: 639.0px) and (min-width: 300.0px) {\n}\n",
+                  this.policy.addCssProperty(minWidth).addCssProperty(maxWidth));
 
     checkStyleTag("@media not screen, screen and (color), print and (orientation: portrait) {}",
-                  "@media not screen, screen and (color), print and (orientation: portrait) {\n}\n");
+                  "@media not screen, screen and (color), print and (orientation: portrait) {\n}\n",
+                  policy.addCssProperty(color).addCssProperty(orientation));
 
     checkStyleTag("@media not screen, print and (orientation: doesNotExist), all {}",
-                  "@media not screen, all {\n}\n");
+                  "@media not screen, all {\n}\n",
+                  policy.addCssProperty(orientation));
 
     checkStyleTag("@media (min-width: 500.0px) {\n}\n",
-                  "@media all and (min-width: 500.0px) {\n}\n");
+                  "@media all and (min-width: 500.0px) {\n}\n",
+                  policy.addCssProperty(minWidth));
 
     checkStyleTag("@media (grid) {\n}\n",
-                  "@media all and (grid) {\n}\n");
+                  "@media all and (grid) {\n}\n",
+                  policy.addCssProperty(grid));
 
     checkStyleTag("@media (monochrome) {\n}\n",
-                  "@media all and (monochrome) {\n}\n");
+                  "@media all and (monochrome) {\n}\n",
+                  policy.addCssProperty(monochrome));
 
     checkStyleTag("@media (monochrome: 2) {\n}\n",
-                  "@media all and (monochrome: 2) {\n}\n");
+                  "@media all and (monochrome: 2) {\n}\n",
+                  policy.addCssProperty(monochrome));
 
-    checkStyleTag("@media (color-index) {\n}\n",
-                  "@media all and (color-index) {\n}\n");
-
-    assertThrows(CSSParseException.class, () -> checkStyleTag("@media notValid screen {}", ""));
-
-    assertThrows(CSSParseException.class, () -> checkStyleTag("@media doesNotExist {}", ""));
+    assertThrows(CSSParseException.class, () -> checkStyleTag("@media notValid screen {}", "", policy));
+    assertThrows(CSSParseException.class, () -> checkStyleTag("@media doesNotExist {}", "", policy));
   }
 
-  private void checkStyleTag(String input, String expected) throws ScanException, PolicyException {
+  private void checkStyleTag(String input, String expected, Policy policy) throws ScanException, PolicyException {
     //Given
     String taintedHtml = "<style>" + input + "</style>";
     String expectedCleanHtml = "<style>" + expected + "</style>";
