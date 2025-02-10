@@ -425,11 +425,11 @@ public class CssValidator {
     }
 
     String mediaTypeString = mediaQuery.getMediaType().toString().toLowerCase();
-    boolean isValidMediaType = mediatype.getAllowedValues()
-                                        .contains(mediaTypeString) || mediatype.getAllowedRegExp()
-                                                                               .stream()
-                                                                               .anyMatch(pattern -> pattern.matcher(mediaTypeString)
-                                                                                                           .matches());
+    boolean isRegExpAllowed = true;
+    for (Pattern pattern : mediatype.getAllowedRegExp()) {
+      isRegExpAllowed &= pattern.matcher(mediaTypeString).matches();
+    }
+    boolean isValidMediaType = mediatype.getAllowedValues().contains(mediaTypeString) || isRegExpAllowed;
     if (!isValidMediaType) {
       return false;
     }
