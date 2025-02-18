@@ -34,6 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -67,6 +68,7 @@ import org.owasp.validator.html.model.Attribute;
 import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.model.Tag;
 import org.owasp.validator.html.scan.Constants;
+import org.w3c.css.sac.CSSParseException;
 
 /**
  * This class tests AntiSamy functionality and the basic policy file which should be immune to XSS
@@ -2752,6 +2754,131 @@ public class AntiSamyTest {
 
     //Then
     String expectedCleanHtml = "<style>*.cl {\n}\n</style>";
+    assertEquals(expectedCleanHtml, crDom.getCleanHTML());
+    assertEquals(expectedCleanHtml, crSax.getCleanHTML());
+  }
+
+  @Test
+  public void testGithubIssue552() throws ScanException, PolicyException {
+    Pattern positiveLength = Pattern.compile("((\\+)?0|(\\+)?([0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?)(rem|vw|vh|em|ex|px|in|cm|mm|pt|pc))");
+    Pattern integer = Pattern.compile("([-+])?[0-9]+");
+    Property mediaType = new Property("_mediatype",
+                                      Collections.emptyList(),
+                                      Arrays.asList("", "all", "print", "screen"),
+                                      Collections.emptyList(),
+                                      "",
+                                      "remove");
+    Property minWidth = new Property("_mediafeature_min-width",
+                                     Collections.singletonList(positiveLength),
+                                     Collections.emptyList(),
+                                     Collections.emptyList(),
+                                     "",
+                                     "remove");
+    Property maxWidth = new Property("_mediafeature_max-width",
+                                     Collections.singletonList(positiveLength),
+                                     Collections.emptyList(),
+                                     Collections.emptyList(),
+                                     "",
+                                     "remove");
+    Property color = new Property("_mediafeature_color",
+                                  Collections.singletonList(integer),
+                                  Collections.singletonList(""),
+                                  Collections.emptyList(),
+                                  "",
+                                  "remove");
+    Property orientation = new Property("_mediafeature_orientation",
+                                        Collections.emptyList(),
+                                        Arrays.asList("portrait", "landscape"),
+                                        Collections.emptyList(),
+                                        "",
+                                        "remove");
+    Property grid = new Property("_mediafeature_grid",
+                                 Collections.emptyList(),
+                                 Arrays.asList("", "-1", "-0", "0", "1"),
+                                 Collections.emptyList(),
+                                 "",
+                                 "remove");
+    Property monochrome = new Property("_mediafeature_monochrome",
+                                       Collections.singletonList(integer),
+                                       Collections.singletonList(""),
+                                       Collections.emptyList(),
+                                       "",
+                                       "remove");
+
+    checkStyleTag("@media screen {}",
+                  "@media screen {\n}\n",
+                  policy.addCssProperty(mediaType));
+
+    checkStyleTag("@media screen,print {}",
+                  "@media screen, print {\n}\n",
+                  policy.addCssProperty(mediaType));
+
+    checkStyleTag("@media only screen and (max-width: 639px) and (min-width: 300px) {}",
+                  "@media only screen and (max-width: 639.0px) and (min-width: 300.0px) {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(minWidth).addCssProperty(maxWidth));
+
+    checkStyleTag("@media not screen, screen and (color), print and (orientation: portrait) {}",
+                  "@media not screen, screen and (color), print and (orientation: portrait) {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(color).addCssProperty(orientation));
+
+    checkStyleTag("@media not screen, print and (orientation: doesNotExist), all {}",
+                  "@media not screen, all {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(orientation));
+
+    checkStyleTag("@media (min-width: 500.0px) {}",
+                  "@media (min-width: 500.0px) {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(minWidth));
+
+    checkStyleTag("@media (grid) {}",
+                  "@media (grid) {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(grid));
+
+    checkStyleTag("@media (monochrome) {}",
+                  "@media (monochrome) {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(monochrome));
+
+    checkStyleTag("@media (monochrome: 2) {}",
+                  "@media (monochrome: 2) {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(monochrome));
+
+    checkStyleTag("@media screen and (max-width: 639px) or only print {}",
+                  "@media screen and (max-width: 639.0px), only print {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+
+    checkStyleTag("@media print or (max-width: 639px) or only print {}",
+                  "@media print, (max-width: 639.0px), only print {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+
+    checkStyleTag("@media print or not (max-width: 639px), not print {}",
+                  "@media print, not (max-width: 639.0px), not print {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+
+    checkStyleTag("@media only print or not (max-width: 639px) and (min-width: 500px), not print {}",
+                  "@media only print, not (max-width: 639.0px) and (min-width: 500.0px), not print {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(maxWidth).addCssProperty(minWidth));
+
+    checkStyleTag("@media only print or not (max-width: 639px) and (min-width: 500px), not screen {}",
+                  "@media only print, not screen {\n}\n",
+                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+
+    checkStyleTag("@media screen {*{color: red;notAllowed: nope}}",
+                  "@media screen {\n* {\n\tcolor: red;\n}\n}\n",
+                  policy.addCssProperty(mediaType));
+
+    assertThrows(CSSParseException.class, () -> checkStyleTag("@media notValid screen {}", "", policy));
+    assertThrows(CSSParseException.class, () -> checkStyleTag("@media doesNotExist {}", "", policy));
+  }
+
+  private void checkStyleTag(String input, String expected, Policy policy) throws ScanException, PolicyException {
+    //Given
+    String taintedHtml = "<style>" + input + "</style>";
+    String expectedCleanHtml = "<style>" + expected + "</style>";
+
+    //When
+    CleanResults crDom = as.scan(taintedHtml, policy, AntiSamy.DOM);
+    CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
+
+    //Then
     assertEquals(expectedCleanHtml, crDom.getCleanHTML());
     assertEquals(expectedCleanHtml, crSax.getCleanHTML());
   }
