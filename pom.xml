@@ -78,7 +78,7 @@
         <version.findsecbugs>1.13.0</version.findsecbugs>
         <version.slf4j>2.0.17</version.slf4j>
         <version.spotbugs.maven>4.9.1.0</version.spotbugs.maven>
-        <version.spotbugs>4.9.1</version.spotbugs>
+        <version.spotbugs>4.9.2</version.spotbugs>
     </properties>
 
     <profiles>
