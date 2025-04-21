@@ -75,7 +75,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2024-12-02T22:15:50Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
-        <version.findsecbugs>1.13.0</version.findsecbugs>
+        <version.findsecbugs>1.14.0</version.findsecbugs>
         <version.slf4j>2.0.17</version.slf4j>
         <version.spotbugs.maven>4.9.3.0</version.spotbugs.maven>
         <version.spotbugs>4.9.3</version.spotbugs>
