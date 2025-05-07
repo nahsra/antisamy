@@ -5,7 +5,7 @@
     <groupId>org.owasp.antisamy</groupId>
     <artifactId>antisamy</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.8</version>
+    <version>1.7.9-SNAPSHOT</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -73,7 +73,7 @@
         <fluido.version>2.1.0</fluido.version>
         <gpg.skip>true</gpg.skip><!-- by default skip gpg -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2025-05-07T19:56:02Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-05-08T03:31:53Z</project.build.outputTimestamp>
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.14.0</version.findsecbugs>
         <version.slf4j>2.0.17</version.slf4j>
