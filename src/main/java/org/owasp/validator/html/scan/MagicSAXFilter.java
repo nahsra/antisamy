@@ -434,7 +434,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
                   addNofollow, addNoopenerAndNoreferrer, currentRelValue);
           if (!relValue.isEmpty()) {
             int relIndex;
-            if ((relIndex = validattributes.getIndex("rel")) > 0) {
+            if ((relIndex = validattributes.getIndex("rel")) >= 0) {
               validattributes.setValue(relIndex, relValue);
             } else {
               validattributes.addAttribute(makeSimpleQname("rel"), "CDATA", relValue);
