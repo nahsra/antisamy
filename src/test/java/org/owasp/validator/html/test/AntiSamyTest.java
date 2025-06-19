@@ -2906,4 +2906,16 @@ public class AntiSamyTest {
     assertEquals(expectedCleanHtml, crDom.getCleanHTML());
     assertEquals(expectedCleanHtml, crSax.getCleanHTML());
   }
+
+  @Test
+  public void testGithubIssue587() throws ScanException, PolicyException {
+    // "rel" attribute with SAX parser was being duplicated when it was already present at the beginning
+    // of the attribute list. Fix checks the correct index before processing.
+    String output = as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.DOM)
+            .getCleanHTML();
+    assertThat(output.split("rel=").length - 1, is(1));
+    output = as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.SAX)
+            .getCleanHTML();
+    assertThat(output.split("rel=").length - 1, is(1));
+  }
 }
