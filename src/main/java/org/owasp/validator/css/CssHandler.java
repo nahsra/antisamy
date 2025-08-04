@@ -34,11 +34,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import org.owasp.validator.css.media.CssMediaFeature;
 import org.owasp.validator.css.media.CssMediaQuery;
 import org.owasp.validator.css.media.CssMediaQueryList;
-import org.owasp.validator.css.media.CssMediaType;
 import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
@@ -547,7 +547,7 @@ public class CssHandler implements DocumentHandler {
       }
       styleSheet.append(query.getMediaType());
       for (CssMediaFeature feature : query.getMediaFeatures()) {
-        if (feature == query.getMediaFeatures().get(0) && query.getMediaType() == CssMediaType.IMPLIED_ALL) {
+        if (feature == query.getMediaFeatures().get(0) && Objects.equals(query.getMediaType(), "")) {
           styleSheet.append("(");
         } else {
           styleSheet.append(" and (");
@@ -562,7 +562,10 @@ public class CssHandler implements DocumentHandler {
     }
 
     if (!first) {
-      styleSheet.append(" {");
+      if (styleSheet.codePointAt(styleSheet.length() - 1) != ' ') {
+        styleSheet.append(' ');
+      }
+      styleSheet.append("{");
       styleSheet.append('\n');
       mediaState = MediaState.INSIDE;
     } else {
