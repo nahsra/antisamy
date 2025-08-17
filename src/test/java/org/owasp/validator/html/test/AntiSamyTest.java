@@ -55,7 +55,6 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.binary.Base64;
-import org.hamcrest.text.MatchesPattern;
 import org.junit.Before;
 import org.junit.Test;
 import org.owasp.validator.html.AntiSamy;
@@ -2292,48 +2291,6 @@ public class AntiSamyTest {
                 AntiSamy.SAX)
             .getCleanHTML(),
         not(containsString("<script>")));
-  }
-
-  @Test
-  public void testImportedStylesParsing() throws ScanException, PolicyException {
-    // Test that imported style sheets can be parsed and order is correct
-    final String input =
-        "<style type='text/css'>\n"
-            + "\t@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/classic.css);\n"
-            + "\t@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/providers.css);\n"
-            + "\t.very-specific-antisamy {font: 15pt \"Arial\"; color: blue;}\n"
-            + "</style>";
-    Policy revised =
-        policy
-            .cloneWithDirective(Policy.EMBED_STYLESHEETS, "true")
-            .cloneWithDirective(Policy.FORMAT_OUTPUT, "false");
-    // Styles are imported
-    String cleanHtmlDOM = as.scan(input, revised, AntiSamy.DOM).getCleanHTML();
-    String cleanHtmlSAX = as.scan(input, revised, AntiSamy.SAX).getCleanHTML();
-    assertThat(cleanHtmlDOM, not(containsString("<![CDATA[/* */]]>")));
-    assertThat(cleanHtmlSAX, not(containsString("<![CDATA[/* */]]>")));
-    // Order is correct:
-    //  First import: grid_1 class
-    //  Second import: janrain-provider150-sprit class
-    //  Original styles: very-specific-antisamy class
-    final Pattern p =
-        Pattern.compile(
-            ".*?\\.grid_1.*?\\.janrain-provider150-sprit.*?\\.very-specific-antisamy.*?",
-            Pattern.DOTALL);
-    assertThat(cleanHtmlDOM, MatchesPattern.matchesPattern(p));
-    assertThat(cleanHtmlSAX, MatchesPattern.matchesPattern(p));
-
-    Policy revised2 =
-        policy
-            .cloneWithDirective(Policy.EMBED_STYLESHEETS, "false")
-            .cloneWithDirective(Policy.FORMAT_OUTPUT, "false");
-    // Styles are not imported
-    cleanHtmlDOM = as.scan(input, revised2, AntiSamy.DOM).getCleanHTML();
-    cleanHtmlSAX = as.scan(input, revised2, AntiSamy.SAX).getCleanHTML();
-    assertThat(cleanHtmlDOM, not(containsString(".grid_1")));
-    assertThat(cleanHtmlSAX, not(containsString(".grid_1")));
-    assertThat(cleanHtmlDOM, not(containsString(".janrain-provider150-sprit")));
-    assertThat(cleanHtmlSAX, not(containsString(".janrain-provider150-sprit")));
   }
 
   @Test

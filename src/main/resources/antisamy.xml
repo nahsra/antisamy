@@ -13,10 +13,6 @@
         <directive name="validateParamAsEmbed" value="true" />
         <directive name="noopenerAndNoreferrerAnchors" value="true" />
 
-        <!-- remember, this won't work for relative URIs - AntiSamy doesn't know anything about the URL or your web structure -->
-        <directive name="embedStyleSheets" value="false" />
-        <directive name="connectionTimeout" value="5000" />
-        <directive name="maxStyleSheetImports" value="3" />
 
         <!-- Allows the use of dynamic attributes (i.e. HTML5 "data-") -->
         <directive name="allowDynamicAttributes" value="true" />

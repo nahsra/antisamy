@@ -447,7 +447,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     /*
      * Invoke the css parser on this element.
      */
-    CssScanner styleScanner = new CssScanner(policy, messages, policy.isEmbedStyleSheets());
+    CssScanner styleScanner = new CssScanner(policy, messages);
 
     try {
       int childNodesCount = ele.getChildNodes().getLength();
@@ -579,7 +579,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         /*
          * Invoke the CSS parser on this element.
          */
-        CssScanner styleScanner = new CssScanner(policy, messages, false);
+        CssScanner styleScanner = new CssScanner(policy, messages);
 
         try {
           CleanResults cr = styleScanner.scanInlineStyle(value, tagName, policy.getMaxInputSize());

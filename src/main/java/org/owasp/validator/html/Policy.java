@@ -115,15 +115,6 @@ public class Policy {
   public static final String ALLOW_DYNAMIC_ATTRIBUTES = "allowDynamicAttributes";
   public static final String MAX_INPUT_SIZE = "maxInputSize";
 
-  /** @deprecated Remote styles import feature to be removed and along with this error message. */
-  @Deprecated public static final int DEFAULT_MAX_STYLESHEET_IMPORTS = 1;
-  /** @deprecated Remote styles import feature to be removed and along with this error message. */
-  @Deprecated public static final String EMBED_STYLESHEETS = "embedStyleSheets";
-  /** @deprecated Remote styles import feature to be removed and along with this error message. */
-  @Deprecated public static final String CONNECTION_TIMEOUT = "connectionTimeout";
-  /** @deprecated Remote styles import feature to be removed and along with this error message. */
-  @Deprecated public static final String MAX_STYLESHEET_IMPORTS = "maxStyleSheetImports";
-
   public static final String EXTERNAL_GENERAL_ENTITIES =
       "http://xml.org/sax/features/external-general-entities";
   public static final String EXTERNAL_PARAM_ENTITIES =

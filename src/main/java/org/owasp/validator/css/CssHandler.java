@@ -28,11 +28,8 @@
  */
 package org.owasp.validator.css;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -82,9 +79,6 @@ public class CssHandler implements DocumentHandler {
   /** The error message bundle to pull from. */
   private ResourceBundle messages;
 
-  /** A queue of imported stylesheets; used to track imported stylesheets */
-  private final LinkedList<URI> importedStyleSheets;
-
   /** The tag currently being examined (if any); used for inline stylesheet error messages */
   private final String tagName;
 
@@ -105,8 +99,7 @@ public class CssHandler implements DocumentHandler {
   private enum MediaState {INSIDE, OUTSIDE, DENIED}
 
   /**
-   * Constructs a handler for stylesheets using the given policy. The List of embedded stylesheets
-   * produced by this constructor is now available via the getImportedStylesheetsURIList() method.
+   * Constructs a handler for stylesheets using the given policy.
    * This constructor to be used when there is no tag name associated with this inline style.
    *
    * @param policy the policy to use
@@ -118,8 +111,7 @@ public class CssHandler implements DocumentHandler {
   }
 
   /**
-   * Constructs a handler for stylesheets using the given policy. The List of embedded stylesheets
-   * produced by this constructor is available via the getImportedStylesheetsURIList() method.
+   * Constructs a handler for stylesheets using the given policy.
    *
    * @param policy the policy to use
    * @param errorMessages the List of error messages to add error messages too if there are errors
@@ -133,9 +125,6 @@ public class CssHandler implements DocumentHandler {
     this.errorMessages = errorMessages;
     this.messages = messages;
     this.validator = new CssValidator(policy);
-    // Create a queue of all style sheets that need to be validated to
-    // account for any sheets that may be imported by the current CSS
-    this.importedStyleSheets = new LinkedList<URI>();
     this.tagName = tagName;
     this.isInline = (tagName != null);
   }
@@ -148,20 +137,6 @@ public class CssHandler implements DocumentHandler {
   public String getCleanStylesheet() {
     // Always ensure results contain most recent generation of stylesheet
     return styleSheet.toString();
-  }
-
-  /**
-   * Returns a list of imported stylesheets from the main parsed stylesheet.
-   *
-   * @return the import stylesheet URI list.
-   */
-  public LinkedList<URI> getImportedStylesheetsURIList() {
-    return importedStyleSheets;
-  }
-
-  /** Empties the stylesheet buffer. */
-  public void emptyStyleSheet() {
-    styleSheet.delete(0, styleSheet.length());
   }
 
   /**
@@ -224,77 +199,7 @@ public class CssHandler implements DocumentHandler {
   @Override
   public void importStyle(String uri, SACMediaList media, String defaultNamespaceURI)
       throws CSSException {
-
-    /* The ability to import remote styles is deprecated and will be removed in a future
-     * release. When that is done this method will simply generate the following error
-     * message and return.
-     */
-
-    if (!policy.isEmbedStyleSheets()) {
-      errorMessages.add(
-          ErrorMessageUtil.getMessage(
-              messages, ErrorMessageUtil.ERROR_CSS_IMPORT_DISABLED, new Object[] {}));
-      return;
-    }
-
-    try {
-      // check for non-nullness (validate after canonicalization)
-      if (uri == null) {
-        errorMessages.add(
-            ErrorMessageUtil.getMessage(
-                messages, ErrorMessageUtil.ERROR_CSS_IMPORT_URL_INVALID, new Object[] {}));
-        return;
-      }
-
-      URI importedStyleSheet = new URI(uri);
-
-      // canonicalize the URI
-      importedStyleSheet.normalize();
-
-      // validate the URL
-
-      if (!policy.getCommonRegularExpressions("offsiteURL").matches(importedStyleSheet.toString())
-          && !policy
-              .getCommonRegularExpressions("onsiteURL")
-              .matches(importedStyleSheet.toString())) {
-        errorMessages.add(
-            ErrorMessageUtil.getMessage(
-                messages,
-                ErrorMessageUtil.ERROR_CSS_IMPORT_URL_INVALID,
-                new Object[] {HTMLEntityEncoder.htmlEntityEncode(uri)}));
-        return;
-      }
-
-      if (!importedStyleSheet.isAbsolute()) {
-        // we have no concept of relative reference for free form text as an end user can't know
-        // where the corresponding free form will end up
-        if (tagName != null) {
-          errorMessages.add(
-              ErrorMessageUtil.getMessage(
-                  messages,
-                  ErrorMessageUtil.ERROR_CSS_TAG_RELATIVE,
-                  new Object[] {
-                    HTMLEntityEncoder.htmlEntityEncode(tagName),
-                    HTMLEntityEncoder.htmlEntityEncode(uri)
-                  }));
-        } else {
-          errorMessages.add(
-              ErrorMessageUtil.getMessage(
-                  messages,
-                  ErrorMessageUtil.ERROR_STYLESHEET_RELATIVE,
-                  new Object[] {HTMLEntityEncoder.htmlEntityEncode(uri)}));
-        }
-        return;
-      }
-
-      importedStyleSheets.add(importedStyleSheet);
-    } catch (URISyntaxException use) {
-      errorMessages.add(
-          ErrorMessageUtil.getMessage(
-              messages,
-              ErrorMessageUtil.ERROR_CSS_IMPORT_URL_INVALID,
-              new Object[] {HTMLEntityEncoder.htmlEntityEncode(uri)}));
-    }
+    // no-op, left due to interface implementation requirement
   }
 
   /*
