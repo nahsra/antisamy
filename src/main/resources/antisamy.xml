@@ -71,8 +71,8 @@
         <!-- This is for pseudo-element selector (ex. foo:pseudo-element { ... } -->
         <regexp name="cssPseudoElementSelector" value=":[a-zA-Z0-9\-_]+" />
 
-        <!-- This is to list out any psuedo-element names that are *not* valid -->
-        <regexp name="cssPsuedoElementExclusion" value="" />
+        <!-- This is to list out any pseudo-element names that are *not* valid -->
+        <regexp name="cssPseudoElementExclusion" value="" />
 
         <!-- This is for attribute selectors (ex. foo[attr=value] { ... } -->
         <regexp name="cssAttributeSelector" value="\[[a-zA-Z0-9\-_]+((=|~=|\|=){1}[a-zA-Z0-9\-_]+){1}\]" />
@@ -108,6 +108,10 @@
         <!-- Used for CSS Color specifications (complex regexp expresses integer values of 0-255) -->
         <regexp name="rgbCode"
             value="rgb\(([1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),([1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),([1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\)" />
+
+        <!-- Relative color values between 0%-100% are also allowed -->
+        <regexp name="rgbPercentage"
+                value="rgb\(([0-9][0-9]?|100)\.?\d*%,([0-9][0-9]?|100)\.?\d*%,([0-9][0-9]?|100)\.?\d*%\)" />
 
         <!-- CSS2 Allowed System Color Values -->
         <regexp name="systemColor"
@@ -1141,6 +1145,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
         </property>
@@ -1207,6 +1212,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
         </property>
@@ -1221,6 +1227,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
         </property>
@@ -1235,6 +1242,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
         </property>
@@ -1249,6 +1257,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
         </property>
@@ -1263,6 +1272,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
         </property>
@@ -1314,6 +1324,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
         </property>
@@ -1693,6 +1704,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
         </property>
@@ -2348,6 +2360,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
             <shorthand-list>
@@ -2366,6 +2379,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
             <shorthand-list>
@@ -2384,6 +2398,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
             <shorthand-list>
@@ -2402,6 +2417,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
             <shorthand-list>
@@ -2420,6 +2436,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
             </regexp-list>
             <shorthand-list>
@@ -2587,6 +2604,7 @@
                 <regexp name="colorName" />
                 <regexp name="colorCode" />
                 <regexp name="rgbCode" />
+                <regexp name="rgbPercentage" />
                 <regexp name="systemColor" />
                 <regexp name="length" />
             </regexp-list>

@@ -28,8 +28,12 @@
  */
 package org.owasp.validator.css;
 
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.regex.Pattern;
+import org.apache.batik.css.parser.CSSLexicalUnit;
+import org.owasp.validator.css.media.CssMediaFeature;
+import org.owasp.validator.css.media.CssMediaQuery;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.model.AntiSamyPattern;
@@ -54,6 +58,8 @@ import org.w3c.css.sac.SimpleSelector;
  * @author Jason Li
  */
 public class CssValidator {
+
+  private static final LexicalUnit EMPTYSTRINGLEXICALUNIT = CSSLexicalUnit.createString(LexicalUnit.SAC_STRING_VALUE, "", null);
 
   private final Policy policy;
 
@@ -199,13 +205,13 @@ public class CssValidator {
             policy.getCommonRegularExpressions("cssIDSelector"),
             policy.getCommonRegularExpressions("cssIDExclusion"));
       case Condition.SAC_PSEUDO_CLASS_CONDITION:
-        // this is a basic psuedo element condition; compare condition
+        // this is a basic pseudo-element condition; compare condition
         // against valid pattern and is not blacklisted by exclusion pattern
 
         return validateCondition(
             (AttributeCondition) condition,
             policy.getCommonRegularExpressions("cssPseudoElementSelector"),
-            policy.getCommonRegularExpressions("cssPsuedoElementExclusion"));
+            policy.getCommonRegularExpressions("cssPseudoElementExclusion"));
       case Condition.SAC_BEGIN_HYPHEN_ATTRIBUTE_CONDITION:
       case Condition.SAC_ONE_OF_ATTRIBUTE_CONDITION:
       case Condition.SAC_ATTRIBUTE_CONDITION:
@@ -344,15 +350,15 @@ public class CssValidator {
         // this is a rgb encoded color
         StringBuffer sb = new StringBuffer("rgb(");
         LexicalUnit param = lu.getParameters();
-        sb.append(param.getIntegerValue()); // R value
+        sb.append(getColorValue(param)); // R value
         sb.append(',');
         param = param.getNextLexicalUnit(); // comma
         param = param.getNextLexicalUnit(); // G value
-        sb.append(param.getIntegerValue());
+        sb.append(getColorValue(param));
         sb.append(',');
         param = param.getNextLexicalUnit(); // comma
         param = param.getNextLexicalUnit(); // B value
-        sb.append(param.getIntegerValue());
+        sb.append(getColorValue(param));
         sb.append(')');
 
         return sb.toString();
@@ -361,10 +367,42 @@ public class CssValidator {
         return "inherit";
       case LexicalUnit.SAC_OPERATOR_COMMA:
         return ",";
+      case LexicalUnit.SAC_OPERATOR_SLASH:
+        return "/";
+      case LexicalUnit.SAC_FUNCTION:
+        StringBuilder builder = new StringBuilder();
+
+        // Append the function name, e.g., "var"
+        builder.append(lu.getFunctionName()).append("(");
+
+        LexicalUnit params = lu.getParameters();
+        while (params != null) {
+          String paramsValue = lexicalValueToString(params);
+          if (paramsValue == null) {
+            return null;
+          }
+          builder.append(paramsValue);
+          params = params.getNextLexicalUnit();
+          if (params != null) {
+            builder.append(", ");
+          }
+        }
+
+        // Check for fallback (some functions like "var" have fallback values)
+        LexicalUnit fallback = lu.getPreviousLexicalUnit();
+        if (fallback != null) {
+          String fallbackValue = lexicalValueToString(fallback);
+          if (fallbackValue == null) {
+            return null;
+          }
+          builder.append(", ").append(fallbackValue);
+        }
+
+        builder.append(")");
+        return builder.toString();
       case LexicalUnit.SAC_ATTR:
       case LexicalUnit.SAC_COUNTER_FUNCTION:
       case LexicalUnit.SAC_COUNTERS_FUNCTION:
-      case LexicalUnit.SAC_FUNCTION:
       case LexicalUnit.SAC_RECT_FUNCTION:
       case LexicalUnit.SAC_SUB_EXPRESSION:
       case LexicalUnit.SAC_UNICODERANGE:
@@ -372,6 +410,61 @@ public class CssValidator {
         // these are properties that shouldn't be necessary for most run
         // of the mill HTML/CSS
         return null;
+    }
+  }
+
+  /**
+   * Returns whether the given {@link CssMediaQuery} is valid
+   *
+   * @param mediaQuery mediaQuery
+   * @return valid mediaQuery?
+   */
+  public boolean isValidMediaQuery(CssMediaQuery mediaQuery) {
+    // check mediaType against allowed media-HTML-Attribute
+    Property mediatype = policy.getPropertyByName("_mediatype");
+    if (mediatype == null) {
+      return false;
+    }
+
+    String mediaTypeString = mediaQuery.getMediaType().toString().toLowerCase();
+    boolean isRegExpAllowed = false;
+    for (Pattern pattern : mediatype.getAllowedRegExp()) {
+      isRegExpAllowed |= pattern.matcher(mediaTypeString).matches();
+    }
+    boolean isValidMediaType = mediatype.getAllowedValues().contains(mediaTypeString) || isRegExpAllowed;
+    if (!isValidMediaType) {
+      return false;
+    }
+
+    for (CssMediaFeature feature : mediaQuery.getMediaFeatures()) {
+      LexicalUnit expression = feature.getExpression();
+      if (expression == null) {
+        expression = EMPTYSTRINGLEXICALUNIT;
+      }
+      if (!isValidMediaFeature(feature.getName(), expression)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean isValidMediaFeature(String name, LexicalUnit lu) {
+    return isValidProperty("_mediafeature_" + name, lu);
+  }
+
+  /**
+   * Returns color value as int.
+   * Maps percentages to values between 0 and 255.
+   * Negative percentages are mapped to 0, values bigger than 100% to 255.
+   *
+   * @param param LexicalUnit
+   * @return color value as int
+   */
+  private static String getColorValue(LexicalUnit param) {
+    if (param.getLexicalUnitType() == LexicalUnit.SAC_PERCENTAGE) {
+      return new DecimalFormat("0.#").format(param.getFloatValue()) + "%";
+    } else {
+      return "" + param.getIntegerValue();
     }
   }
 }

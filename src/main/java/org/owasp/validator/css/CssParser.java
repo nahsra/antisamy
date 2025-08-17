@@ -28,7 +28,16 @@
  */
 package org.owasp.validator.css;
 
+import static org.owasp.validator.css.media.CssMediaQueryLogicalOperator.AND;
+import static org.owasp.validator.css.media.CssMediaQueryLogicalOperator.OR;
+
+import java.util.Objects;
+import org.apache.batik.css.parser.CSSSACMediaList;
 import org.apache.batik.css.parser.LexicalUnits;
+import org.owasp.validator.css.media.CssMediaFeature;
+import org.owasp.validator.css.media.CssMediaQuery;
+import org.owasp.validator.css.media.CssMediaQueryList;
+import org.owasp.validator.css.media.CssMediaQueryLogicalOperator;
 import org.w3c.css.sac.CSSException;
 import org.w3c.css.sac.CSSParseException;
 import org.w3c.css.sac.LexicalUnit;
@@ -94,6 +103,154 @@ public class CssParser extends org.apache.batik.css.parser.Parser {
         }
         documentHandler.property(name, exp, important);
       }
+    }
+  }
+
+  @Override
+  protected CSSSACMediaList parseMediaList() {
+    CssMediaQueryList mediaList = new CssMediaQueryList();
+
+    mediaList.append(parseMediaQuery());
+    while (hasAnotherMediaQuery()) {
+      nextIgnoreSpaces();
+      mediaList.append(parseMediaQuery());
+    }
+
+    return mediaList;
+  }
+
+  private boolean hasAnotherMediaQuery() {
+    return current == LexicalUnits.COMMA || (current == LexicalUnits.IDENTIFIER && scanner.getStringValue().equals(OR.toString()));
+  }
+
+  protected CssMediaQuery parseMediaQuery() {
+    CssMediaQuery query = new CssMediaQuery();
+    String mediaType = null;
+    CssMediaQueryLogicalOperator logicalOperator = null;
+    switch (current) {
+      case LexicalUnits.LEFT_CURLY_BRACE:
+        mediaType = "";
+        query.setMediaType(mediaType);
+        return query;
+      case LexicalUnits.LEFT_BRACE:
+        mediaType = "";
+        break;
+      case LexicalUnits.IDENTIFIER:
+        logicalOperator = CssMediaQueryLogicalOperator.parse(scanner.getStringValue());
+        if (logicalOperator != null) {
+          switch (logicalOperator) {
+            case ONLY:
+              parseLogicalOperatorOnly();
+              mediaType = parseMediaType();
+              break;
+            case NOT:
+              mediaType = parseLogicalOperatorNot();
+              break;
+            case AND:
+            case OR:
+            case COMMA:
+              throw createCSSParseException("identifier");
+          }
+        } else {
+          mediaType = parseMediaType();
+        }
+        break;
+      default:
+        throw createCSSParseException("identifier");
+    }
+    query.setMediaType(mediaType);
+    query.setLogicalOperator(logicalOperator);
+
+    if (Objects.equals(mediaType, "")) {
+      query.addMediaFeature(parseMediaFeature());
+    }
+
+    while (current == LexicalUnits.IDENTIFIER && CssMediaQueryLogicalOperator.parse(scanner.getStringValue()) == AND) {
+      nextIgnoreSpaces();
+      query.addMediaFeature(parseMediaFeature());
+    }
+    return query;
+  }
+
+  private String parseMediaType() {
+    String mediaType = scanner.getStringValue();
+    if (mediaType == null) {
+      throw createCSSParseException("identifier");
+    }
+    nextIgnoreSpaces();
+    return mediaType;
+  }
+
+  private String parseLogicalOperatorNot() {
+    String mediaType;
+    if (nextIgnoreSpaces() == LexicalUnits.IDENTIFIER) {
+      mediaType = parseMediaType();
+    } else {
+      mediaType = "";
+    }
+    return mediaType;
+  }
+
+  private void parseLogicalOperatorOnly() {
+    if (nextIgnoreSpaces() != LexicalUnits.IDENTIFIER) {
+      throw createCSSParseException("identifier");
+    }
+  }
+
+  protected CssMediaFeature parseMediaFeature() {
+    if (current != LexicalUnits.LEFT_BRACE) {
+      throw createCSSParseException("'(' expected.");
+    }
+    nextIgnoreSpaces();
+    String namePrefix = "";
+    if (current == LexicalUnits.MINUS) {
+      nextIgnoreSpaces();
+      namePrefix = "-";
+    }
+    if (current != LexicalUnits.IDENTIFIER) {
+      throw createCSSParseException("identifier");
+    }
+    String name = namePrefix + scanner.getStringValue();
+    nextIgnoreSpaces();
+    LexicalUnit exp = null;
+    if (current == LexicalUnits.COLON) {
+      nextIgnoreSpaces();
+      exp = parseTerm(null);
+    }
+    if (current != LexicalUnits.RIGHT_BRACE) {
+      throw createCSSParseException("')' expected.");
+    }
+    nextIgnoreSpaces();
+
+    return new CssMediaFeature(name, exp);
+  }
+
+  @Override
+  protected void parseMediaRule() {
+    CSSSACMediaList ml = parseMediaList();
+    try {
+      documentHandler.startMedia(ml);
+
+      if (current != LexicalUnits.LEFT_CURLY_BRACE) {
+        reportError("left.curly.brace");
+      } else {
+        nextIgnoreSpaces();
+
+        loop:
+        for (; ; ) {
+          switch (current) {
+            case LexicalUnits.EOF:
+            case LexicalUnits.RIGHT_CURLY_BRACE:
+              break loop;
+            default:
+              parseRuleSet();
+          }
+        }
+
+        nextIgnoreSpaces();
+      }
+    } finally {
+      documentHandler.endMedia(ml);
     }
   }
 }
