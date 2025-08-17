@@ -96,11 +96,15 @@ public class CssHandler implements DocumentHandler {
 
   private MediaState mediaState = MediaState.OUTSIDE;
 
-  private enum MediaState {INSIDE, OUTSIDE, DENIED}
+  private enum MediaState {
+    INSIDE,
+    OUTSIDE,
+    DENIED
+  }
 
   /**
-   * Constructs a handler for stylesheets using the given policy.
-   * This constructor to be used when there is no tag name associated with this inline style.
+   * Constructs a handler for stylesheets using the given policy. This constructor to be used when
+   * there is no tag name associated with this inline style.
    *
    * @param policy the policy to use
    * @param errorMessages the List of error messages to add error messages too if there are errors
@@ -452,7 +456,8 @@ public class CssHandler implements DocumentHandler {
       }
       styleSheet.append(query.getMediaType());
       for (CssMediaFeature feature : query.getMediaFeatures()) {
-        if (feature == query.getMediaFeatures().get(0) && Objects.equals(query.getMediaType(), "")) {
+        if (feature == query.getMediaFeatures().get(0)
+            && Objects.equals(query.getMediaType(), "")) {
           styleSheet.append("(");
         } else {
           styleSheet.append(" and (");
