@@ -67,7 +67,9 @@ import org.xml.sax.SAXNotSupportedException;
  * </code> method invocation.
  *
  * @author Arshan Dabirsiaghi
+ * @deprecated Support for DOM parser will be removed.
  */
+@Deprecated
 public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
   private Document document = new DocumentImpl();
   private DocumentFragment dom = document.createDocumentFragment();
@@ -97,7 +99,9 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
    * Create an instance of this class configured to use the specified policy.
    *
    * @param policy The policy to use.
+   * @deprecated Support for DOM parser will be removed.
    */
+  @Deprecated
   public AntiSamyDOMScanner(Policy policy) {
     super(policy);
   }
@@ -107,7 +111,9 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
    *
    * @throws PolicyException thrown when there is a problem validating or parsing the policy file.
    *     Any validation errors not caught by the XML validation will be thrown with this exception.
+   * @deprecated Support for DOM parser will be removed.
    */
+  @Deprecated
   public AntiSamyDOMScanner() throws PolicyException {
     super();
   }
@@ -122,7 +128,9 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
    *     in the CleanResults does NOT necessarily indicate the input was safe (i.e., contained no
    *     attacks).
    * @throws ScanException When there is a problem encountered while scanning the HTML input.
+   * @deprecated Support for DOM parser will be removed.
    */
+  @Deprecated
   @Override
   public CleanResults scan(String html) throws ScanException {
 
@@ -219,6 +227,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     }
   }
 
+  @Deprecated
   static DOMFragmentParser getDomParser()
       throws SAXNotRecognizedException, SAXNotSupportedException {
     DOMFragmentParser parser = new DOMFragmentParser();
@@ -874,6 +883,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     return eleAsString.toString();
   }
 
+  @Deprecated
   @Override
   public CleanResults getResults() {
     return results;
