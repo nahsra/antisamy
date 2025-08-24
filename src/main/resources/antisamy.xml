@@ -13,10 +13,6 @@
         <directive name="validateParamAsEmbed" value="true" />
         <directive name="noopenerAndNoreferrerAnchors" value="true" />
 
-        <!-- remember, this won't work for relative URIs - AntiSamy doesn't know anything about the URL or your web structure -->
-        <directive name="embedStyleSheets" value="false" />
-        <directive name="connectionTimeout" value="5000" />
-        <directive name="maxStyleSheetImports" value="3" />
 
         <!-- Allows the use of dynamic attributes (i.e. HTML5 "data-") -->
         <directive name="allowDynamicAttributes" value="true" />
@@ -110,8 +106,7 @@
             value="rgb\(([1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),([1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),([1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\)" />
 
         <!-- Relative color values between 0%-100% are also allowed -->
-        <regexp name="rgbPercentage"
-                value="rgb\(([0-9][0-9]?|100)\.?\d*%,([0-9][0-9]?|100)\.?\d*%,([0-9][0-9]?|100)\.?\d*%\)" />
+        <regexp name="rgbPercentage" value="rgb\(([0-9][0-9]?|100)\.?\d*%,([0-9][0-9]?|100)\.?\d*%,([0-9][0-9]?|100)\.?\d*%\)" />
 
         <!-- CSS2 Allowed System Color Values -->
         <regexp name="systemColor"

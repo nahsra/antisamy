@@ -39,7 +39,6 @@ import java.util.ResourceBundle;
 import org.apache.batik.css.parser.CSSSelectorList;
 import org.junit.Before;
 import org.junit.Test;
-import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.scan.Constants;
 import org.owasp.validator.html.test.TestPolicy;
 import org.owasp.validator.html.util.ErrorMessageUtil;
@@ -64,70 +63,6 @@ public class CssHandlerTest {
           ResourceBundle.getBundle(
               "AntiSamy", new Locale(Constants.DEFAULT_LOCALE_LANG, Constants.DEFAULT_LOCALE_LOC));
     }
-  }
-
-  @Test
-  public void testImportStyleErrors() {
-    // Tests different errors when building a list of URIs for importing styles
-    List<String> errorMessages = new ArrayList<String>();
-    TestPolicy revised = policy.cloneWithDirective(Policy.EMBED_STYLESHEETS, "true");
-    CssHandler handler = new CssHandler(revised, errorMessages, messages, "style");
-
-    handler.importStyle(null, null, null);
-    assertThat(handler.getErrorMessages().size(), is(1));
-    assertThat(
-        handler.getErrorMessages().toArray()[0],
-        is(
-            ErrorMessageUtil.getMessage(
-                messages, ErrorMessageUtil.ERROR_CSS_IMPORT_URL_INVALID, new Object[] {})));
-
-    errorMessages.clear();
-    handler.importStyle("javascript:invalidUrl()", null, null);
-    assertThat(handler.getErrorMessages().size(), is(1));
-    assertThat(
-        handler.getErrorMessages().toArray()[0],
-        is(
-            ErrorMessageUtil.getMessage(
-                messages,
-                ErrorMessageUtil.ERROR_CSS_IMPORT_URL_INVALID,
-                new Object[] {HTMLEntityEncoder.htmlEntityEncode("javascript:invalidUrl()")})));
-
-    errorMessages.clear();
-    handler.importStyle("Invalid:\\Url", null, null);
-    assertThat(handler.getErrorMessages().size(), is(1));
-    assertThat(
-        handler.getErrorMessages().toArray()[0],
-        is(
-            ErrorMessageUtil.getMessage(
-                messages,
-                ErrorMessageUtil.ERROR_CSS_IMPORT_URL_INVALID,
-                new Object[] {HTMLEntityEncoder.htmlEntityEncode("Invalid:\\Url")})));
-
-    errorMessages.clear();
-    handler.importStyle("relative.url", null, null);
-    assertThat(handler.getErrorMessages().size(), is(1));
-    assertThat(
-        handler.getErrorMessages().toArray()[0],
-        is(
-            ErrorMessageUtil.getMessage(
-                messages,
-                ErrorMessageUtil.ERROR_CSS_TAG_RELATIVE,
-                new Object[] {
-                  HTMLEntityEncoder.htmlEntityEncode("style"),
-                  HTMLEntityEncoder.htmlEntityEncode("relative.url")
-                })));
-
-    errorMessages.clear();
-    CssHandler handlerWithoutTag = new CssHandler(revised, errorMessages, messages, null);
-    handlerWithoutTag.importStyle("relative.url", null, null);
-    assertThat(handler.getErrorMessages().size(), is(1));
-    assertThat(
-        handler.getErrorMessages().toArray()[0],
-        is(
-            ErrorMessageUtil.getMessage(
-                messages,
-                ErrorMessageUtil.ERROR_STYLESHEET_RELATIVE,
-                new Object[] {HTMLEntityEncoder.htmlEntityEncode("relative.url")})));
   }
 
   @Test

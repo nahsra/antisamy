@@ -28,7 +28,6 @@
 package org.owasp.validator.css;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -38,8 +37,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import org.junit.Before;
 import org.junit.Test;
-import org.owasp.validator.html.CleanResults;
-import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.ScanException;
 import org.owasp.validator.html.scan.Constants;
 import org.owasp.validator.html.test.TestPolicy;
@@ -69,7 +66,6 @@ public class CssScannerTest {
     final String input =
         "@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/classic.css);\n"
             + ".very-specific-antisamy {font: 15pt \"Arial\"; color: blue;}";
-    // If not passing "shouldParseImportedStyles" then it's false by default.
     CssScanner scanner = new CssScanner(policy, messages);
     String result = scanner.scanStyleSheet(input, 1000).getCleanHTML();
     // If style sheet was imported, .grid_1 class should be there.
@@ -82,50 +78,5 @@ public class CssScannerTest {
     final String input = "<![CDATA[.very-specific-antisamy {font: 15pt \"Arial\"; color: blue;}]]>";
     CssScanner scanner = new CssScanner(policy, messages);
     assertThat(scanner.scanStyleSheet(input, 1000).getCleanHTML(), containsString("CDATA"));
-  }
-
-  @Test
-  public void testImportLimiting() throws ScanException {
-    /* To be removed when deprecated importing styles feature is removed. */
-
-    final String input =
-        "@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/classic.css);\n"
-            + "@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/providers.css);\n"
-            + ".very-specific-antisamy {font: 15pt \"Arial\"; color: blue;}";
-    TestPolicy revised =
-        policy
-            .cloneWithDirective(Policy.EMBED_STYLESHEETS, "true")
-            .cloneWithDirective(Policy.MAX_INPUT_SIZE, "500")
-            .cloneWithDirective(Policy.MAX_STYLESHEET_IMPORTS, "2");
-    CssScanner scanner = new CssScanner(revised, messages, true);
-    CleanResults result = scanner.scanStyleSheet(input, 500);
-    // Both sheets are larger than 500 bytes
-    assertThat(result.getErrorMessages().size(), is(2));
-    assertThat(result.getErrorMessages().get(0), containsString("500"));
-
-    // Limit to only one import
-    revised =
-        policy
-            .cloneWithDirective(Policy.EMBED_STYLESHEETS, "true")
-            .cloneWithDirective(Policy.MAX_STYLESHEET_IMPORTS, "1");
-    scanner = new CssScanner(revised, messages, true);
-    result = scanner.scanStyleSheet(input, 500000);
-    // If only first style sheet was imported, .grid_1 class should be there and
-    // .janrain-provider150-sprit classes should not.
-    assertThat(result.getCleanHTML(), containsString(".grid_1"));
-    assertThat(result.getCleanHTML(), not(containsString(".janrain-provider150-sprit")));
-
-    // Force timeout errors
-    revised =
-        policy
-            .cloneWithDirective(Policy.EMBED_STYLESHEETS, "true")
-            .cloneWithDirective(Policy.CONNECTION_TIMEOUT, "1");
-    scanner = new CssScanner(revised, messages, true);
-    result = scanner.scanStyleSheet(input, 500000);
-    assertThat(result.getErrorMessages().size(), is(2));
-    // If style sheets were imported, .grid_1 and .janrain-provider150-sprit classes should be
-    // there.
-    assertThat(result.getCleanHTML(), not(containsString(".grid_1")));
-    assertThat(result.getCleanHTML(), not(containsString(".janrain-provider150-sprit")));
   }
 }

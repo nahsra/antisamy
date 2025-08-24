@@ -55,7 +55,6 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.binary.Base64;
-import org.hamcrest.text.MatchesPattern;
 import org.junit.Before;
 import org.junit.Test;
 import org.owasp.validator.html.AntiSamy;
@@ -120,8 +119,8 @@ public class AntiSamyTest {
       messages = ResourceBundle.getBundle("AntiSamy", Locale.getDefault());
     } catch (MissingResourceException mre) {
       messages =
-              ResourceBundle.getBundle(
-                      "AntiSamy", new Locale(Constants.DEFAULT_LOCALE_LANG, Constants.DEFAULT_LOCALE_LOC));
+          ResourceBundle.getBundle(
+              "AntiSamy", new Locale(Constants.DEFAULT_LOCALE_LANG, Constants.DEFAULT_LOCALE_LOC));
     }
   }
 
@@ -1812,8 +1811,8 @@ public class AntiSamyTest {
     CleanResults results_dom = as.scan(test, policy, AntiSamy.DOM);
 
     assertEquals(
-            "whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\"/>",
-            results_sax.getCleanHTML());
+        "whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\"/>",
+        results_sax.getCleanHTML());
     assertEquals(results_sax.getCleanHTML(), results_dom.getCleanHTML());
   }
 
@@ -2295,48 +2294,6 @@ public class AntiSamyTest {
   }
 
   @Test
-  public void testImportedStylesParsing() throws ScanException, PolicyException {
-    // Test that imported style sheets can be parsed and order is correct
-    final String input =
-        "<style type='text/css'>\n"
-            + "\t@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/classic.css);\n"
-            + "\t@import url(https://raw.githubusercontent.com/nahsra/antisamy/main/src/test/resources/s/slashdot.org_files/providers.css);\n"
-            + "\t.very-specific-antisamy {font: 15pt \"Arial\"; color: blue;}\n"
-            + "</style>";
-    Policy revised =
-        policy
-            .cloneWithDirective(Policy.EMBED_STYLESHEETS, "true")
-            .cloneWithDirective(Policy.FORMAT_OUTPUT, "false");
-    // Styles are imported
-    String cleanHtmlDOM = as.scan(input, revised, AntiSamy.DOM).getCleanHTML();
-    String cleanHtmlSAX = as.scan(input, revised, AntiSamy.SAX).getCleanHTML();
-    assertThat(cleanHtmlDOM, not(containsString("<![CDATA[/* */]]>")));
-    assertThat(cleanHtmlSAX, not(containsString("<![CDATA[/* */]]>")));
-    // Order is correct:
-    //  First import: grid_1 class
-    //  Second import: janrain-provider150-sprit class
-    //  Original styles: very-specific-antisamy class
-    final Pattern p =
-        Pattern.compile(
-            ".*?\\.grid_1.*?\\.janrain-provider150-sprit.*?\\.very-specific-antisamy.*?",
-            Pattern.DOTALL);
-    assertThat(cleanHtmlDOM, MatchesPattern.matchesPattern(p));
-    assertThat(cleanHtmlSAX, MatchesPattern.matchesPattern(p));
-
-    Policy revised2 =
-        policy
-            .cloneWithDirective(Policy.EMBED_STYLESHEETS, "false")
-            .cloneWithDirective(Policy.FORMAT_OUTPUT, "false");
-    // Styles are not imported
-    cleanHtmlDOM = as.scan(input, revised2, AntiSamy.DOM).getCleanHTML();
-    cleanHtmlSAX = as.scan(input, revised2, AntiSamy.SAX).getCleanHTML();
-    assertThat(cleanHtmlDOM, not(containsString(".grid_1")));
-    assertThat(cleanHtmlSAX, not(containsString(".grid_1")));
-    assertThat(cleanHtmlDOM, not(containsString(".janrain-provider150-sprit")));
-    assertThat(cleanHtmlSAX, not(containsString(".janrain-provider150-sprit")));
-  }
-
-  @Test
   public void testNoopenerAndNoreferrer() throws ScanException, PolicyException {
     Map<String, Attribute> map = new HashMap<>();
     map.put(
@@ -2728,29 +2685,30 @@ public class AntiSamyTest {
 
   @Test
   public void testGithubIssue546() throws ScanException, PolicyException {
-    //Given
+    // Given
     String taintedHtml = "<style>.cl { color: rgb(50%, 20.5%, 100%); }</style>";
 
-    //When
+    // When
     CleanResults crDom = as.scan(taintedHtml, policy, AntiSamy.DOM);
     CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
 
-    //Then
+    // Then
     String expectedCleanHtml = "<style>*.cl {\n\tcolor: rgb(50%,20.5%,100%);\n}\n</style>";
     assertEquals(expectedCleanHtml, crDom.getCleanHTML());
     assertEquals(expectedCleanHtml, crSax.getCleanHTML());
   }
 
   @Test
-  public void testGithubIssue546FaultyPercentagesGetFilteredByRegex() throws ScanException, PolicyException {
-    //Given
+  public void testGithubIssue546FaultyPercentagesGetFilteredByRegex()
+      throws ScanException, PolicyException {
+    // Given
     String taintedHtml = "<style>.cl { color: rgb(50%, -20%, 150%); }</style>";
 
-    //When
+    // When
     CleanResults crDom = as.scan(taintedHtml, policy, AntiSamy.DOM);
     CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
 
-    //Then
+    // Then
     String expectedCleanHtml = "<style>*.cl {\n}\n</style>";
     assertEquals(expectedCleanHtml, crDom.getCleanHTML());
     assertEquals(expectedCleanHtml, crSax.getCleanHTML());
@@ -2758,110 +2716,136 @@ public class AntiSamyTest {
 
   @Test
   public void testGithubIssue552() throws ScanException, PolicyException {
-    Pattern positiveLength = Pattern.compile("((\\+)?0|(\\+)?([0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?)(rem|vw|vh|em|ex|px|in|cm|mm|pt|pc))");
+    Pattern positiveLength =
+        Pattern.compile(
+            "((\\+)?0|(\\+)?([0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?)(rem|vw|vh|em|ex|px|in|cm|mm|pt|pc))");
     Pattern integer = Pattern.compile("([-+])?[0-9]+");
-    Property mediaType = new Property("_mediatype",
-                                      Collections.emptyList(),
-                                      Arrays.asList("", "all", "print", "screen"),
-                                      Collections.emptyList(),
-                                      "",
-                                      "remove");
-    Property minWidth = new Property("_mediafeature_min-width",
-                                     Collections.singletonList(positiveLength),
-                                     Collections.emptyList(),
-                                     Collections.emptyList(),
-                                     "",
-                                     "remove");
-    Property maxWidth = new Property("_mediafeature_max-width",
-                                     Collections.singletonList(positiveLength),
-                                     Collections.emptyList(),
-                                     Collections.emptyList(),
-                                     "",
-                                     "remove");
-    Property color = new Property("_mediafeature_color",
-                                  Collections.singletonList(integer),
-                                  Collections.singletonList(""),
-                                  Collections.emptyList(),
-                                  "",
-                                  "remove");
-    Property orientation = new Property("_mediafeature_orientation",
-                                        Collections.emptyList(),
-                                        Arrays.asList("portrait", "landscape"),
-                                        Collections.emptyList(),
-                                        "",
-                                        "remove");
-    Property grid = new Property("_mediafeature_grid",
-                                 Collections.emptyList(),
-                                 Arrays.asList("", "-1", "-0", "0", "1"),
-                                 Collections.emptyList(),
-                                 "",
-                                 "remove");
-    Property monochrome = new Property("_mediafeature_monochrome",
-                                       Collections.singletonList(integer),
-                                       Collections.singletonList(""),
-                                       Collections.emptyList(),
-                                       "",
-                                       "remove");
+    Property mediaType =
+        new Property(
+            "_mediatype",
+            Collections.emptyList(),
+            Arrays.asList("", "all", "print", "screen"),
+            Collections.emptyList(),
+            "",
+            "remove");
+    Property minWidth =
+        new Property(
+            "_mediafeature_min-width",
+            Collections.singletonList(positiveLength),
+            Collections.emptyList(),
+            Collections.emptyList(),
+            "",
+            "remove");
+    Property maxWidth =
+        new Property(
+            "_mediafeature_max-width",
+            Collections.singletonList(positiveLength),
+            Collections.emptyList(),
+            Collections.emptyList(),
+            "",
+            "remove");
+    Property color =
+        new Property(
+            "_mediafeature_color",
+            Collections.singletonList(integer),
+            Collections.singletonList(""),
+            Collections.emptyList(),
+            "",
+            "remove");
+    Property orientation =
+        new Property(
+            "_mediafeature_orientation",
+            Collections.emptyList(),
+            Arrays.asList("portrait", "landscape"),
+            Collections.emptyList(),
+            "",
+            "remove");
+    Property grid =
+        new Property(
+            "_mediafeature_grid",
+            Collections.emptyList(),
+            Arrays.asList("", "-1", "-0", "0", "1"),
+            Collections.emptyList(),
+            "",
+            "remove");
+    Property monochrome =
+        new Property(
+            "_mediafeature_monochrome",
+            Collections.singletonList(integer),
+            Collections.singletonList(""),
+            Collections.emptyList(),
+            "",
+            "remove");
 
-    checkStyleTag("@media screen {}",
-                  "@media screen {\n}\n",
-                  policy.addCssProperty(mediaType));
+    checkStyleTag("@media screen {}", "@media screen {\n}\n", policy.addCssProperty(mediaType));
 
-    checkStyleTag("@media screen,print {}",
-                  "@media screen, print {\n}\n",
-                  policy.addCssProperty(mediaType));
+    checkStyleTag(
+        "@media screen,print {}", "@media screen, print {\n}\n", policy.addCssProperty(mediaType));
 
-    checkStyleTag("@media only screen and (max-width: 639px) and (min-width: 300px) {}",
-                  "@media only screen and (max-width: 639.0px) and (min-width: 300.0px) {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(minWidth).addCssProperty(maxWidth));
+    checkStyleTag(
+        "@media only screen and (max-width: 639px) and (min-width: 300px) {}",
+        "@media only screen and (max-width: 639.0px) and (min-width: 300.0px) {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(minWidth).addCssProperty(maxWidth));
 
-    checkStyleTag("@media not screen, screen and (color), print and (orientation: portrait) {}",
-                  "@media not screen, screen and (color), print and (orientation: portrait) {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(color).addCssProperty(orientation));
+    checkStyleTag(
+        "@media not screen, screen and (color), print and (orientation: portrait) {}",
+        "@media not screen, screen and (color), print and (orientation: portrait) {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(color).addCssProperty(orientation));
 
-    checkStyleTag("@media not screen, print and (orientation: doesNotExist), all {}",
-                  "@media not screen, all {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(orientation));
+    checkStyleTag(
+        "@media not screen, print and (orientation: doesNotExist), all {}",
+        "@media not screen, all {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(orientation));
 
-    checkStyleTag("@media (min-width: 500.0px) {}",
-                  "@media (min-width: 500.0px) {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(minWidth));
+    checkStyleTag(
+        "@media (min-width: 500.0px) {}",
+        "@media (min-width: 500.0px) {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(minWidth));
 
-    checkStyleTag("@media (grid) {}",
-                  "@media (grid) {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(grid));
+    checkStyleTag(
+        "@media (grid) {}",
+        "@media (grid) {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(grid));
 
-    checkStyleTag("@media (monochrome) {}",
-                  "@media (monochrome) {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(monochrome));
+    checkStyleTag(
+        "@media (monochrome) {}",
+        "@media (monochrome) {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(monochrome));
 
-    checkStyleTag("@media (monochrome: 2) {}",
-                  "@media (monochrome: 2) {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(monochrome));
+    checkStyleTag(
+        "@media (monochrome: 2) {}",
+        "@media (monochrome: 2) {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(monochrome));
 
-    checkStyleTag("@media screen and (max-width: 639px) or only print {}",
-                  "@media screen and (max-width: 639.0px), only print {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+    checkStyleTag(
+        "@media screen and (max-width: 639px) or only print {}",
+        "@media screen and (max-width: 639.0px), only print {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(maxWidth));
 
-    checkStyleTag("@media print or (max-width: 639px) or only print {}",
-                  "@media print, (max-width: 639.0px), only print {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+    checkStyleTag(
+        "@media print or (max-width: 639px) or only print {}",
+        "@media print, (max-width: 639.0px), only print {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(maxWidth));
 
-    checkStyleTag("@media print or not (max-width: 639px), not print {}",
-                  "@media print, not (max-width: 639.0px), not print {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+    checkStyleTag(
+        "@media print or not (max-width: 639px), not print {}",
+        "@media print, not (max-width: 639.0px), not print {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(maxWidth));
 
-    checkStyleTag("@media only print or not (max-width: 639px) and (min-width: 500px), not print {}",
-                  "@media only print, not (max-width: 639.0px) and (min-width: 500.0px), not print {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(maxWidth).addCssProperty(minWidth));
+    checkStyleTag(
+        "@media only print or not (max-width: 639px) and (min-width: 500px), not print {}",
+        "@media only print, not (max-width: 639.0px) and (min-width: 500.0px), not print {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(maxWidth).addCssProperty(minWidth));
 
-    checkStyleTag("@media only print or not (max-width: 639px) and (min-width: 500px), not screen {}",
-                  "@media only print, not screen {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+    checkStyleTag(
+        "@media only print or not (max-width: 639px) and (min-width: 500px), not screen {}",
+        "@media only print, not screen {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(maxWidth));
 
-    checkStyleTag("@media screen {*{color: red;notAllowed: nope}}",
-                  "@media screen {\n* {\n\tcolor: red;\n}\n}\n",
-                  policy.addCssProperty(mediaType));
+    checkStyleTag(
+        "@media screen {*{color: red;notAllowed: nope}}",
+        "@media screen {\n* {\n\tcolor: red;\n}\n}\n",
+        policy.addCssProperty(mediaType));
 
     checkStyleTag("@media notValid screen {}", "", policy.addCssProperty(mediaType));
     checkStyleTag("@media doesNotExist {}", "", policy.addCssProperty(mediaType));
@@ -2893,16 +2877,17 @@ public class AntiSamyTest {
         policy.addCssProperty(mediaType));
   }
 
-  private void checkStyleTag(String input, String expected, Policy policy) throws ScanException, PolicyException {
-    //Given
+  private void checkStyleTag(String input, String expected, Policy policy)
+      throws ScanException, PolicyException {
+    // Given
     String taintedHtml = "<style>" + input + "</style>";
     String expectedCleanHtml = "<style>" + expected + "</style>";
 
-    //When
+    // When
     CleanResults crDom = as.scan(taintedHtml, policy, AntiSamy.DOM);
     CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
 
-    //Then
+    // Then
     if (expectedCleanHtml.equals("<style></style>")) {
       assertEquals("<style>/* */</style>", crDom.getCleanHTML());
       assertEquals("", crSax.getCleanHTML());
@@ -2914,36 +2899,45 @@ public class AntiSamyTest {
 
   @Test
   public void testGithubIssue554() throws ScanException, PolicyException {
-    checkInlineStyle("font: bold italic large Palatino, serif", "font: bold italic large Palatino , serif;");
+    checkInlineStyle(
+        "font: bold italic large Palatino, serif", "font: bold italic large Palatino , serif;");
     checkInlineStyle("font: 12pt/14pt sans-serif", "font: 12.0pt / 14.0pt sans-serif;");
     checkInlineStyle("font: 12.0pt / 14.0pt sans-serif;", "font: 12.0pt / 14.0pt sans-serif;");
     checkInlineStyle("font: 12.25pt sans-serif;", "font: 12.25pt sans-serif;");
-    checkInlineStyle("font: 14px/20px Tahoma, Geneva, Arial, Verdana, sans-serif",
-                     "font: 14.0px / 20.0px Tahoma , Geneva , Arial , Verdana , sans-serif;");
+    checkInlineStyle(
+        "font: 14px/20px Tahoma, Geneva, Arial, Verdana, sans-serif",
+        "font: 14.0px / 20.0px Tahoma , Geneva , Arial , Verdana , sans-serif;");
   }
 
-  private void checkInlineStyle(String inline, String expected) throws ScanException, PolicyException {
-    //Given
+  private void checkInlineStyle(String inline, String expected)
+      throws ScanException, PolicyException {
+    // Given
     String taintedHtml = "<html><head/><body><p style=\"" + inline + "\">test</p></body></html>";
-    String expectedCleanHtml = "<html>\n  <head/>\n  <body>\n    <p style=\"" + expected + "\">test</p>\n  </body>\n</html>";
+    String expectedCleanHtml =
+        "<html>\n  <head/>\n  <body>\n    <p style=\""
+            + expected
+            + "\">test</p>\n  </body>\n</html>";
 
-    //When
+    // When
     CleanResults crDom = as.scan(taintedHtml, policy, AntiSamy.DOM);
     CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
 
-    //Then
+    // Then
     assertEquals(expectedCleanHtml, crDom.getCleanHTML());
     assertEquals(expectedCleanHtml, crSax.getCleanHTML());
   }
 
   @Test
   public void testGithubIssue587() throws ScanException, PolicyException {
-    // "rel" attribute with SAX parser was being duplicated when it was already present at the beginning
+    // "rel" attribute with SAX parser was being duplicated when it was already present at the
+    // beginning
     // of the attribute list. Fix checks the correct index before processing.
-    String output = as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.DOM)
+    String output =
+        as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.DOM)
             .getCleanHTML();
     assertThat(output.split("rel=").length - 1, is(1));
-    output = as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.SAX)
+    output =
+        as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.SAX)
             .getCleanHTML();
     assertThat(output.split("rel=").length - 1, is(1));
   }

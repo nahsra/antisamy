@@ -51,23 +51,6 @@ public final class ErrorMessageUtil {
   public static final String ERROR_CSS_ATTRIBUTE_MALFORMED = "error.css.attribute.malformed";
   public static final String ERROR_CSS_TAG_MALFORMED = "error.css.tag.malformed";
 
-  public static final String ERROR_STYLESHEET_NOT_ALLOWED = "error.css.disallowed";
-
-  /** @deprecated Remote styles import feature to be removed and along with this error message. */
-  @Deprecated public static final String ERROR_CSS_IMPORT_DISABLED = "error.css.import.disabled";
-  /** @deprecated Remote styles import feature to be removed and along with this error message. */
-  @Deprecated public static final String ERROR_CSS_IMPORT_EXCEEDED = "error.css.import.exceeded";
-  /** @deprecated Remote styles import feature to be removed and along with this error message. */
-  @Deprecated public static final String ERROR_CSS_IMPORT_FAILURE = "error.css.import.failure";
-  /** @deprecated Remote styles import feature to be removed and along with this error message. */
-  @Deprecated public static final String ERROR_CSS_IMPORT_INPUT_SIZE = "error.css.import.toolarge";
-  /** @deprecated Remote styles import feature to be removed and along with this error message. */
-  @Deprecated
-  public static final String ERROR_CSS_IMPORT_URL_INVALID = "error.css.import.url.invalid";
-
-  public static final String ERROR_STYLESHEET_RELATIVE = "error.css.stylesheet.relative";
-  public static final String ERROR_CSS_TAG_RELATIVE = "error.css.tag.relative";
-
   public static final String ERROR_STYLESHEET_RULE_NOTFOUND = "error.css.stylesheet.rule.notfound";
   public static final String ERROR_CSS_TAG_RULE_NOTFOUND = "error.css.tag.rule.notfound";
 
