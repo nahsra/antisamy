@@ -77,7 +77,7 @@
         <project.java.target>1.8</project.java.target>
         <version.findsecbugs>1.14.0</version.findsecbugs>
         <version.slf4j>2.0.17</version.slf4j>
-        <version.spotbugs.maven>4.9.5.0</version.spotbugs.maven>
+        <version.spotbugs.maven>4.9.6.0</version.spotbugs.maven>
         <version.spotbugs>4.9.6</version.spotbugs>
     </properties>
 
