@@ -40,8 +40,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.batik.css.parser.ParseException;
-import org.apache.batik.css.parser.Parser;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -61,7 +59,9 @@ import org.owasp.validator.html.util.ErrorMessageUtil;
 import org.owasp.validator.html.util.HTMLEntityEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.css.sac.CSSException;
 import org.w3c.css.sac.InputSource;
+import org.w3c.css.sac.Parser;
 
 /**
  * Encapsulates the parsing and validation of a CSS stylesheet or inline declaration. To make use of
@@ -81,7 +81,7 @@ public class CssScanner {
   private static final String CDATA = "^\\s*<!\\[CDATA\\[(.*)\\]\\]>\\s*$";
 
   /** The parser to be used in any scanning */
-  private final Parser parser = new CssParser();
+  private final Parser parser = ParserFactory.makeParser();
 
   /** The policy file to be used in any scanning */
   private final InternalPolicy policy;
@@ -168,10 +168,9 @@ public class CssScanner {
       // should already have been counted by the caller since it was
       // embedded in the HTML
       parser.parseStyleSheet(new InputSource(new StringReader(taintedCss)));
-    } catch (IOException | ParseException e) {
-      /*
-       * ParseException, from batik, is unfortunately a RuntimeException.
-       */
+    } catch (IOException e) {
+      // @TODO: should a CSSException als be a ScanException or what's the reason
+      // that the batik ParseExeption was handle here but not the CSSException
       throw new ScanException(e);
     }
 
@@ -211,7 +210,7 @@ public class CssScanner {
       // note this does not count against the size limit because it
       // should already have been counted by the caller since it was
       // embedded in the HTML
-      parser.parseStyleDeclaration(taintedCss);
+      parseStyleDeclaration(parser, taintedCss);
     } catch (IOException ioe) {
       throw new ScanException(ioe);
     }
@@ -219,6 +218,11 @@ public class CssScanner {
     String cleaned = getCleanStylesheetWithImports(sizeLimit, errorMessages, handler);
 
     return new CleanResults(startOfScan, cleaned, null, errorMessages);
+  }
+
+  private static void parseStyleDeclaration(final Parser parser, final String cssDeclaration) throws CSSException, IOException {
+    InputSource source = new InputSource(new StringReader(cssDeclaration));
+    parser.parseStyleDeclaration(source);
   }
 
   private String getCleanStylesheetWithImports(
@@ -313,7 +317,10 @@ public class CssScanner {
                   final HttpEntity entity = response.getEntity();
                   try {
                     return entity != null ? EntityUtils.toString(entity) : null;
-                  } catch (final ParseException | org.apache.hc.core5.http.ParseException ex) {
+                    // @TODO: it is not clear how a Batik Parse Exception could be catched here
+                    // the response handler does not know anything about the css parsing
+                    // the css parsing happens after the response body (string) was returned.
+                  } catch (final org.apache.hc.core5.http.ParseException ex) {
                     throw new ClientProtocolException(ex);
                   }
                 } else {
