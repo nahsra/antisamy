@@ -33,11 +33,10 @@ import static org.owasp.validator.css.media.CssMediaQueryLogicalOperator.OR;
 
 import java.io.IOException;
 import java.util.Objects;
-
-import org.apache.batik.css.parser.Parser;
 import org.apache.batik.css.parser.CSSSACMediaList;
 import org.apache.batik.css.parser.LexicalUnits;
 import org.apache.batik.css.parser.ParseException;
+import org.apache.batik.css.parser.Parser;
 import org.owasp.validator.css.media.CssMediaFeature;
 import org.owasp.validator.css.media.CssMediaQuery;
 import org.owasp.validator.css.media.CssMediaQueryList;
@@ -50,10 +49,11 @@ import org.w3c.css.sac.SelectorList;
 
 public class CssParser extends Parser {
 
-  /** 
+  /**
    * Overwritten in order to keep all Batik References in one place.
+   *
    * @param InputSource the input source containing the Style Sheet to parse. Not null.
-  */
+   */
   @Override
   public void parseStyleSheet(InputSource source) throws CSSException, IOException {
     Objects.requireNonNull(source, "Source must not to be null.");
@@ -62,7 +62,7 @@ public class CssParser extends Parser {
     } catch (ParseException parserException) {
       throw new CSSException(parserException);
     }
-  } 
+  }
 
   @Override
   public void parseStyleSheet(String uri) throws CSSException, IOException {
@@ -194,7 +194,8 @@ public class CssParser extends Parser {
   }
 
   private boolean hasAnotherMediaQuery() {
-    return current == LexicalUnits.COMMA || (current == LexicalUnits.IDENTIFIER && scanner.getStringValue().equals(OR.toString()));
+    return current == LexicalUnits.COMMA
+        || (current == LexicalUnits.IDENTIFIER && scanner.getStringValue().equals(OR.toString()));
   }
 
   protected CssMediaQuery parseMediaQuery() {
@@ -239,7 +240,8 @@ public class CssParser extends Parser {
       query.addMediaFeature(parseMediaFeature());
     }
 
-    while (current == LexicalUnits.IDENTIFIER && CssMediaQueryLogicalOperator.parse(scanner.getStringValue()) == AND) {
+    while (current == LexicalUnits.IDENTIFIER
+        && CssMediaQueryLogicalOperator.parse(scanner.getStringValue()) == AND) {
       nextIgnoreSpaces();
       query.addMediaFeature(parseMediaFeature());
     }
