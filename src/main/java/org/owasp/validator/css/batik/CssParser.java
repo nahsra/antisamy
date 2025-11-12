@@ -42,8 +42,6 @@ import org.owasp.validator.css.media.CssMediaFeature;
 import org.owasp.validator.css.media.CssMediaQuery;
 import org.owasp.validator.css.media.CssMediaQueryList;
 import org.owasp.validator.css.media.CssMediaQueryLogicalOperator;
-import org.owasp.validator.css.media.CssMediaType;
-
 import org.w3c.css.sac.CSSException;
 import org.w3c.css.sac.CSSParseException;
 import org.w3c.css.sac.InputSource;
@@ -201,11 +199,15 @@ public class CssParser extends Parser {
 
   protected CssMediaQuery parseMediaQuery() {
     CssMediaQuery query = new CssMediaQuery();
-    CssMediaType mediaType = null;
+    String mediaType = null;
     CssMediaQueryLogicalOperator logicalOperator = null;
     switch (current) {
+      case LexicalUnits.LEFT_CURLY_BRACE:
+        mediaType = "";
+        query.setMediaType(mediaType);
+        return query;
       case LexicalUnits.LEFT_BRACE:
-        mediaType = CssMediaType.IMPLIED_ALL;
+        mediaType = "";
         break;
       case LexicalUnits.IDENTIFIER:
         logicalOperator = CssMediaQueryLogicalOperator.parse(scanner.getStringValue());
@@ -233,7 +235,7 @@ public class CssParser extends Parser {
     query.setMediaType(mediaType);
     query.setLogicalOperator(logicalOperator);
 
-    if (mediaType == CssMediaType.IMPLIED_ALL) {
+    if (Objects.equals(mediaType, "")) {
       query.addMediaFeature(parseMediaFeature());
     }
 
@@ -244,9 +246,8 @@ public class CssParser extends Parser {
     return query;
   }
 
-  private CssMediaType parseMediaType() {
-    CssMediaType mediaType;
-    mediaType = CssMediaType.parse(scanner.getStringValue());
+  private String parseMediaType() {
+    String mediaType = scanner.getStringValue();
     if (mediaType == null) {
       throw createCSSParseException("identifier");
     }
@@ -254,12 +255,12 @@ public class CssParser extends Parser {
     return mediaType;
   }
 
-  private CssMediaType parseLogicalOperatorNot() {
-    CssMediaType mediaType;
+  private String parseLogicalOperatorNot() {
+    String mediaType;
     if (nextIgnoreSpaces() == LexicalUnits.IDENTIFIER) {
       mediaType = parseMediaType();
     } else {
-      mediaType = CssMediaType.IMPLIED_ALL;
+      mediaType = "";
     }
     return mediaType;
   }

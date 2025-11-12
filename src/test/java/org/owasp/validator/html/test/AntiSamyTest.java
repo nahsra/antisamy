@@ -34,7 +34,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -68,7 +67,6 @@ import org.owasp.validator.html.model.Attribute;
 import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.model.Tag;
 import org.owasp.validator.html.scan.Constants;
-import org.w3c.css.sac.CSSParseException;
 
 /**
  * This class tests AntiSamy functionality and the basic policy file which should be immune to XSS
@@ -2865,8 +2863,34 @@ public class AntiSamyTest {
                   "@media screen {\n* {\n\tcolor: red;\n}\n}\n",
                   policy.addCssProperty(mediaType));
 
-    assertThrows(CSSParseException.class, () -> checkStyleTag("@media notValid screen {}", "", policy));
-    assertThrows(CSSParseException.class, () -> checkStyleTag("@media doesNotExist {}", "", policy));
+    checkStyleTag("@media notValid screen {}", "", policy.addCssProperty(mediaType));
+    checkStyleTag("@media doesNotExist {}", "", policy.addCssProperty(mediaType));
+  }
+
+  @Test
+  public void testGithubIssue596() throws ScanException, PolicyException {
+    Property mediaType =
+        new Property(
+            "_mediatype",
+            Collections.emptyList(),
+            Arrays.asList("", "all", "print", "screen", "custom"),
+            Collections.emptyList(),
+            "",
+            "remove");
+
+    checkStyleTag("@media {}", "@media {\n}\n", policy.addCssProperty(mediaType));
+
+    checkStyleTag(
+        "@media {*{color: red;notAllowed: nope}}",
+        "@media {\n* {\n\tcolor: red;\n}\n}\n",
+        policy.addCssProperty(mediaType));
+
+    checkStyleTag("@media custom {}", "@media custom {\n}\n", policy.addCssProperty(mediaType));
+
+    checkStyleTag(
+        "@media custom {*{color: red;notAllowed: nope}}",
+        "@media custom {\n* {\n\tcolor: red;\n}\n}\n",
+        policy.addCssProperty(mediaType));
   }
 
   private void checkStyleTag(String input, String expected, Policy policy) throws ScanException, PolicyException {
@@ -2879,8 +2903,13 @@ public class AntiSamyTest {
     CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
 
     //Then
-    assertEquals(expectedCleanHtml, crDom.getCleanHTML());
-    assertEquals(expectedCleanHtml, crSax.getCleanHTML());
+    if (expectedCleanHtml.equals("<style></style>")) {
+      assertEquals("<style>/* */</style>", crDom.getCleanHTML());
+      assertEquals("", crSax.getCleanHTML());
+    } else {
+      assertEquals(expectedCleanHtml, crDom.getCleanHTML());
+      assertEquals(expectedCleanHtml, crSax.getCleanHTML());
+    }
   }
 
   @Test
@@ -2905,5 +2934,17 @@ public class AntiSamyTest {
     //Then
     assertEquals(expectedCleanHtml, crDom.getCleanHTML());
     assertEquals(expectedCleanHtml, crSax.getCleanHTML());
+  }
+
+  @Test
+  public void testGithubIssue587() throws ScanException, PolicyException {
+    // "rel" attribute with SAX parser was being duplicated when it was already present at the beginning
+    // of the attribute list. Fix checks the correct index before processing.
+    String output = as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.DOM)
+            .getCleanHTML();
+    assertThat(output.split("rel=").length - 1, is(1));
+    output = as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.SAX)
+            .getCleanHTML();
+    assertThat(output.split("rel=").length - 1, is(1));
   }
 }
