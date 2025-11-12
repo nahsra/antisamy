@@ -168,7 +168,7 @@ public class CssScanner {
       // should already have been counted by the caller since it was
       // embedded in the HTML
       parser.parseStyleSheet(new InputSource(new StringReader(taintedCss)));
-    } catch (IOException e) {
+    } catch (CSSException | IOException e) {
       // @TODO: should a CSSException als be a ScanException or what's the reason
       // that the batik ParseExeption was handle here but not the CSSException
       throw new ScanException(e);
@@ -220,7 +220,8 @@ public class CssScanner {
     return new CleanResults(startOfScan, cleaned, null, errorMessages);
   }
 
-  private static void parseStyleDeclaration(final Parser parser, final String cssDeclaration) throws CSSException, IOException {
+  private static void parseStyleDeclaration(final Parser parser, final String cssDeclaration)
+      throws CSSException, IOException {
     InputSource source = new InputSource(new StringReader(cssDeclaration));
     parser.parseStyleDeclaration(source);
   }
