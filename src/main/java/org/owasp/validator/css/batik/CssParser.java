@@ -26,23 +26,97 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.owasp.validator.css;
+package org.owasp.validator.css.batik;
 
 import static org.owasp.validator.css.media.CssMediaQueryLogicalOperator.AND;
 import static org.owasp.validator.css.media.CssMediaQueryLogicalOperator.OR;
 
+import java.io.IOException;
 import java.util.Objects;
 import org.apache.batik.css.parser.CSSSACMediaList;
 import org.apache.batik.css.parser.LexicalUnits;
+import org.apache.batik.css.parser.ParseException;
+import org.apache.batik.css.parser.Parser;
 import org.owasp.validator.css.media.CssMediaFeature;
 import org.owasp.validator.css.media.CssMediaQuery;
 import org.owasp.validator.css.media.CssMediaQueryList;
 import org.owasp.validator.css.media.CssMediaQueryLogicalOperator;
 import org.w3c.css.sac.CSSException;
 import org.w3c.css.sac.CSSParseException;
+import org.w3c.css.sac.InputSource;
 import org.w3c.css.sac.LexicalUnit;
+import org.w3c.css.sac.SelectorList;
 
-public class CssParser extends org.apache.batik.css.parser.Parser {
+public class CssParser extends Parser {
+
+  /**
+   * Overwritten in order to keep all Batik References in one place.
+   *
+   * @param InputSource the input source containing the Style Sheet to parse. Not null.
+   */
+  @Override
+  public void parseStyleSheet(InputSource source) throws CSSException, IOException {
+    Objects.requireNonNull(source, "Source must not to be null.");
+    try {
+      super.parseStyleSheet(source);
+    } catch (ParseException parserException) {
+      throw new CSSException(parserException);
+    }
+  }
+
+  @Override
+  public void parseStyleSheet(String uri) throws CSSException, IOException {
+    try {
+      super.parseStyleSheet(uri);
+    } catch (ParseException parserException) {
+      throw new CSSException(parserException);
+    }
+  }
+
+  @Override
+  public void parseStyleDeclaration(InputSource source) throws CSSException, IOException {
+    try {
+      super.parseStyleDeclaration(source);
+    } catch (ParseException parserException) {
+      throw new CSSException(parserException);
+    }
+  }
+
+  @Override
+  public void parseRule(InputSource source) throws CSSException, IOException {
+    try {
+      super.parseRule(source);
+    } catch (ParseException parserException) {
+      throw new CSSException(parserException);
+    }
+  }
+
+  @Override
+  public SelectorList parseSelectors(InputSource source) throws CSSException, IOException {
+    try {
+      return super.parseSelectors(source);
+    } catch (ParseException parserException) {
+      throw new CSSException(parserException);
+    }
+  }
+
+  @Override
+  public LexicalUnit parsePropertyValue(InputSource source) throws CSSException, IOException {
+    try {
+      return super.parsePropertyValue(source);
+    } catch (ParseException parserException) {
+      throw new CSSException(parserException);
+    }
+  }
+
+  @Override
+  public boolean parsePriority(InputSource source) throws CSSException, IOException {
+    try {
+      return super.parsePriority(source);
+    } catch (ParseException parserException) {
+      throw new CSSException(parserException);
+    }
+  }
 
   /**
    * This implementation is a workaround to solve leading dash errors on property names.
@@ -120,7 +194,8 @@ public class CssParser extends org.apache.batik.css.parser.Parser {
   }
 
   private boolean hasAnotherMediaQuery() {
-    return current == LexicalUnits.COMMA || (current == LexicalUnits.IDENTIFIER && scanner.getStringValue().equals(OR.toString()));
+    return current == LexicalUnits.COMMA
+        || (current == LexicalUnits.IDENTIFIER && scanner.getStringValue().equals(OR.toString()));
   }
 
   protected CssMediaQuery parseMediaQuery() {
@@ -165,7 +240,8 @@ public class CssParser extends org.apache.batik.css.parser.Parser {
       query.addMediaFeature(parseMediaFeature());
     }
 
-    while (current == LexicalUnits.IDENTIFIER && CssMediaQueryLogicalOperator.parse(scanner.getStringValue()) == AND) {
+    while (current == LexicalUnits.IDENTIFIER
+        && CssMediaQueryLogicalOperator.parse(scanner.getStringValue()) == AND) {
       nextIgnoreSpaces();
       query.addMediaFeature(parseMediaFeature());
     }
