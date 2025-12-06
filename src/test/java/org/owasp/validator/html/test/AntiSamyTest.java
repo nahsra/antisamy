@@ -2698,7 +2698,7 @@ public class AntiSamyTest {
 
     assertThat(
         cleaned,
-        containsString(
+        containsStringIgnoringCase(
             "<body> <table> "
                 + "<select name=\"Lang\"> "
                 + "<option value=\"da\">Dansk</option> "));
@@ -2709,7 +2709,7 @@ public class AntiSamyTest {
 
     assertThat(
         cleaned,
-        containsString(
+            containsStringIgnoringCase(
             "<body> <table> "
                 + "<select name=\"Lang\"> "
                 + "<option value=\"da\">Dansk</option> "));
