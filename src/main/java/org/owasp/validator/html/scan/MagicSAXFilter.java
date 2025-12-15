@@ -76,7 +76,6 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
   // From policy
   private boolean preserveComments;
   private int maxInputSize;
-  private boolean shouldParseImportedStyles;
 
   public MagicSAXFilter(ResourceBundle messages) {
     this.messages = messages;
@@ -89,7 +88,6 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     isValidateParamAsEmbed = policy.isValidateParamAsEmbed();
     preserveComments = policy.isPreserveComments();
     maxInputSize = policy.getMaxInputSize();
-    shouldParseImportedStyles = policy.isEmbedStyleSheets();
     operations.clear();
     errorMessages.clear();
     cssContent = null;
@@ -224,7 +222,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 
   private CssScanner makeCssScanner() {
     if (cssScanner == null) {
-      cssScanner = new CssScanner(policy, messages, shouldParseImportedStyles);
+      cssScanner = new CssScanner(policy, messages);
     }
     return cssScanner;
   }

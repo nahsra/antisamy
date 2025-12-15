@@ -43,8 +43,12 @@ import org.owasp.validator.html.scan.AntiSamySAXScanner;
  */
 public class AntiSamy {
 
-  /** Designates DOM scan type which calls the DOM parser. */
-  public static final int DOM = 0;
+  /**
+   * Designates DOM scan type which calls the DOM parser.
+   *
+   * @deprecated Support for DOM parser will be removed.
+   */
+  @Deprecated public static final int DOM = 0;
 
   /** Designates SAX scan type which calls the SAX parser. */
   public static final int SAX = 1;
@@ -83,7 +87,10 @@ public class AntiSamy {
    *     the results).
    * @throws ScanException When there is a problem encountered while scanning the HTML input.
    * @throws PolicyException When there is a problem validating or parsing the policy file.
+   * @deprecated Support for DOM parser will be removed, usage of method without <code>scanType
+   *     </code> is encouraged.
    */
+  @Deprecated
   public CleanResults scan(String taintedHTML, int scanType) throws ScanException, PolicyException {
 
     return this.scan(taintedHTML, this.policy, scanType);
@@ -99,7 +106,9 @@ public class AntiSamy {
    *     the results).
    * @throws ScanException When there is a problem encountered while scanning the HTML input.
    * @throws PolicyException When there is a problem validating or parsing the policy file.
+   * @deprecated Support for DOM parser will be removed.
    */
+  @Deprecated
   public CleanResults scan(String taintedHTML, Policy policy)
       throws ScanException, PolicyException {
     return this.scan(taintedHTML, policy, DOM);
@@ -116,7 +125,10 @@ public class AntiSamy {
    *     the results).
    * @throws ScanException When there is a problem encountered while scanning the HTML input.
    * @throws PolicyException When there is a problem validating or parsing the policy file.
+   * @deprecated Support for DOM parser will be removed, SAX parser will be used in the future.
+   *     Usage of method without <code>scanType</code> is encouraged.
    */
+  @Deprecated
   public CleanResults scan(String taintedHTML, Policy policy, int scanType)
       throws ScanException, PolicyException {
     if (policy == null) {
@@ -157,7 +169,9 @@ public class AntiSamy {
    *     the results).
    * @throws ScanException When there is a problem encountered while scanning the HTML input.
    * @throws PolicyException When there is a problem validating or parsing the policy file.
+   * @deprecated Support for DOM parser will be removed, SAX parser will be used in the future.
    */
+  @Deprecated
   public CleanResults scan(String taintedHTML, String policyFilename)
       throws ScanException, PolicyException {
 
@@ -176,7 +190,9 @@ public class AntiSamy {
    *     the results).
    * @throws ScanException When there is a problem encountered while scanning the HTML input.
    * @throws PolicyException When there is a problem validating or parsing the policy file.
+   * @deprecated Support for DOM parser will be removed, SAX parser will be used in the future.
    */
+  @Deprecated
   public CleanResults scan(String taintedHTML, File policyFile)
       throws ScanException, PolicyException {
 
