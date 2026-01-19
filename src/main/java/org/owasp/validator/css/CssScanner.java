@@ -169,8 +169,6 @@ public class CssScanner {
       // embedded in the HTML
       parser.parseStyleSheet(new InputSource(new StringReader(taintedCss)));
     } catch (CSSException | IOException e) {
-      // @TODO: should a CSSException als be a ScanException or what's the reason
-      // that the batik ParseExeption was handle here but not the CSSException
       throw new ScanException(e);
     }
 
@@ -318,9 +316,6 @@ public class CssScanner {
                   final HttpEntity entity = response.getEntity();
                   try {
                     return entity != null ? EntityUtils.toString(entity) : null;
-                    // @TODO: it is not clear how a Batik Parse Exception could be catched here
-                    // the response handler does not know anything about the css parsing
-                    // the css parsing happens after the response body (string) was returned.
                   } catch (final org.apache.hc.core5.http.ParseException ex) {
                     throw new ClientProtocolException(ex);
                   }
