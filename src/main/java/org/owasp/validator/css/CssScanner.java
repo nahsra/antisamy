@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2022, Arshan Dabirsiaghi, Jason Li
+ * Copyright (c) 2007-2026, Arshan Dabirsiaghi, Jason Li
  *
  * All rights reserved.
  *
