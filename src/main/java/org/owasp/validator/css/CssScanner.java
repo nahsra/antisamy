@@ -168,7 +168,7 @@ public class CssScanner {
       // should already have been counted by the caller since it was
       // embedded in the HTML
       parser.parseStyleSheet(new InputSource(new StringReader(taintedCss)));
-    } catch (CSSException | IOException e) {
+    } catch (CSSException | IOException | RuntimeException e) {
       throw new ScanException(e);
     }
 
