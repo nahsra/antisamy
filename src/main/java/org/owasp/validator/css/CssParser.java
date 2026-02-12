@@ -149,14 +149,18 @@ public class CssParser extends org.apache.batik.css.parser.Parser {
             case AND:
             case OR:
             case COMMA:
-              throw createCSSParseException("identifier");
+              //throw createCSSParseException("identifier");
+              mediaType = "all";
+              break;
           }
         } else {
           mediaType = parseMediaType();
         }
         break;
       default:
-        throw createCSSParseException("identifier");
+        //throw createCSSParseException("identifier");
+        mediaType = "all";
+        break;
     }
     query.setMediaType(mediaType);
     query.setLogicalOperator(logicalOperator);
