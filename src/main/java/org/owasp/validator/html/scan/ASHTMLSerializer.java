@@ -3,6 +3,7 @@ package org.owasp.validator.html.scan;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Locale;
+
 import org.apache.xml.serialize.ElementState;
 import org.apache.xml.serialize.HTMLdtd;
 import org.apache.xml.serialize.OutputFormat;
@@ -149,8 +150,14 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
       _printer.unindent();
       // XHTML: Close empty tag with ' />' so it's XML and HTML compatible.
       // HTML: Empty tags are defined as such in DTD no in document.
-      if (!elem.hasChildNodes() && isAllowedEmptyTag(tagName) && !requiresClosingTag(tagName))
-        _printer.printText("/>");
+      if (!elem.hasChildNodes()
+              && isAllowedEmptyTag(tagName) && !requiresClosingTag(tagName))
+        if (HTMLdtd.isEmptyTag(tagName)) {
+          _printer.printText(">");
+        }
+        else {
+          _printer.printText("/>");
+        }
       else _printer.printText('>');
       // After element but parent element is no longer empty.
       state.afterElement = true;
@@ -170,8 +177,13 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
     _printer.unindent();
     state = getElementState();
 
-    if (state.empty && isAllowedEmptyTag(rawName) && !requiresClosingTag(rawName)) { //
-      _printer.printText("/>");
+    if (state.empty && isAllowedEmptyTag(rawName) && !requiresClosingTag(rawName)) {
+      if (HTMLdtd.isEmptyTag(rawName)) {
+          _printer.printText(">");
+      }
+      else {
+        _printer.printText("/>");
+      }
     } else {
       if (state.empty) _printer.printText('>');
       // This element is not empty and that last content was another element, so print a line break

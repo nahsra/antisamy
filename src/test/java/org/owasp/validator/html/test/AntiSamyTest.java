@@ -27,7 +27,6 @@ package org.owasp.validator.html.test;
 
 import static org.hamcrest.CoreMatchers.both;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -54,6 +53,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.codec.binary.Base64;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.Before;
@@ -880,8 +880,8 @@ public class AntiSamyTest {
     assertFalse(p.matcher(s1).matches());
     assertFalse(p.matcher(s2).matches());
 
-    assertThat(s1, containsString("<hr/>"));
-    assertThat(s2, containsString("<hr/>"));
+    assertThat(s1, containsString("<hr>"));
+    assertThat(s2, containsString("<hr>"));
   }
 
   @Test
@@ -1450,8 +1450,9 @@ public class AntiSamyTest {
     crDom = as.scan(html, revised, AntiSamy.DOM).getCleanHTML();
     crSax = as.scan(html, revised, AntiSamy.SAX).getCleanHTML();
 
-    assertTrue(html.equals(crDom));
-    assertTrue(html.equals(crSax));
+    html = "<html><head><title>foobar</title></head><body><img src=\"http://foobar.com/pic.gif\"></body></html>";
+    assertEquals(html, crDom);
+    assertEquals(html, crSax);
   }
 
   @Test
@@ -1582,44 +1583,86 @@ public class AntiSamyTest {
 
     // let's start with a YouTube embed
     String input =
-        "<object width=\"560\" height=\"340\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed></object>";
+        "<object width=\"560\" height=\"340\">"
+        + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\"></param>"
+        + "<param name=\"allowFullScreen\" value=\"true\"></param>"
+        + "<param name=\"allowscriptaccess\" value=\"always\"></param>"
+        + "<embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed>"
+        + "</object>";
     String expectedOutput =
-        "<object height=\"340\" width=\"560\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"/><param name=\"allowFullScreen\" value=\"true\"/><param name=\"allowscriptaccess\" value=\"always\"/><embed allowfullscreen=\"true\" allowscriptaccess=\"always\" height=\"340\" src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" width=\"560\"/></object>";
+        "<object height=\"340\" width=\"560\">"
+        + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\">"
+        + "<param name=\"allowFullScreen\" value=\"true\">"
+        + "<param name=\"allowscriptaccess\" value=\"always\">"
+        + "<embed allowfullscreen=\"true\" allowscriptaccess=\"always\" height=\"340\" src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" width=\"560\"/>"
+        + "</object>";
     CleanResults cr = as.scan(input, revised, AntiSamy.DOM);
-    assertThat(cr.getCleanHTML(), containsString(expectedOutput));
+    assertEquals(expectedOutput, cr.getCleanHTML());
 
     String saxExpectedOutput =
-        "<object width=\"560\" height=\"340\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"/><param name=\"allowFullScreen\" value=\"true\"/><param name=\"allowscriptaccess\" value=\"always\"/><embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"/></object>";
+        "<object width=\"560\" height=\"340\">"
+        + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\">"
+        + "<param name=\"allowFullScreen\" value=\"true\">"
+        + "<param name=\"allowscriptaccess\" value=\"always\">"
+        + "<embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"/>"
+        + "</object>";
     cr = as.scan(input, revised, AntiSamy.SAX);
-    assertThat(cr.getCleanHTML(), equalTo(saxExpectedOutput));
+    assertEquals(saxExpectedOutput, cr.getCleanHTML());
 
     // now what if someone sticks malicious URL in the value of the
     // value attribute in the param tag? remove that param tag
     input =
-        "<object width=\"560\" height=\"340\"><param name=\"movie\" value=\"http://supermaliciouscode.com/badstuff.swf\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed></object>";
+        "<object width=\"560\" height=\"340\">"
+        + "<param name=\"movie\" value=\"http://supermaliciouscode.com/badstuff.swf\"></param>"
+        + "<param name=\"allowFullScreen\" value=\"true\"></param>"
+        + "<param name=\"allowscriptaccess\" value=\"always\"></param>"
+        + "<embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed>"
+        + "</object>";
     expectedOutput =
-        "<object height=\"340\" width=\"560\"><param name=\"allowFullScreen\" value=\"true\"/><param name=\"allowscriptaccess\" value=\"always\"/><embed allowfullscreen=\"true\" allowscriptaccess=\"always\" height=\"340\" src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" width=\"560\"/></object>";
+        "<object height=\"340\" width=\"560\">"
+        + "<param name=\"allowFullScreen\" value=\"true\">"
+        + "<param name=\"allowscriptaccess\" value=\"always\">"
+        + "<embed allowfullscreen=\"true\" allowscriptaccess=\"always\" height=\"340\" src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" width=\"560\"/>"
+        + "</object>";
     saxExpectedOutput =
-        "<object width=\"560\" height=\"340\"><param name=\"allowFullScreen\" value=\"true\"/><param name=\"allowscriptaccess\" value=\"always\"/><embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"/></object>";
+        "<object width=\"560\" height=\"340\">"
+        + "<param name=\"allowFullScreen\" value=\"true\">"
+        + "<param name=\"allowscriptaccess\" value=\"always\">"
+        + "<embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"/>"
+        + "</object>";
     cr = as.scan(input, revised, AntiSamy.DOM);
-    assertThat(cr.getCleanHTML(), containsString(expectedOutput));
+    assertEquals(expectedOutput, cr.getCleanHTML());
 
     cr = as.scan(input, revised, AntiSamy.SAX);
-    assertThat(cr.getCleanHTML(), equalTo(saxExpectedOutput));
+    assertEquals(saxExpectedOutput, cr.getCleanHTML());
 
     // now what if someone sticks malicious URL in the value of the src
     // attribute in the embed tag? remove that embed tag
     input =
-        "<object width=\"560\" height=\"340\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://hereswhereikeepbadcode.com/ohnoscary.swf\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed></object>";
+        "<object width=\"560\" height=\"340\">"
+        + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\"></param>"
+        + "<param name=\"allowFullScreen\" value=\"true\"></param>"
+        + "<param name=\"allowscriptaccess\" value=\"always\"></param>"
+        + "<embed src=\"http://hereswhereikeepbadcode.com/ohnoscary.swf\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed>"
+        + "</object>";
     expectedOutput =
-        "<object height=\"340\" width=\"560\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"/><param name=\"allowFullScreen\" value=\"true\"/><param name=\"allowscriptaccess\" value=\"always\"/></object>";
+        "<object height=\"340\" width=\"560\">"
+        + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\">"
+        + "<param name=\"allowFullScreen\" value=\"true\">"
+        + "<param name=\"allowscriptaccess\" value=\"always\">"
+        + "</object>";
     saxExpectedOutput =
-        "<object width=\"560\" height=\"340\"><param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"/><param name=\"allowFullScreen\" value=\"true\"/><param name=\"allowscriptaccess\" value=\"always\"/></object>";
+        "<object width=\"560\" height=\"340\">"
+        + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\">"
+        + "<param name=\"allowFullScreen\" value=\"true\">"
+        + "<param name=\"allowscriptaccess\" value=\"always\">"
+        + "</object>";
 
     cr = as.scan(input, revised, AntiSamy.DOM);
-    assertThat(cr.getCleanHTML(), containsString(expectedOutput));
+    assertEquals(expectedOutput, cr.getCleanHTML());
+
     CleanResults scan = as.scan(input, revised, AntiSamy.SAX);
-    assertThat(scan.getCleanHTML(), equalTo(saxExpectedOutput));
+    assertEquals(saxExpectedOutput, scan.getCleanHTML());
   }
 
   @Test
@@ -1812,7 +1855,7 @@ public class AntiSamyTest {
     CleanResults results_dom = as.scan(test, policy, AntiSamy.DOM);
 
     assertEquals(
-            "whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\"/>",
+            "whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\">",
             results_sax.getCleanHTML());
     assertEquals(results_sax.getCleanHTML(), results_dom.getCleanHTML());
   }
@@ -1857,7 +1900,7 @@ public class AntiSamyTest {
     Writer writer = new StringWriter();
     as.scan(reader, writer, policy);
     String cleanHtml = writer.toString().trim();
-    assertEquals("whatever" + testImgSrcURL + "/>", cleanHtml);
+    assertEquals("whatever" + testImgSrcURL + ">", cleanHtml);
   }
 
   @Test
@@ -2722,8 +2765,8 @@ public class AntiSamyTest {
     CleanResults crSax = as.scan(s, policy, AntiSamy.SAX);
     String domValue = crDom.getCleanHTML();
     String saxValue = crSax.getCleanHTML();
-    assertEquals("<p>this is para data</p>\n" + "<br/>\n" + "<p>this is para data 2</p>", domValue);
-    assertEquals("<p>this is para data</p>\n" + "<br/>\n" + "<p>this is para data 2</p>", saxValue);
+    assertEquals("<p>this is para data</p>\n" + "<br>\n" + "<p>this is para data 2</p>", domValue);
+    assertEquals("<p>this is para data</p>\n" + "<br>\n" + "<p>this is para data 2</p>", saxValue);
   }
 
   @Test
@@ -2946,5 +2989,211 @@ public class AntiSamyTest {
     output = as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.SAX)
             .getCleanHTML();
     assertThat(output.split("rel=").length - 1, is(1));
+  }
+
+  @Test
+  public void testEmptyTagsDom() throws ScanException, PolicyException {
+      String[][] tagPairs = new String[100][2];
+      int i = 0;
+
+      // 1.7.7 <div></div>
+      tagPairs[i++] = new String[]{"<div></div>",            "<div/>"};
+      tagPairs[i++] = new String[]{"<span></span>",          ""};
+      tagPairs[i++] = new String[]{"<p></p>",                ""};
+
+      tagPairs[i++] = new String[]{"<a></a>",                "<a rel=\"nofollow\"></a>"};
+      tagPairs[i++] = new String[]{"<h1></h1>",              ""};
+      tagPairs[i++] = new String[]{"<h2></h2>",              ""};
+      tagPairs[i++] = new String[]{"<h3></h3>",              ""};
+      tagPairs[i++] = new String[]{"<h4></h4>",              ""};
+      tagPairs[i++] = new String[]{"<h5></h5>",              ""};
+      tagPairs[i++] = new String[]{"<h6></h6>",              ""};
+      tagPairs[i++] = new String[]{"<ul></ul>",              ""};
+      tagPairs[i++] = new String[]{"<ol></ol>",              ""};
+      tagPairs[i++] = new String[]{"<li></li>",              ""};
+      tagPairs[i++] = new String[]{"<table></table>",        ""};
+      tagPairs[i++] = new String[]{"<tr></tr>",              ""};
+      tagPairs[i++] = new String[]{"<td></td>",              ""};
+      tagPairs[i++] = new String[]{"<th></th>",              ""};
+      tagPairs[i++] = new String[]{"<thead></thead>",        ""};
+      tagPairs[i++] = new String[]{"<tbody></tbody>",        ""};
+      tagPairs[i++] = new String[]{"<form></form>",          ""};
+      tagPairs[i++] = new String[]{"<button></button>",      ""};
+      tagPairs[i++] = new String[]{"<label></label>",        ""};
+      tagPairs[i++] = new String[]{"<select></select>",      ""};
+      tagPairs[i++] = new String[]{"<option></option>",      ""};
+
+      // 1.7.7 <textarea></textarea>
+      tagPairs[i++] = new String[]{"<textarea></textarea>",  "<textarea/>"};
+
+      tagPairs[i++] = new String[]{"<video></video>",        ""};
+      tagPairs[i++] = new String[]{"<audio></audio>",        ""};
+
+      // 1.7.7 <param></param>
+      // 1.7.8 <param/>
+      tagPairs[i++] = new String[]{"<param></param>",        "<param>"};
+
+      tagPairs[i++] = new String[]{"<canvas></canvas>",      ""};
+      tagPairs[i++] = new String[]{"<iframe></iframe>",      ""};
+      tagPairs[i++] = new String[]{"<script></script>",      ""};
+      tagPairs[i++] = new String[]{"<style></style>",        ""};
+      tagPairs[i++] = new String[]{"<header></header>",      ""};
+      tagPairs[i++] = new String[]{"<footer></footer>",      ""};
+      tagPairs[i++] = new String[]{"<nav></nav>",            ""};
+      tagPairs[i++] = new String[]{"<main></main>",          ""};
+      tagPairs[i++] = new String[]{"<section></section>",    ""};
+      tagPairs[i++] = new String[]{"<article></article>",    ""};
+      tagPairs[i++] = new String[]{"<aside></aside>",        ""};
+      tagPairs[i++] = new String[]{"<figure></figure>",      ""};
+      tagPairs[i++] = new String[]{"<figcaption></figcaption>", ""};
+      tagPairs[i++] = new String[]{"<blockquote></blockquote>", ""};
+      tagPairs[i++] = new String[]{"<pre></pre>",            ""};
+      tagPairs[i++] = new String[]{"<code></code>",          ""};
+      tagPairs[i++] = new String[]{"<strong></strong>",      ""};
+      tagPairs[i++] = new String[]{"<em></em>",              ""};
+      tagPairs[i++] = new String[]{"<b></b>",                ""};
+      tagPairs[i++] = new String[]{"<i></i>",                ""};
+      tagPairs[i++] = new String[]{"<u></u>",                ""};
+      tagPairs[i++] = new String[]{"<s></s>",                ""};
+
+      // 1.7.7 <br>
+      // 1.7.8 <br/>
+      tagPairs[i++] = new String[]{"<br>",                   "<br>"};
+
+      // 1.7.7 <hr>
+      // 1.7.7 <hr/>
+      tagPairs[i++] = new String[]{"<hr>",                   "<hr>"};
+
+      tagPairs[i++] = new String[]{"<html></html>",          ""};
+
+      // 1.7.7 <html>\n  <head></head>\n</html>
+      tagPairs[i++] = new String[]{"<head></head>",          "<html>\n  <head/>\n</html>"};
+      // 1.7.7 <html>\n  <head></head>\n</html>
+      tagPairs[i++] = new String[]{"<body></body>",          "<html>\n  <head/>\n</html>"};
+      tagPairs[i++] = new String[]{"<title></title>",        ""};
+
+      // 1.7.7 <input>
+      // 1.7.8 <input/>
+      tagPairs[i++] = new String[]{"<input>",                "<input>"};
+      // 1.7.7 <input>
+      // 1.7.8 <input/>
+      tagPairs[i++] = new String[]{"<input></input>",        "<input>"};
+
+      // 1.7.7 <img>
+      // 1.7.7 <img/>
+      tagPairs[i++] = new String[]{"<img>",                  "<img>"};
+      // 1.7.7 <img>
+      // 1.7.7 <img/>
+      tagPairs[i++] = new String[]{"<img></img>",            "<img>"};
+
+      tagPairs[i++] = new String[]{"<meta>",                 ""};
+      tagPairs[i++] = new String[]{"<meta></meta>",          ""};
+      tagPairs[i++] = new String[]{"<link></link>",          "<link>"};
+
+      for (int j = 0; j < i; j++) {
+          String output = as.scan(tagPairs[j][0], policy, AntiSamy.DOM).getCleanHTML();
+          assertEquals(tagPairs[j][1], output);
+      }
+  }
+
+  @Test
+  public void testEmptyTagsSax() throws ScanException, PolicyException {
+      String[][] tagPairs = new String[100][2];
+      int i = 0;
+
+      // 1.7.7 <div></div>
+      tagPairs[i++] = new String[]{"<div></div>",            "<div/>"};
+      tagPairs[i++] = new String[]{"<span></span>",          "<span></span>"};
+      tagPairs[i++] = new String[]{"<p></p>",                "<p></p>"};
+
+      tagPairs[i++] = new String[]{"<a></a>",                "<a rel=\"nofollow\"></a>"};
+      tagPairs[i++] = new String[]{"<h1></h1>",              "<h1></h1>"};
+      tagPairs[i++] = new String[]{"<h2></h2>",              "<h2></h2>"};
+      tagPairs[i++] = new String[]{"<h3></h3>",              "<h3></h3>"};
+      tagPairs[i++] = new String[]{"<h4></h4>",              "<h4></h4>"};
+      tagPairs[i++] = new String[]{"<h5></h5>",              "<h5></h5>"};
+      tagPairs[i++] = new String[]{"<h6></h6>",              "<h6></h6>"};
+      tagPairs[i++] = new String[]{"<ul></ul>",              "<ul></ul>"};
+      tagPairs[i++] = new String[]{"<ol></ol>",              "<ol></ol>"};
+      tagPairs[i++] = new String[]{"<li></li>",              "<li></li>"};
+      tagPairs[i++] = new String[]{"<table></table>",        "<table></table>"};
+      tagPairs[i++] = new String[]{"<tr></tr>",              ""};
+      tagPairs[i++] = new String[]{"<td></td>",              ""};
+      tagPairs[i++] = new String[]{"<th></th>",              ""};
+      tagPairs[i++] = new String[]{"<thead></thead>",        ""};
+      tagPairs[i++] = new String[]{"<tbody></tbody>",        ""};
+      tagPairs[i++] = new String[]{"<form></form>",          "<form></form>"};
+      tagPairs[i++] = new String[]{"<button></button>",      "<button></button>"};
+      tagPairs[i++] = new String[]{"<label></label>",        "<label></label>"};
+      tagPairs[i++] = new String[]{"<select></select>",      "<select></select>"};
+      tagPairs[i++] = new String[]{"<option></option>",      "<option></option>"};
+
+      // 1.7.7 <textarea></textarea>
+      tagPairs[i++] = new String[]{"<textarea></textarea>",  "<textarea/>"};
+
+      tagPairs[i++] = new String[]{"<video></video>",        ""};
+      tagPairs[i++] = new String[]{"<audio></audio>",        ""};
+      tagPairs[i++] = new String[]{"<param></param>",        ""};
+      tagPairs[i++] = new String[]{"<canvas></canvas>",      ""};
+      tagPairs[i++] = new String[]{"<iframe></iframe>",      ""};
+      tagPairs[i++] = new String[]{"<script></script>",      ""};
+      tagPairs[i++] = new String[]{"<style></style>",        ""};
+      tagPairs[i++] = new String[]{"<header></header>",      ""};
+      tagPairs[i++] = new String[]{"<footer></footer>",      ""};
+      tagPairs[i++] = new String[]{"<nav></nav>",            ""};
+      tagPairs[i++] = new String[]{"<main></main>",          ""};
+      tagPairs[i++] = new String[]{"<section></section>",    ""};
+      tagPairs[i++] = new String[]{"<article></article>",    ""};
+      tagPairs[i++] = new String[]{"<aside></aside>",        ""};
+      tagPairs[i++] = new String[]{"<figure></figure>",      ""};
+      tagPairs[i++] = new String[]{"<figcaption></figcaption>", ""};
+      tagPairs[i++] = new String[]{"<blockquote></blockquote>", "<blockquote></blockquote>"};
+      tagPairs[i++] = new String[]{"<pre></pre>",            "<pre></pre>"};
+      tagPairs[i++] = new String[]{"<code></code>",          "<code></code>"};
+      tagPairs[i++] = new String[]{"<strong></strong>",      "<strong></strong>"};
+      tagPairs[i++] = new String[]{"<em></em>",              "<em></em>"};
+      tagPairs[i++] = new String[]{"<b></b>",                "<b></b>"};
+      tagPairs[i++] = new String[]{"<i></i>",                "<i></i>"};
+      tagPairs[i++] = new String[]{"<u></u>",                "<u></u>"};
+      tagPairs[i++] = new String[]{"<s></s>",                ""};
+
+      // 1.7.7 <br>
+      // 1.7.8 <br/>
+      tagPairs[i++] = new String[]{"<br>",                   "<br>"};
+      // 1.7.7 <hr>
+      // 1.7.8 <hr/>
+      tagPairs[i++] = new String[]{"<hr>",                   "<hr>"};
+
+      tagPairs[i++] = new String[]{"<html></html>",          "<html></html>"};
+
+      // 1.7.7 <html>\n  <head></head>\n</html>
+      tagPairs[i++] = new String[]{"<head></head>",          "<html>\n  <head/>\n</html>"};
+      // 1.7.7 <html>\n  <head></head>\n  <body></body>\n</html>
+      tagPairs[i++] = new String[]{"<body></body>",          "<html>\n  <head/>\n  <body></body>\n</html>"};
+
+      tagPairs[i++] = new String[]{"<title></title>",        "<title></title>"};
+
+      // 1.7.7 <input>
+      // 1.7.8 <input/>
+      tagPairs[i++] = new String[]{"<input>",                "<input>"};
+      // 1.7.7 <input>
+      // 1.7.8 <input/>
+      tagPairs[i++] = new String[]{"<input></input>",        "<input>"};
+
+      // 1.7.7 <img>
+      // 1.7.8 <img/>
+      tagPairs[i++] = new String[]{"<img>",                  "<img>"};
+      // 1.7.7 <img>
+      // 1.7.8 <img/>
+      tagPairs[i++] = new String[]{"<img></img>",            "<img>"};
+
+      tagPairs[i++] = new String[]{"<meta>",                 ""};
+      tagPairs[i++] = new String[]{"<meta></meta>",          ""};
+      tagPairs[i++] = new String[]{"<link></link>",          "<link>"};
+
+      for (int j = 0; j < i; j++) {
+          String output = as.scan(tagPairs[j][0], policy, AntiSamy.SAX).getCleanHTML();
+          assertEquals(tagPairs[j][1], output);
+      }
   }
 }
