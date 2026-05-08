@@ -3028,26 +3028,26 @@ public class AntiSamyTest {
       // 1.7.8 <textarea/>
       tagPairs[i++] = new String[]{"<textarea></textarea>",  "<textarea></textarea>"};
 
-      tagPairs[i++] = new String[]{"<video></video>",        ""};
-      tagPairs[i++] = new String[]{"<audio></audio>",        ""};
+      tagPairs[i++] = new String[]{"<video></video>",        "<video/>"};
+      tagPairs[i++] = new String[]{"<audio></audio>",        "<audio/>"};
 
       // 1.7.7 <param></param>
       // 1.7.8 <param/>
       tagPairs[i++] = new String[]{"<param></param>",        "<param>"};
 
-      tagPairs[i++] = new String[]{"<canvas></canvas>",      ""};
-      tagPairs[i++] = new String[]{"<iframe></iframe>",      ""};
-      tagPairs[i++] = new String[]{"<script></script>",      ""};
-      tagPairs[i++] = new String[]{"<style></style>",        ""};
-      tagPairs[i++] = new String[]{"<header></header>",      ""};
-      tagPairs[i++] = new String[]{"<footer></footer>",      ""};
-      tagPairs[i++] = new String[]{"<nav></nav>",            ""};
-      tagPairs[i++] = new String[]{"<main></main>",          ""};
-      tagPairs[i++] = new String[]{"<section></section>",    ""};
-      tagPairs[i++] = new String[]{"<article></article>",    ""};
-      tagPairs[i++] = new String[]{"<aside></aside>",        ""};
-      tagPairs[i++] = new String[]{"<figure></figure>",      ""};
-      tagPairs[i++] = new String[]{"<figcaption></figcaption>", ""};
+      tagPairs[i++] = new String[]{"<canvas></canvas>",      "<canvas/>"};
+      tagPairs[i++] = new String[]{"<iframe></iframe>",      "<iframe></iframe>"};
+      tagPairs[i++] = new String[]{"<script></script>",      "<script></script>"};
+      tagPairs[i++] = new String[]{"<style></style>",        "<style/>"};
+      tagPairs[i++] = new String[]{"<header></header>",      "<header/>"};
+      tagPairs[i++] = new String[]{"<footer></footer>",      "<footer/>"};
+      tagPairs[i++] = new String[]{"<nav></nav>",            "<nav/>"};
+      tagPairs[i++] = new String[]{"<main></main>",          "<main/>"};
+      tagPairs[i++] = new String[]{"<section></section>",    "<section/>"};
+      tagPairs[i++] = new String[]{"<article></article>",    "<article/>"};
+      tagPairs[i++] = new String[]{"<aside></aside>",        "<aside/>"};
+      tagPairs[i++] = new String[]{"<figure></figure>",      "<figure/>"};
+      tagPairs[i++] = new String[]{"<figcaption></figcaption>", "<figcaption/>"};
       tagPairs[i++] = new String[]{"<blockquote></blockquote>", ""};
       tagPairs[i++] = new String[]{"<pre></pre>",            ""};
       tagPairs[i++] = new String[]{"<code></code>",          ""};
@@ -3082,18 +3082,21 @@ public class AntiSamyTest {
       tagPairs[i++] = new String[]{"<input></input>",        "<input>"};
 
       // 1.7.7 <img>
-      // 1.7.7 <img/>
+      // 1.7.8 <img/>
       tagPairs[i++] = new String[]{"<img>",                  "<img>"};
       // 1.7.7 <img>
-      // 1.7.7 <img/>
+      // 1.7.8 <img/>
       tagPairs[i++] = new String[]{"<img></img>",            "<img>"};
 
       tagPairs[i++] = new String[]{"<meta>",                 ""};
       tagPairs[i++] = new String[]{"<meta></meta>",          ""};
       tagPairs[i++] = new String[]{"<link></link>",          "<link>"};
 
+      URL url = getClass().getResource("/antisamy-allowAllEmptyTags.xml");
+      Policy ourPolicy = TestPolicy.getInstance(url);
+
       for (int j = 0; j < i; j++) {
-          String output = as.scan(tagPairs[j][0], policy, AntiSamy.DOM).getCleanHTML();
+          String output = as.scan(tagPairs[j][0], ourPolicy, AntiSamy.DOM).getCleanHTML();
           assertEquals(tagPairs[j][1], output);
       }
   }
@@ -3120,11 +3123,27 @@ public class AntiSamyTest {
       tagPairs[i++] = new String[]{"<ol></ol>",              "<ol></ol>"};
       tagPairs[i++] = new String[]{"<li></li>",              "<li></li>"};
       tagPairs[i++] = new String[]{"<table></table>",        "<table></table>"};
+
       tagPairs[i++] = new String[]{"<tr></tr>",              ""};
+      tagPairs[i++] = new String[]{"<table><tr></tr></table>",
+                          "<table>\n  <tbody>\n    <tr/>\n  </tbody>\n</table>"};
+
       tagPairs[i++] = new String[]{"<td></td>",              ""};
+      tagPairs[i++] = new String[]{"<table><tr><td></td></tr></table>",
+                          "<table>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n</table>"};
+
       tagPairs[i++] = new String[]{"<th></th>",              ""};
+      tagPairs[i++] = new String[]{"<table><th></th></table>",
+                          "<table>\n  <tbody>\n    <tr>\n      <th/>\n    </tr>\n  </tbody>\n</table>"};
+
       tagPairs[i++] = new String[]{"<thead></thead>",        ""};
+      tagPairs[i++] = new String[]{"<table><thead></thead></table>",
+                          "<table>\n  <thead/>\n</table>"};
+
       tagPairs[i++] = new String[]{"<tbody></tbody>",        ""};
+      tagPairs[i++] = new String[]{"<table><thead></thead></table>",
+                          "<table>\n  <thead/>\n</table>"};
+
       tagPairs[i++] = new String[]{"<form></form>",          "<form></form>"};
       tagPairs[i++] = new String[]{"<button></button>",      "<button></button>"};
       tagPairs[i++] = new String[]{"<label></label>",        "<label></label>"};
@@ -3135,22 +3154,23 @@ public class AntiSamyTest {
       // 1.7.8 <textarea/>
       tagPairs[i++] = new String[]{"<textarea></textarea>",  "<textarea></textarea>"};
 
-      tagPairs[i++] = new String[]{"<video></video>",        ""};
-      tagPairs[i++] = new String[]{"<audio></audio>",        ""};
+      tagPairs[i++] = new String[]{"<video></video>",        "<video/>"};
+      tagPairs[i++] = new String[]{"<audio></audio>",        "<audio/>"};
       tagPairs[i++] = new String[]{"<param></param>",        ""};
-      tagPairs[i++] = new String[]{"<canvas></canvas>",      ""};
-      tagPairs[i++] = new String[]{"<iframe></iframe>",      ""};
-      tagPairs[i++] = new String[]{"<script></script>",      ""};
+
+      tagPairs[i++] = new String[]{"<canvas></canvas>",      "<canvas/>"};
+      tagPairs[i++] = new String[]{"<iframe></iframe>",      "<iframe></iframe>"};
+      tagPairs[i++] = new String[]{"<script></script>",      "<script></script>"};
       tagPairs[i++] = new String[]{"<style></style>",        ""};
-      tagPairs[i++] = new String[]{"<header></header>",      ""};
-      tagPairs[i++] = new String[]{"<footer></footer>",      ""};
-      tagPairs[i++] = new String[]{"<nav></nav>",            ""};
-      tagPairs[i++] = new String[]{"<main></main>",          ""};
-      tagPairs[i++] = new String[]{"<section></section>",    ""};
-      tagPairs[i++] = new String[]{"<article></article>",    ""};
-      tagPairs[i++] = new String[]{"<aside></aside>",        ""};
-      tagPairs[i++] = new String[]{"<figure></figure>",      ""};
-      tagPairs[i++] = new String[]{"<figcaption></figcaption>", ""};
+      tagPairs[i++] = new String[]{"<header></header>",      "<header/>"};
+      tagPairs[i++] = new String[]{"<footer></footer>",      "<footer/>"};
+      tagPairs[i++] = new String[]{"<nav></nav>",            "<nav/>"};
+      tagPairs[i++] = new String[]{"<main></main>",          "<main/>"};
+      tagPairs[i++] = new String[]{"<section></section>",    "<section/>"};
+      tagPairs[i++] = new String[]{"<article></article>",    "<article/>"};
+      tagPairs[i++] = new String[]{"<aside></aside>",        "<aside/>"};
+      tagPairs[i++] = new String[]{"<figure></figure>",      "<figure/>"};
+      tagPairs[i++] = new String[]{"<figcaption></figcaption>", "<figcaption/>"};
       tagPairs[i++] = new String[]{"<blockquote></blockquote>", "<blockquote></blockquote>"};
       tagPairs[i++] = new String[]{"<pre></pre>",            "<pre></pre>"};
       tagPairs[i++] = new String[]{"<code></code>",          "<code></code>"};
@@ -3195,8 +3215,11 @@ public class AntiSamyTest {
       tagPairs[i++] = new String[]{"<meta></meta>",          ""};
       tagPairs[i++] = new String[]{"<link></link>",          "<link>"};
 
+      URL url = getClass().getResource("/antisamy-allowAllEmptyTags.xml");
+      Policy ourPolicy = TestPolicy.getInstance(url);
+
       for (int j = 0; j < i; j++) {
-          String output = as.scan(tagPairs[j][0], policy, AntiSamy.SAX).getCleanHTML();
+          String output = as.scan(tagPairs[j][0], ourPolicy, AntiSamy.SAX).getCleanHTML();
           assertEquals(tagPairs[j][1], output);
       }
   }
