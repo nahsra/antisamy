@@ -177,7 +177,12 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
     _printer.unindent();
     state = getElementState();
 
-    if (state.empty && isAllowedEmptyTag(rawName) && !requiresClosingTag(rawName)) {
+    if (state.empty
+            // for being backward compatible with 1.7.7
+            && !"DIV".equalsIgnoreCase(rawName)
+            && !"TEXTAREA".equalsIgnoreCase(rawName)
+
+            && isAllowedEmptyTag(rawName) && !requiresClosingTag(rawName)) {
       if (HTMLdtd.isEmptyTag(rawName)) {
           _printer.printText(">");
       }

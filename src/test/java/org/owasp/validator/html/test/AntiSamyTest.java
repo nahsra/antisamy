@@ -2997,7 +2997,8 @@ public class AntiSamyTest {
       int i = 0;
 
       // 1.7.7 <div></div>
-      tagPairs[i++] = new String[]{"<div></div>",            "<div/>"};
+      // 1.7.8 <div/>
+      tagPairs[i++] = new String[]{"<div></div>",            "<div></div>"};
       tagPairs[i++] = new String[]{"<span></span>",          ""};
       tagPairs[i++] = new String[]{"<p></p>",                ""};
 
@@ -3024,7 +3025,8 @@ public class AntiSamyTest {
       tagPairs[i++] = new String[]{"<option></option>",      ""};
 
       // 1.7.7 <textarea></textarea>
-      tagPairs[i++] = new String[]{"<textarea></textarea>",  "<textarea/>"};
+      // 1.7.8 <textarea/>
+      tagPairs[i++] = new String[]{"<textarea></textarea>",  "<textarea></textarea>"};
 
       tagPairs[i++] = new String[]{"<video></video>",        ""};
       tagPairs[i++] = new String[]{"<audio></audio>",        ""};
@@ -3102,7 +3104,8 @@ public class AntiSamyTest {
       int i = 0;
 
       // 1.7.7 <div></div>
-      tagPairs[i++] = new String[]{"<div></div>",            "<div/>"};
+      // 1.7.8 <div/>
+      tagPairs[i++] = new String[]{"<div></div>",            "<div></div>"};
       tagPairs[i++] = new String[]{"<span></span>",          "<span></span>"};
       tagPairs[i++] = new String[]{"<p></p>",                "<p></p>"};
 
@@ -3129,7 +3132,8 @@ public class AntiSamyTest {
       tagPairs[i++] = new String[]{"<option></option>",      "<option></option>"};
 
       // 1.7.7 <textarea></textarea>
-      tagPairs[i++] = new String[]{"<textarea></textarea>",  "<textarea/>"};
+      // 1.7.8 <textarea/>
+      tagPairs[i++] = new String[]{"<textarea></textarea>",  "<textarea></textarea>"};
 
       tagPairs[i++] = new String[]{"<video></video>",        ""};
       tagPairs[i++] = new String[]{"<audio></audio>",        ""};
