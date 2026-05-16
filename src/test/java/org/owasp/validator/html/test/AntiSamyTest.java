@@ -54,6 +54,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.codec.binary.Base64;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.Before;
@@ -2946,5 +2947,103 @@ public class AntiSamyTest {
     output = as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.SAX)
             .getCleanHTML();
     assertThat(output.split("rel=").length - 1, is(1));
+  }
+
+  @Test
+  public void testCommentInsideElementIsPreserved() throws Exception {
+      String input    = "<div><!-- comment inside element --></div>";
+      String expected = "<div/>";
+
+      CleanResults cr = as.scan(input, TestPolicy.getInstance());
+      assertEquals(expected, cr.getCleanHTML().trim());
+
+      expected = "<div>\n  <!-- comment inside element --></div>";
+      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+      cr = as.scan(input, testPolicy);
+      assertEquals(expected, cr.getCleanHTML().trim());
+  }
+
+  @Test
+  public void testCommentAtRootLevelIsPreserved() throws Exception {
+      String input    = "<!-- root level comment -->";
+      String expected = "";
+
+      CleanResults cr = as.scan(input, TestPolicy.getInstance());
+      assertEquals(expected, cr.getCleanHTML().trim());
+
+      expected = "<!-- root level comment -->";
+      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+      cr = as.scan(input, testPolicy);
+      assertEquals(expected, cr.getCleanHTML().trim());
+  }
+
+  @Test
+  public void testCommentBeforeElementAtRootLevel() throws Exception {
+      String input    = "<!-- header comment --><div>text</div>";
+      String expected = "<div>text</div>";
+
+      CleanResults cr = as.scan(input, TestPolicy.getInstance());
+      assertEquals(expected, cr.getCleanHTML().trim());
+
+      expected = "<!-- header comment --><div>text</div>";
+      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+      cr = as.scan(input, testPolicy);
+      assertEquals(expected, cr.getCleanHTML().trim());
+  }
+
+  @Test
+  public void testCommentAfterElementAtRootLevel() throws Exception {
+      String input    = "<div>text</div><!-- footer comment -->";
+      String expected = "<div>text</div>";
+
+      CleanResults cr = as.scan(input, TestPolicy.getInstance());
+      assertEquals(expected, cr.getCleanHTML().trim());
+
+      expected = "<div>text</div>\n<!-- footer comment -->";
+      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+      cr = as.scan(input, testPolicy);
+      assertEquals(expected, cr.getCleanHTML().trim());
+  }
+
+  @Test
+  public void testCommentBetweenElementsAtRootLevel() throws Exception {
+      String input    = "<p>first</p><!-- between --><p>second</p>";
+      String expected = "<p>first</p>\n<p>second</p>";
+
+      CleanResults cr = as.scan(input, TestPolicy.getInstance());
+      assertEquals(expected, cr.getCleanHTML().trim());
+
+      expected = "<p>first</p>\n<!-- between --><p>second</p>";
+      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+      cr = as.scan(input, testPolicy);
+      assertEquals(expected, cr.getCleanHTML().trim());
+  }
+
+  @Test
+  public void testMultipleCommentsAtRootLevel() throws Exception {
+      String input    = "<!-- first --><!-- second --><div>text</div><!-- third -->";
+      String expected = "<div>text</div>";
+
+      CleanResults cr = as.scan(input, TestPolicy.getInstance());
+      assertEquals(expected, cr.getCleanHTML().trim());
+
+      expected = "<!-- first --><!-- second --><div>text</div>\n<!-- third -->";
+      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+      cr = as.scan(input, testPolicy);
+      assertEquals(expected, cr.getCleanHTML().trim());
+  }
+
+  @Test
+  public void testOnlyCommentsAtRootLevel() throws Exception {
+      String input    = "<!-- one --><!-- two --><!-- three -->";
+      String expected = "";
+
+      CleanResults cr = as.scan(input, TestPolicy.getInstance());
+      assertEquals(expected, cr.getCleanHTML().trim());
+
+      expected = "<!-- one --><!-- two --><!-- three -->";
+      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+      cr = as.scan(input, testPolicy);
+      assertEquals(expected, cr.getCleanHTML().trim());
   }
 }

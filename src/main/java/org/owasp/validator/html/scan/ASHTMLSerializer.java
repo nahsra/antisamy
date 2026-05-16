@@ -3,6 +3,7 @@ package org.owasp.validator.html.scan;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Locale;
+
 import org.apache.xml.serialize.ElementState;
 import org.apache.xml.serialize.HTMLdtd;
 import org.apache.xml.serialize.OutputFormat;
@@ -11,6 +12,7 @@ import org.owasp.validator.html.TagMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
+import org.w3c.dom.Comment;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -35,6 +37,25 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
     if (encodeAllPossibleEntities || Constants.big5CharsToEncode.indexOf(charToPrint) != -1)
       return super.getEntityRef(charToPrint);
     return null;
+  }
+
+  /**
+   * Overrides the base class to fix a bug where comment nodes that are direct children of a
+   * DocumentFragment (i.e. at the document root level) are silently dropped even when
+   * preserveComments=true. The Xerces HTMLSerializer only handles COMMENT_NODE inside element
+   * serialization, never when isDocumentState() is true. We intercept comment nodes here and
+   * print them directly; all other node types fall through to the base implementation.
+   */
+  @Override
+  protected void serializeNode(Node node) throws IOException {
+    if (node.getNodeType() == Node.COMMENT_NODE && isDocumentState()) {
+      // Base class drops comment nodes at document/fragment root level — emit them explicitly.
+      _printer.printText("<!--");
+      _printer.printText(((Comment) node).getData());
+      _printer.printText("-->");
+    } else {
+      super.serializeNode(node);
+    }
   }
 
   /**
