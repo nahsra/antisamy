@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <anti-samy-rules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="antisamy.xsd">
-	<directives></directives>
-	<common-regexps></common-regexps>
-	<common-attributes></common-attributes>
-	<global-tag-attributes></global-tag-attributes>
-	<dynamic-tag-attributes></dynamic-tag-attributes>
-	<tag-rules></tag-rules>
-	<css-rules></css-rules>
-	<notSupportedTag></notSupportedTag>
+    <directives></directives>
+    <common-regexps></common-regexps>
+    <common-attributes></common-attributes>
+    <global-tag-attributes></global-tag-attributes>
+    <dynamic-tag-attributes></dynamic-tag-attributes>
+    <tag-rules></tag-rules>
+    <css-rules></css-rules>
+    <notSupportedTag></notSupportedTag>
 </anti-samy-rules>
