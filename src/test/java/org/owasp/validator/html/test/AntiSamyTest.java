@@ -53,7 +53,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.codec.binary.Base64;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.Before;
@@ -120,8 +119,8 @@ public class AntiSamyTest {
       messages = ResourceBundle.getBundle("AntiSamy", Locale.getDefault());
     } catch (MissingResourceException mre) {
       messages =
-              ResourceBundle.getBundle(
-                      "AntiSamy", new Locale(Constants.DEFAULT_LOCALE_LANG, Constants.DEFAULT_LOCALE_LOC));
+          ResourceBundle.getBundle(
+              "AntiSamy", new Locale(Constants.DEFAULT_LOCALE_LANG, Constants.DEFAULT_LOCALE_LOC));
     }
   }
 
@@ -1583,28 +1582,28 @@ public class AntiSamyTest {
     // let's start with a YouTube embed
     String input =
         "<object width=\"560\" height=\"340\">"
-        + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\"></param>"
-        + "<param name=\"allowFullScreen\" value=\"true\"></param>"
-        + "<param name=\"allowscriptaccess\" value=\"always\"></param>"
-        + "<embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed>"
-        + "</object>";
+            + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\"></param>"
+            + "<param name=\"allowFullScreen\" value=\"true\"></param>"
+            + "<param name=\"allowscriptaccess\" value=\"always\"></param>"
+            + "<embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed>"
+            + "</object>";
     String expectedOutput =
         "<object height=\"340\" width=\"560\">"
-        + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"/>"
-        + "<param name=\"allowFullScreen\" value=\"true\"/>"
-        + "<param name=\"allowscriptaccess\" value=\"always\"/>"
-        + "<embed allowfullscreen=\"true\" allowscriptaccess=\"always\" height=\"340\" src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" width=\"560\"/>"
-        + "</object>";
+            + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"/>"
+            + "<param name=\"allowFullScreen\" value=\"true\"/>"
+            + "<param name=\"allowscriptaccess\" value=\"always\"/>"
+            + "<embed allowfullscreen=\"true\" allowscriptaccess=\"always\" height=\"340\" src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" width=\"560\"/>"
+            + "</object>";
     CleanResults cr = as.scan(input, revised, AntiSamy.DOM);
     assertEquals(expectedOutput, cr.getCleanHTML());
 
     String saxExpectedOutput =
         "<object width=\"560\" height=\"340\">"
-        + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"/>"
-        + "<param name=\"allowFullScreen\" value=\"true\"/>"
-        + "<param name=\"allowscriptaccess\" value=\"always\"/>"
-        + "<embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"/>"
-        + "</object>";
+            + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"/>"
+            + "<param name=\"allowFullScreen\" value=\"true\"/>"
+            + "<param name=\"allowscriptaccess\" value=\"always\"/>"
+            + "<embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"/>"
+            + "</object>";
     cr = as.scan(input, revised, AntiSamy.SAX);
     assertEquals(saxExpectedOutput, cr.getCleanHTML());
 
@@ -1612,23 +1611,23 @@ public class AntiSamyTest {
     // value attribute in the param tag? remove that param tag
     input =
         "<object width=\"560\" height=\"340\">"
-        + "<param name=\"movie\" value=\"http://supermaliciouscode.com/badstuff.swf\"></param>"
-        + "<param name=\"allowFullScreen\" value=\"true\"></param>"
-        + "<param name=\"allowscriptaccess\" value=\"always\"></param>"
-        + "<embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed>"
-        + "</object>";
+            + "<param name=\"movie\" value=\"http://supermaliciouscode.com/badstuff.swf\"></param>"
+            + "<param name=\"allowFullScreen\" value=\"true\"></param>"
+            + "<param name=\"allowscriptaccess\" value=\"always\"></param>"
+            + "<embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"></embed>"
+            + "</object>";
     expectedOutput =
         "<object height=\"340\" width=\"560\">"
-        + "<param name=\"allowFullScreen\" value=\"true\"/>"
-        + "<param name=\"allowscriptaccess\" value=\"always\"/>"
-        + "<embed allowfullscreen=\"true\" allowscriptaccess=\"always\" height=\"340\" src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" width=\"560\"/>"
-        + "</object>";
+            + "<param name=\"allowFullScreen\" value=\"true\"/>"
+            + "<param name=\"allowscriptaccess\" value=\"always\"/>"
+            + "<embed allowfullscreen=\"true\" allowscriptaccess=\"always\" height=\"340\" src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" width=\"560\"/>"
+            + "</object>";
     saxExpectedOutput =
         "<object width=\"560\" height=\"340\">"
-        + "<param name=\"allowFullScreen\" value=\"true\"/>"
-        + "<param name=\"allowscriptaccess\" value=\"always\"/>"
-        + "<embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"/>"
-        + "</object>";
+            + "<param name=\"allowFullScreen\" value=\"true\"/>"
+            + "<param name=\"allowscriptaccess\" value=\"always\"/>"
+            + "<embed src=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"/>"
+            + "</object>";
     cr = as.scan(input, revised, AntiSamy.DOM);
     assertEquals(expectedOutput, cr.getCleanHTML());
 
@@ -1639,23 +1638,23 @@ public class AntiSamyTest {
     // attribute in the embed tag? remove that embed tag
     input =
         "<object width=\"560\" height=\"340\">"
-        + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\"></param>"
-        + "<param name=\"allowFullScreen\" value=\"true\"></param>"
-        + "<param name=\"allowscriptaccess\" value=\"always\"></param>"
-        + "<embed src=\"http://hereswhereikeepbadcode.com/ohnoscary.swf\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"/>"
-        + "</object>";
+            + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&hl=en&fs=1&\"></param>"
+            + "<param name=\"allowFullScreen\" value=\"true\"></param>"
+            + "<param name=\"allowscriptaccess\" value=\"always\"></param>"
+            + "<embed src=\"http://hereswhereikeepbadcode.com/ohnoscary.swf\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"560\" height=\"340\"/>"
+            + "</object>";
     expectedOutput =
         "<object height=\"340\" width=\"560\">"
-        + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"/>"
-        + "<param name=\"allowFullScreen\" value=\"true\"/>"
-        + "<param name=\"allowscriptaccess\" value=\"always\"/>"
-        + "</object>";
+            + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"/>"
+            + "<param name=\"allowFullScreen\" value=\"true\"/>"
+            + "<param name=\"allowscriptaccess\" value=\"always\"/>"
+            + "</object>";
     saxExpectedOutput =
         "<object width=\"560\" height=\"340\">"
-        + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"/>"
-        + "<param name=\"allowFullScreen\" value=\"true\"/>"
-        + "<param name=\"allowscriptaccess\" value=\"always\"/>"
-        + "</object>";
+            + "<param name=\"movie\" value=\"http://www.youtube.com/v/IyAyd4WnvhU&amp;hl=en&amp;fs=1&amp;\"/>"
+            + "<param name=\"allowFullScreen\" value=\"true\"/>"
+            + "<param name=\"allowscriptaccess\" value=\"always\"/>"
+            + "</object>";
 
     cr = as.scan(input, revised, AntiSamy.DOM);
     assertEquals(expectedOutput, cr.getCleanHTML());
@@ -1854,8 +1853,8 @@ public class AntiSamyTest {
     CleanResults results_dom = as.scan(test, policy, AntiSamy.DOM);
 
     assertEquals(
-            "whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\"/>",
-            results_sax.getCleanHTML());
+        "whatever<img src=\"https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png\"/>",
+        results_sax.getCleanHTML());
     assertEquals(results_sax.getCleanHTML(), results_dom.getCleanHTML());
   }
 
@@ -2770,29 +2769,30 @@ public class AntiSamyTest {
 
   @Test
   public void testGithubIssue546() throws ScanException, PolicyException {
-    //Given
+    // Given
     String taintedHtml = "<style>.cl { color: rgb(50%, 20.5%, 100%); }</style>";
 
-    //When
+    // When
     CleanResults crDom = as.scan(taintedHtml, policy, AntiSamy.DOM);
     CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
 
-    //Then
+    // Then
     String expectedCleanHtml = "<style>*.cl {\n\tcolor: rgb(50%,20.5%,100%);\n}\n</style>";
     assertEquals(expectedCleanHtml, crDom.getCleanHTML());
     assertEquals(expectedCleanHtml, crSax.getCleanHTML());
   }
 
   @Test
-  public void testGithubIssue546FaultyPercentagesGetFilteredByRegex() throws ScanException, PolicyException {
-    //Given
+  public void testGithubIssue546FaultyPercentagesGetFilteredByRegex()
+      throws ScanException, PolicyException {
+    // Given
     String taintedHtml = "<style>.cl { color: rgb(50%, -20%, 150%); }</style>";
 
-    //When
+    // When
     CleanResults crDom = as.scan(taintedHtml, policy, AntiSamy.DOM);
     CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
 
-    //Then
+    // Then
     String expectedCleanHtml = "<style>*.cl {\n}\n</style>";
     assertEquals(expectedCleanHtml, crDom.getCleanHTML());
     assertEquals(expectedCleanHtml, crSax.getCleanHTML());
@@ -2800,110 +2800,136 @@ public class AntiSamyTest {
 
   @Test
   public void testGithubIssue552() throws ScanException, PolicyException {
-    Pattern positiveLength = Pattern.compile("((\\+)?0|(\\+)?([0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?)(rem|vw|vh|em|ex|px|in|cm|mm|pt|pc))");
+    Pattern positiveLength =
+        Pattern.compile(
+            "((\\+)?0|(\\+)?([0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?)(rem|vw|vh|em|ex|px|in|cm|mm|pt|pc))");
     Pattern integer = Pattern.compile("([-+])?[0-9]+");
-    Property mediaType = new Property("_mediatype",
-                                      Collections.emptyList(),
-                                      Arrays.asList("", "all", "print", "screen"),
-                                      Collections.emptyList(),
-                                      "",
-                                      "remove");
-    Property minWidth = new Property("_mediafeature_min-width",
-                                     Collections.singletonList(positiveLength),
-                                     Collections.emptyList(),
-                                     Collections.emptyList(),
-                                     "",
-                                     "remove");
-    Property maxWidth = new Property("_mediafeature_max-width",
-                                     Collections.singletonList(positiveLength),
-                                     Collections.emptyList(),
-                                     Collections.emptyList(),
-                                     "",
-                                     "remove");
-    Property color = new Property("_mediafeature_color",
-                                  Collections.singletonList(integer),
-                                  Collections.singletonList(""),
-                                  Collections.emptyList(),
-                                  "",
-                                  "remove");
-    Property orientation = new Property("_mediafeature_orientation",
-                                        Collections.emptyList(),
-                                        Arrays.asList("portrait", "landscape"),
-                                        Collections.emptyList(),
-                                        "",
-                                        "remove");
-    Property grid = new Property("_mediafeature_grid",
-                                 Collections.emptyList(),
-                                 Arrays.asList("", "-1", "-0", "0", "1"),
-                                 Collections.emptyList(),
-                                 "",
-                                 "remove");
-    Property monochrome = new Property("_mediafeature_monochrome",
-                                       Collections.singletonList(integer),
-                                       Collections.singletonList(""),
-                                       Collections.emptyList(),
-                                       "",
-                                       "remove");
+    Property mediaType =
+        new Property(
+            "_mediatype",
+            Collections.emptyList(),
+            Arrays.asList("", "all", "print", "screen"),
+            Collections.emptyList(),
+            "",
+            "remove");
+    Property minWidth =
+        new Property(
+            "_mediafeature_min-width",
+            Collections.singletonList(positiveLength),
+            Collections.emptyList(),
+            Collections.emptyList(),
+            "",
+            "remove");
+    Property maxWidth =
+        new Property(
+            "_mediafeature_max-width",
+            Collections.singletonList(positiveLength),
+            Collections.emptyList(),
+            Collections.emptyList(),
+            "",
+            "remove");
+    Property color =
+        new Property(
+            "_mediafeature_color",
+            Collections.singletonList(integer),
+            Collections.singletonList(""),
+            Collections.emptyList(),
+            "",
+            "remove");
+    Property orientation =
+        new Property(
+            "_mediafeature_orientation",
+            Collections.emptyList(),
+            Arrays.asList("portrait", "landscape"),
+            Collections.emptyList(),
+            "",
+            "remove");
+    Property grid =
+        new Property(
+            "_mediafeature_grid",
+            Collections.emptyList(),
+            Arrays.asList("", "-1", "-0", "0", "1"),
+            Collections.emptyList(),
+            "",
+            "remove");
+    Property monochrome =
+        new Property(
+            "_mediafeature_monochrome",
+            Collections.singletonList(integer),
+            Collections.singletonList(""),
+            Collections.emptyList(),
+            "",
+            "remove");
 
-    checkStyleTag("@media screen {}",
-                  "@media screen {\n}\n",
-                  policy.addCssProperty(mediaType));
+    checkStyleTag("@media screen {}", "@media screen {\n}\n", policy.addCssProperty(mediaType));
 
-    checkStyleTag("@media screen,print {}",
-                  "@media screen, print {\n}\n",
-                  policy.addCssProperty(mediaType));
+    checkStyleTag(
+        "@media screen,print {}", "@media screen, print {\n}\n", policy.addCssProperty(mediaType));
 
-    checkStyleTag("@media only screen and (max-width: 639px) and (min-width: 300px) {}",
-                  "@media only screen and (max-width: 639.0px) and (min-width: 300.0px) {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(minWidth).addCssProperty(maxWidth));
+    checkStyleTag(
+        "@media only screen and (max-width: 639px) and (min-width: 300px) {}",
+        "@media only screen and (max-width: 639.0px) and (min-width: 300.0px) {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(minWidth).addCssProperty(maxWidth));
 
-    checkStyleTag("@media not screen, screen and (color), print and (orientation: portrait) {}",
-                  "@media not screen, screen and (color), print and (orientation: portrait) {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(color).addCssProperty(orientation));
+    checkStyleTag(
+        "@media not screen, screen and (color), print and (orientation: portrait) {}",
+        "@media not screen, screen and (color), print and (orientation: portrait) {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(color).addCssProperty(orientation));
 
-    checkStyleTag("@media not screen, print and (orientation: doesNotExist), all {}",
-                  "@media not screen, all {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(orientation));
+    checkStyleTag(
+        "@media not screen, print and (orientation: doesNotExist), all {}",
+        "@media not screen, all {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(orientation));
 
-    checkStyleTag("@media (min-width: 500.0px) {}",
-                  "@media (min-width: 500.0px) {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(minWidth));
+    checkStyleTag(
+        "@media (min-width: 500.0px) {}",
+        "@media (min-width: 500.0px) {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(minWidth));
 
-    checkStyleTag("@media (grid) {}",
-                  "@media (grid) {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(grid));
+    checkStyleTag(
+        "@media (grid) {}",
+        "@media (grid) {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(grid));
 
-    checkStyleTag("@media (monochrome) {}",
-                  "@media (monochrome) {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(monochrome));
+    checkStyleTag(
+        "@media (monochrome) {}",
+        "@media (monochrome) {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(monochrome));
 
-    checkStyleTag("@media (monochrome: 2) {}",
-                  "@media (monochrome: 2) {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(monochrome));
+    checkStyleTag(
+        "@media (monochrome: 2) {}",
+        "@media (monochrome: 2) {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(monochrome));
 
-    checkStyleTag("@media screen and (max-width: 639px) or only print {}",
-                  "@media screen and (max-width: 639.0px), only print {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+    checkStyleTag(
+        "@media screen and (max-width: 639px) or only print {}",
+        "@media screen and (max-width: 639.0px), only print {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(maxWidth));
 
-    checkStyleTag("@media print or (max-width: 639px) or only print {}",
-                  "@media print, (max-width: 639.0px), only print {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+    checkStyleTag(
+        "@media print or (max-width: 639px) or only print {}",
+        "@media print, (max-width: 639.0px), only print {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(maxWidth));
 
-    checkStyleTag("@media print or not (max-width: 639px), not print {}",
-                  "@media print, not (max-width: 639.0px), not print {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+    checkStyleTag(
+        "@media print or not (max-width: 639px), not print {}",
+        "@media print, not (max-width: 639.0px), not print {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(maxWidth));
 
-    checkStyleTag("@media only print or not (max-width: 639px) and (min-width: 500px), not print {}",
-                  "@media only print, not (max-width: 639.0px) and (min-width: 500.0px), not print {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(maxWidth).addCssProperty(minWidth));
+    checkStyleTag(
+        "@media only print or not (max-width: 639px) and (min-width: 500px), not print {}",
+        "@media only print, not (max-width: 639.0px) and (min-width: 500.0px), not print {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(maxWidth).addCssProperty(minWidth));
 
-    checkStyleTag("@media only print or not (max-width: 639px) and (min-width: 500px), not screen {}",
-                  "@media only print, not screen {\n}\n",
-                  policy.addCssProperty(mediaType).addCssProperty(maxWidth));
+    checkStyleTag(
+        "@media only print or not (max-width: 639px) and (min-width: 500px), not screen {}",
+        "@media only print, not screen {\n}\n",
+        policy.addCssProperty(mediaType).addCssProperty(maxWidth));
 
-    checkStyleTag("@media screen {*{color: red;notAllowed: nope}}",
-                  "@media screen {\n* {\n\tcolor: red;\n}\n}\n",
-                  policy.addCssProperty(mediaType));
+    checkStyleTag(
+        "@media screen {*{color: red;notAllowed: nope}}",
+        "@media screen {\n* {\n\tcolor: red;\n}\n}\n",
+        policy.addCssProperty(mediaType));
 
     checkStyleTag("@media notValid screen {}", "", policy.addCssProperty(mediaType));
     checkStyleTag("@media doesNotExist {}", "", policy.addCssProperty(mediaType));
@@ -2935,16 +2961,17 @@ public class AntiSamyTest {
         policy.addCssProperty(mediaType));
   }
 
-  private void checkStyleTag(String input, String expected, Policy policy) throws ScanException, PolicyException {
-    //Given
+  private void checkStyleTag(String input, String expected, Policy policy)
+      throws ScanException, PolicyException {
+    // Given
     String taintedHtml = "<style>" + input + "</style>";
     String expectedCleanHtml = "<style>" + expected + "</style>";
 
-    //When
+    // When
     CleanResults crDom = as.scan(taintedHtml, policy, AntiSamy.DOM);
     CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
 
-    //Then
+    // Then
     if (expectedCleanHtml.equals("<style></style>")) {
       assertEquals("<style>/* */</style>", crDom.getCleanHTML());
       assertEquals("", crSax.getCleanHTML());
@@ -2956,567 +2983,739 @@ public class AntiSamyTest {
 
   @Test
   public void testGithubIssue554() throws ScanException, PolicyException {
-    checkInlineStyle("font: bold italic large Palatino, serif", "font: bold italic large Palatino , serif;");
+    checkInlineStyle(
+        "font: bold italic large Palatino, serif", "font: bold italic large Palatino , serif;");
     checkInlineStyle("font: 12pt/14pt sans-serif", "font: 12.0pt / 14.0pt sans-serif;");
     checkInlineStyle("font: 12.0pt / 14.0pt sans-serif;", "font: 12.0pt / 14.0pt sans-serif;");
     checkInlineStyle("font: 12.25pt sans-serif;", "font: 12.25pt sans-serif;");
-    checkInlineStyle("font: 14px/20px Tahoma, Geneva, Arial, Verdana, sans-serif",
-                     "font: 14.0px / 20.0px Tahoma , Geneva , Arial , Verdana , sans-serif;");
+    checkInlineStyle(
+        "font: 14px/20px Tahoma, Geneva, Arial, Verdana, sans-serif",
+        "font: 14.0px / 20.0px Tahoma , Geneva , Arial , Verdana , sans-serif;");
   }
 
-  private void checkInlineStyle(String inline, String expected) throws ScanException, PolicyException {
-    //Given
+  private void checkInlineStyle(String inline, String expected)
+      throws ScanException, PolicyException {
+    // Given
     String taintedHtml = "<html><head/><body><p style=\"" + inline + "\">test</p></body></html>";
-    String expectedCleanHtml = "<html>\n  <head></head>\n  <body>\n    <p style=\"" + expected + "\">test</p>\n  </body>\n</html>";
+    String expectedCleanHtml =
+        "<html>\n  <head></head>\n  <body>\n    <p style=\""
+            + expected
+            + "\">test</p>\n  </body>\n</html>";
 
-    //When
+    // When
     CleanResults crDom = as.scan(taintedHtml, policy, AntiSamy.DOM);
     CleanResults crSax = as.scan(taintedHtml, policy, AntiSamy.SAX);
 
-    //Then
+    // Then
     assertEquals(expectedCleanHtml, crDom.getCleanHTML());
     assertEquals(expectedCleanHtml, crSax.getCleanHTML());
   }
 
   @Test
   public void testGithubIssue587() throws ScanException, PolicyException {
-    // "rel" attribute with SAX parser was being duplicated when it was already present at the beginning
+    // "rel" attribute with SAX parser was being duplicated when it was already present at the
+    // beginning
     // of the attribute list. Fix checks the correct index before processing.
-    String output = as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.DOM)
+    String output =
+        as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.DOM)
             .getCleanHTML();
     assertThat(output.split("rel=").length - 1, is(1));
-    output = as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.SAX)
+    output =
+        as.scan("<a rel='nofollow' target='_blank'>Link text</a>", policy, AntiSamy.SAX)
             .getCleanHTML();
     assertThat(output.split("rel=").length - 1, is(1));
   }
 
   @Test
   public void testCommentInsideElementIsPreserved() throws Exception {
-      String input    = "<div><!-- comment inside element --></div>";
-      String expected = "<div></div>";
+    String input = "<div><!-- comment inside element --></div>";
+    String expected = "<div></div>";
 
-      CleanResults cr = as.scan(input, TestPolicy.getInstance());
-      assertEquals(expected, cr.getCleanHTML().trim());
+    CleanResults cr = as.scan(input, TestPolicy.getInstance());
+    assertEquals(expected, cr.getCleanHTML().trim());
 
-      expected = "<div>\n  <!-- comment inside element --></div>";
-      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
-      cr = as.scan(input, testPolicy);
-      assertEquals(expected, cr.getCleanHTML().trim());
+    expected = "<div>\n  <!-- comment inside element --></div>";
+    Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+    cr = as.scan(input, testPolicy);
+    assertEquals(expected, cr.getCleanHTML().trim());
   }
 
   @Test
   public void testCommentAtRootLevelIsPreserved() throws Exception {
-      String input    = "<!-- root level comment -->";
-      String expected = "";
+    String input = "<!-- root level comment -->";
+    String expected = "";
 
-      CleanResults cr = as.scan(input, TestPolicy.getInstance());
-      assertEquals(expected, cr.getCleanHTML().trim());
+    CleanResults cr = as.scan(input, TestPolicy.getInstance());
+    assertEquals(expected, cr.getCleanHTML().trim());
 
-      expected = "<!-- root level comment -->";
-      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
-      cr = as.scan(input, testPolicy);
-      assertEquals(expected, cr.getCleanHTML().trim());
+    expected = "<!-- root level comment -->";
+    Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+    cr = as.scan(input, testPolicy);
+    assertEquals(expected, cr.getCleanHTML().trim());
   }
 
   @Test
   public void testCommentBeforeElementAtRootLevel() throws Exception {
-      String input    = "<!-- header comment --><div>text</div>";
-      String expected = "<div>text</div>";
+    String input = "<!-- header comment --><div>text</div>";
+    String expected = "<div>text</div>";
 
-      CleanResults cr = as.scan(input, TestPolicy.getInstance());
-      assertEquals(expected, cr.getCleanHTML().trim());
+    CleanResults cr = as.scan(input, TestPolicy.getInstance());
+    assertEquals(expected, cr.getCleanHTML().trim());
 
-      expected = "<!-- header comment --><div>text</div>";
-      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
-      cr = as.scan(input, testPolicy);
-      assertEquals(expected, cr.getCleanHTML().trim());
+    expected = "<!-- header comment --><div>text</div>";
+    Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+    cr = as.scan(input, testPolicy);
+    assertEquals(expected, cr.getCleanHTML().trim());
   }
 
   @Test
   public void testCommentAfterElementAtRootLevel() throws Exception {
-      String input    = "<div>text</div><!-- footer comment -->";
-      String expected = "<div>text</div>";
+    String input = "<div>text</div><!-- footer comment -->";
+    String expected = "<div>text</div>";
 
-      CleanResults cr = as.scan(input, TestPolicy.getInstance());
-      assertEquals(expected, cr.getCleanHTML().trim());
+    CleanResults cr = as.scan(input, TestPolicy.getInstance());
+    assertEquals(expected, cr.getCleanHTML().trim());
 
-      expected = "<div>text</div>\n<!-- footer comment -->";
-      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
-      cr = as.scan(input, testPolicy);
-      assertEquals(expected, cr.getCleanHTML().trim());
+    expected = "<div>text</div>\n<!-- footer comment -->";
+    Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+    cr = as.scan(input, testPolicy);
+    assertEquals(expected, cr.getCleanHTML().trim());
   }
 
   @Test
   public void testCommentBetweenElementsAtRootLevel() throws Exception {
-      String input    = "<p>first</p><!-- between --><p>second</p>";
-      String expected = "<p>first</p>\n<p>second</p>";
+    String input = "<p>first</p><!-- between --><p>second</p>";
+    String expected = "<p>first</p>\n<p>second</p>";
 
-      CleanResults cr = as.scan(input, TestPolicy.getInstance());
-      assertEquals(expected, cr.getCleanHTML().trim());
+    CleanResults cr = as.scan(input, TestPolicy.getInstance());
+    assertEquals(expected, cr.getCleanHTML().trim());
 
-      expected = "<p>first</p>\n<!-- between --><p>second</p>";
-      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
-      cr = as.scan(input, testPolicy);
-      assertEquals(expected, cr.getCleanHTML().trim());
+    expected = "<p>first</p>\n<!-- between --><p>second</p>";
+    Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+    cr = as.scan(input, testPolicy);
+    assertEquals(expected, cr.getCleanHTML().trim());
   }
 
   @Test
   public void testMultipleCommentsAtRootLevel() throws Exception {
-      String input    = "<!-- first --><!-- second --><div>text</div><!-- third -->";
-      String expected = "<div>text</div>";
+    String input = "<!-- first --><!-- second --><div>text</div><!-- third -->";
+    String expected = "<div>text</div>";
 
-      CleanResults cr = as.scan(input, TestPolicy.getInstance());
-      assertEquals(expected, cr.getCleanHTML().trim());
+    CleanResults cr = as.scan(input, TestPolicy.getInstance());
+    assertEquals(expected, cr.getCleanHTML().trim());
 
-      expected = "<!-- first --><!-- second --><div>text</div>\n<!-- third -->";
-      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
-      cr = as.scan(input, testPolicy);
-      assertEquals(expected, cr.getCleanHTML().trim());
+    expected = "<!-- first --><!-- second --><div>text</div>\n<!-- third -->";
+    Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+    cr = as.scan(input, testPolicy);
+    assertEquals(expected, cr.getCleanHTML().trim());
   }
 
   @Test
   public void testOnlyCommentsAtRootLevel() throws Exception {
-      String input    = "<!-- one --><!-- two --><!-- three -->";
-      String expected = "";
+    String input = "<!-- one --><!-- two --><!-- three -->";
+    String expected = "";
 
-      CleanResults cr = as.scan(input, TestPolicy.getInstance());
-      assertEquals(expected, cr.getCleanHTML().trim());
+    CleanResults cr = as.scan(input, TestPolicy.getInstance());
+    assertEquals(expected, cr.getCleanHTML().trim());
 
-      expected = "<!-- one --><!-- two --><!-- three -->";
-      Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
-      cr = as.scan(input, testPolicy);
-      assertEquals(expected, cr.getCleanHTML().trim());
+    expected = "<!-- one --><!-- two --><!-- three -->";
+    Policy testPolicy = TestPolicy.getInstance().cloneWithDirective("preserveComments", "true");
+    cr = as.scan(input, testPolicy);
+    assertEquals(expected, cr.getCleanHTML().trim());
   }
 
   @Test
   public void testEmptyTagsDom() throws ScanException, PolicyException {
-      // Input -> Expected XHTML output pairs
-      // Void elements emit self-closing <tag />, non-void empty tags emit <tag></tag>
+    // Input -> Expected XHTML output pairs
+    // Void elements emit self-closing <tag />, non-void empty tags emit <tag></tag>
 
-      String[][] tagPairs = new String[200][2];
-      int i = 0;
+    String[][] tagPairs = new String[200][2];
+    int i = 0;
 
-      // ─── 1. VOID ELEMENTS (self-closing) ────────────────────────────────────────
-      // These have no content model; AntiSamy/Neko always emits <tag />
+    // ─── 1. VOID ELEMENTS (self-closing) ────────────────────────────────────────
+    // These have no content model; AntiSamy/Neko always emits <tag />
 
-      tagPairs[i++] = new String[]{"<br>",                   "<br/>"};
-      tagPairs[i++] = new String[]{"<hr>",                   "<hr/>"};
-      tagPairs[i++] = new String[]{"<input>",                "<input/>"};
-      tagPairs[i++] = new String[]{"<input></input>",        "<input/>"};
-      tagPairs[i++] = new String[]{"<img>",                  "<img/>"};
-      tagPairs[i++] = new String[]{"<img></img>",            "<img/>"};
-      tagPairs[i++] = new String[]{"<meta>",                 "<meta/>"};
-      tagPairs[i++] = new String[]{"<meta></meta>",          "<meta/>"};
-      tagPairs[i++] = new String[]{"<link>",                 "<link/>"};
-      tagPairs[i++] = new String[]{"<link></link>",          "<link/>"};
-      tagPairs[i++] = new String[]{"<param>",                "<param/>"};
-      tagPairs[i++] = new String[]{"<param></param>",        "<param/>"};
-      tagPairs[i++] = new String[]{"<area>",                 "<area/>"};
-      tagPairs[i++] = new String[]{"<area></area>",          "<area/>"};
-      tagPairs[i++] = new String[]{"<base>",                 "<base/>"};
-      tagPairs[i++] = new String[]{"<base></base>",          "<base/>"};
+    tagPairs[i++] = new String[] {"<br>", "<br/>"};
+    tagPairs[i++] = new String[] {"<hr>", "<hr/>"};
+    tagPairs[i++] = new String[] {"<input>", "<input/>"};
+    tagPairs[i++] = new String[] {"<input></input>", "<input/>"};
+    tagPairs[i++] = new String[] {"<img>", "<img/>"};
+    tagPairs[i++] = new String[] {"<img></img>", "<img/>"};
+    tagPairs[i++] = new String[] {"<meta>", "<meta/>"};
+    tagPairs[i++] = new String[] {"<meta></meta>", "<meta/>"};
+    tagPairs[i++] = new String[] {"<link>", "<link/>"};
+    tagPairs[i++] = new String[] {"<link></link>", "<link/>"};
+    tagPairs[i++] = new String[] {"<param>", "<param/>"};
+    tagPairs[i++] = new String[] {"<param></param>", "<param/>"};
+    tagPairs[i++] = new String[] {"<area>", "<area/>"};
+    tagPairs[i++] = new String[] {"<area></area>", "<area/>"};
+    tagPairs[i++] = new String[] {"<base>", "<base/>"};
+    tagPairs[i++] = new String[] {"<base></base>", "<base/>"};
 
-      // col is void and must be inside colgroup inside table
-      tagPairs[i++] = new String[]{"<col>",                  ""};
-      tagPairs[i++] = new String[]{"<col></col>",            ""};
-      tagPairs[i++] = new String[]{"<table><colgroup><col></colgroup></table>",
-                          "<table>\n  <colgroup>\n    <col/>\n  </colgroup>\n</table>"};
-      tagPairs[i++] = new String[]{"<table><colgroup><col></col></colgroup></table>",
-          "<table>\n  <colgroup>\n    <col/>\n  </colgroup>\n</table>"};
+    // col is void and must be inside colgroup inside table
+    tagPairs[i++] = new String[] {"<col>", ""};
+    tagPairs[i++] = new String[] {"<col></col>", ""};
+    tagPairs[i++] =
+        new String[] {
+          "<table><colgroup><col></colgroup></table>",
+          "<table>\n  <colgroup>\n    <col/>\n  </colgroup>\n</table>"
+        };
+    tagPairs[i++] =
+        new String[] {
+          "<table><colgroup><col></col></colgroup></table>",
+          "<table>\n  <colgroup>\n    <col/>\n  </colgroup>\n</table>"
+        };
 
-      tagPairs[i++] = new String[]{"<embed>",                "<embed/>"};
-      tagPairs[i++] = new String[]{"<embed></embed>",        "<embed/>"};
-      tagPairs[i++] = new String[]{"<source>",               "<source/>"};
-      tagPairs[i++] = new String[]{"<source></source>",      "<source/>"};
-      tagPairs[i++] = new String[]{"<track>",                "<track/>"};
-      tagPairs[i++] = new String[]{"<track></track>",        "<track/>"};
-      tagPairs[i++] = new String[]{"<wbr>",                  "<wbr/>"};
-      tagPairs[i++] = new String[]{"<wbr></wbr>",            "<wbr/>"};
+    tagPairs[i++] = new String[] {"<embed>", "<embed/>"};
+    tagPairs[i++] = new String[] {"<embed></embed>", "<embed/>"};
+    tagPairs[i++] = new String[] {"<source>", "<source/>"};
+    tagPairs[i++] = new String[] {"<source></source>", "<source/>"};
+    tagPairs[i++] = new String[] {"<track>", "<track/>"};
+    tagPairs[i++] = new String[] {"<track></track>", "<track/>"};
+    tagPairs[i++] = new String[] {"<wbr>", "<wbr/>"};
+    tagPairs[i++] = new String[] {"<wbr></wbr>", "<wbr/>"};
 
-      // ─── 2. DOCUMENT STRUCTURE ──────────────────────────────────────────────────
-      // Neko reconstructs full document structure when these appear
+    // ─── 2. DOCUMENT STRUCTURE ──────────────────────────────────────────────────
+    // Neko reconstructs full document structure when these appear
 
-      tagPairs[i++] = new String[]{"<html></html>",          ""};
-      tagPairs[i++] = new String[]{"<head></head>",          "<html>\n  <head></head>\n</html>"};
-      tagPairs[i++] = new String[]{"<body></body>",          "<html>\n  <head></head>\n</html>"};
-      tagPairs[i++] = new String[]{"<title></title>",        "<title></title>"};
+    tagPairs[i++] = new String[] {"<html></html>", ""};
+    tagPairs[i++] = new String[] {"<head></head>", "<html>\n  <head></head>\n</html>"};
+    tagPairs[i++] = new String[] {"<body></body>", "<html>\n  <head></head>\n</html>"};
+    tagPairs[i++] = new String[] {"<title></title>", "<title></title>"};
 
-      // ─── 3. BLOCK-LEVEL ELEMENTS ────────────────────────────────────────────────
+    // ─── 3. BLOCK-LEVEL ELEMENTS ────────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<div></div>",            "<div></div>"};
-      tagPairs[i++] = new String[]{"<p></p>",                "<p></p>"};
-      tagPairs[i++] = new String[]{"<pre></pre>",            "<pre></pre>"};
-      tagPairs[i++] = new String[]{"<blockquote></blockquote>", "<blockquote></blockquote>"};
+    tagPairs[i++] = new String[] {"<div></div>", "<div></div>"};
+    tagPairs[i++] = new String[] {"<p></p>", "<p></p>"};
+    tagPairs[i++] = new String[] {"<pre></pre>", "<pre></pre>"};
+    tagPairs[i++] = new String[] {"<blockquote></blockquote>", "<blockquote></blockquote>"};
 
-      // Headings
-      tagPairs[i++] = new String[]{"<h1></h1>",              "<h1></h1>"};
-      tagPairs[i++] = new String[]{"<h2></h2>",              "<h2></h2>"};
-      tagPairs[i++] = new String[]{"<h3></h3>",              "<h3></h3>"};
-      tagPairs[i++] = new String[]{"<h4></h4>",              "<h4></h4>"};
-      tagPairs[i++] = new String[]{"<h5></h5>",              "<h5></h5>"};
-      tagPairs[i++] = new String[]{"<h6></h6>",              "<h6></h6>"};
+    // Headings
+    tagPairs[i++] = new String[] {"<h1></h1>", "<h1></h1>"};
+    tagPairs[i++] = new String[] {"<h2></h2>", "<h2></h2>"};
+    tagPairs[i++] = new String[] {"<h3></h3>", "<h3></h3>"};
+    tagPairs[i++] = new String[] {"<h4></h4>", "<h4></h4>"};
+    tagPairs[i++] = new String[] {"<h5></h5>", "<h5></h5>"};
+    tagPairs[i++] = new String[] {"<h6></h6>", "<h6></h6>"};
 
-      // ─── 4. SECTIONING (HTML5) ──────────────────────────────────────────────────
+    // ─── 4. SECTIONING (HTML5) ──────────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<header></header>",      "<header></header>"};
-      tagPairs[i++] = new String[]{"<footer></footer>",      "<footer></footer>"};
-      tagPairs[i++] = new String[]{"<nav></nav>",            "<nav></nav>"};
-      tagPairs[i++] = new String[]{"<main></main>",          "<main></main>"};
-      tagPairs[i++] = new String[]{"<section></section>",    "<section></section>"};
-      tagPairs[i++] = new String[]{"<article></article>",    "<article></article>"};
-      tagPairs[i++] = new String[]{"<aside></aside>",        "<aside></aside>"};
+    tagPairs[i++] = new String[] {"<header></header>", "<header></header>"};
+    tagPairs[i++] = new String[] {"<footer></footer>", "<footer></footer>"};
+    tagPairs[i++] = new String[] {"<nav></nav>", "<nav></nav>"};
+    tagPairs[i++] = new String[] {"<main></main>", "<main></main>"};
+    tagPairs[i++] = new String[] {"<section></section>", "<section></section>"};
+    tagPairs[i++] = new String[] {"<article></article>", "<article></article>"};
+    tagPairs[i++] = new String[] {"<aside></aside>", "<aside></aside>"};
 
-      // ─── 5. FIGURE & MEDIA ──────────────────────────────────────────────────────
+    // ─── 5. FIGURE & MEDIA ──────────────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<figure></figure>",      "<figure></figure>"};
-      tagPairs[i++] = new String[]{"<figcaption></figcaption>", "<figcaption></figcaption>"};
-      tagPairs[i++] = new String[]{"<picture></picture>",    "<picture></picture>"};
-      tagPairs[i++] = new String[]{"<video></video>",        "<video></video>"};
-      tagPairs[i++] = new String[]{"<audio></audio>",        "<audio></audio>"};
-      tagPairs[i++] = new String[]{"<canvas></canvas>",      "<canvas></canvas>"};
-      tagPairs[i++] = new String[]{"<map></map>",            "<map></map>"};
-      tagPairs[i++] = new String[]{"<object></object>",      "<object></object>"};
-      tagPairs[i++] = new String[]{"<iframe></iframe>",      "<iframe></iframe>"};
+    tagPairs[i++] = new String[] {"<figure></figure>", "<figure></figure>"};
+    tagPairs[i++] = new String[] {"<figcaption></figcaption>", "<figcaption></figcaption>"};
+    tagPairs[i++] = new String[] {"<picture></picture>", "<picture></picture>"};
+    tagPairs[i++] = new String[] {"<video></video>", "<video></video>"};
+    tagPairs[i++] = new String[] {"<audio></audio>", "<audio></audio>"};
+    tagPairs[i++] = new String[] {"<canvas></canvas>", "<canvas></canvas>"};
+    tagPairs[i++] = new String[] {"<map></map>", "<map></map>"};
+    tagPairs[i++] = new String[] {"<object></object>", "<object></object>"};
+    tagPairs[i++] = new String[] {"<iframe></iframe>", "<iframe></iframe>"};
 
-      // ─── 6. LISTS ───────────────────────────────────────────────────────────────
+    // ─── 6. LISTS ───────────────────────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<ul></ul>",              "<ul></ul>"};
-      tagPairs[i++] = new String[]{"<ol></ol>",              "<ol></ol>"};
-      tagPairs[i++] = new String[]{"<li></li>",              "<li></li>"};
-      tagPairs[i++] = new String[]{"<dl></dl>",              "<dl></dl>"};
-      tagPairs[i++] = new String[]{"<dt></dt>",              "<dt></dt>"};
-      tagPairs[i++] = new String[]{"<dd></dd>",              "<dd></dd>"};
+    tagPairs[i++] = new String[] {"<ul></ul>", "<ul></ul>"};
+    tagPairs[i++] = new String[] {"<ol></ol>", "<ol></ol>"};
+    tagPairs[i++] = new String[] {"<li></li>", "<li></li>"};
+    tagPairs[i++] = new String[] {"<dl></dl>", "<dl></dl>"};
+    tagPairs[i++] = new String[] {"<dt></dt>", "<dt></dt>"};
+    tagPairs[i++] = new String[] {"<dd></dd>", "<dd></dd>"};
 
-      // ─── 7. TABLES ──────────────────────────────────────────────────────────────
-      // Neko auto-inserts <tbody> and normalizes table structure with indentation
+    // ─── 7. TABLES ──────────────────────────────────────────────────────────────
+    // Neko auto-inserts <tbody> and normalizes table structure with indentation
 
-      tagPairs[i++] = new String[]{"<table></table>",        "<table></table>"};
+    tagPairs[i++] = new String[] {"<table></table>", "<table></table>"};
 
-      // Orphaned table child elements (no surrounding <table>) are dropped
-      tagPairs[i++] = new String[]{"<tr></tr>",              ""};
-      tagPairs[i++] = new String[]{"<td></td>",              ""};
-      tagPairs[i++] = new String[]{"<th></th>",              ""};
-      tagPairs[i++] = new String[]{"<thead></thead>",        ""};
-      tagPairs[i++] = new String[]{"<tbody></tbody>",        ""};
-      tagPairs[i++] = new String[]{"<tfoot></tfoot>",        ""};
+    // Orphaned table child elements (no surrounding <table>) are dropped
+    tagPairs[i++] = new String[] {"<tr></tr>", ""};
+    tagPairs[i++] = new String[] {"<td></td>", ""};
+    tagPairs[i++] = new String[] {"<th></th>", ""};
+    tagPairs[i++] = new String[] {"<thead></thead>", ""};
+    tagPairs[i++] = new String[] {"<tbody></tbody>", ""};
+    tagPairs[i++] = new String[] {"<tfoot></tfoot>", ""};
 
-      // Properly nested table elements — Neko adds <tbody> and indentation
-      tagPairs[i++] = new String[]{"<table><tr></tr></table>",
-                          "<table>\n  <tbody>\n    <tr></tr>\n  </tbody>\n</table>"};
+    // Properly nested table elements — Neko adds <tbody> and indentation
+    tagPairs[i++] =
+        new String[] {
+          "<table><tr></tr></table>", "<table>\n  <tbody>\n    <tr></tr>\n  </tbody>\n</table>"
+        };
 
-      tagPairs[i++] = new String[]{"<table><tr><td></td></tr></table>",
-                          "<table>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n</table>"};
+    tagPairs[i++] =
+        new String[] {
+          "<table><tr><td></td></tr></table>",
+          "<table>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n</table>"
+        };
 
-      tagPairs[i++] = new String[]{"<table><tr><th></th></tr></table>",
-                          "<table>\n  <tbody>\n    <tr>\n      <th></th>\n    </tr>\n  </tbody>\n</table>"};
+    tagPairs[i++] =
+        new String[] {
+          "<table><tr><th></th></tr></table>",
+          "<table>\n  <tbody>\n    <tr>\n      <th></th>\n    </tr>\n  </tbody>\n</table>"
+        };
 
-      tagPairs[i++] = new String[]{"<table><thead><tr><th></th></tr></thead></table>",
-                          "<table>\n  <thead>\n    <tr>\n      <th></th>\n    </tr>\n  </thead>\n</table>"};
+    tagPairs[i++] =
+        new String[] {
+          "<table><thead><tr><th></th></tr></thead></table>",
+          "<table>\n  <thead>\n    <tr>\n      <th></th>\n    </tr>\n  </thead>\n</table>"
+        };
 
-      tagPairs[i++] = new String[]{"<table><tbody><tr><td></td></tr></tbody></table>",
-                          "<table>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n</table>"};
+    tagPairs[i++] =
+        new String[] {
+          "<table><tbody><tr><td></td></tr></tbody></table>",
+          "<table>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n</table>"
+        };
 
-      tagPairs[i++] = new String[]{"<table><tfoot><tr><td></td></tr></tfoot></table>",
-                          "<table>\n  <tfoot>\n    <tr>\n      <td></td></tr>\n  </tfoot>\n</table>"};
+    tagPairs[i++] =
+        new String[] {
+          "<table><tfoot><tr><td></td></tr></tfoot></table>",
+          "<table>\n  <tfoot>\n    <tr>\n      <td></td></tr>\n  </tfoot>\n</table>"
+        };
 
-      // Full table with all sections
-      tagPairs[i++] = new String[]{
+    // Full table with all sections
+    tagPairs[i++] =
+        new String[] {
           "<table><thead><tr><th></th></tr></thead><tbody><tr><td></td></tr></tbody><tfoot><tr><td></td></tr></tfoot></table>",
-          "<table>\n  <thead>\n    <tr>\n      <th></th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n  <tfoot>\n    <tr>\n      <td></td></tr>\n  </tfoot>\n</table>"};
+          "<table>\n  <thead>\n    <tr>\n      <th></th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n  <tfoot>\n    <tr>\n      <td></td></tr>\n  </tfoot>\n</table>"
+        };
 
-      // Orphaned table child elements (no surrounding <table>) are dropped
-      tagPairs[i++] = new String[]{"<colgroup></colgroup>",  ""};
-      tagPairs[i++] = new String[]{"<table><colgroup></colgroup></table>",
-          "<table>\n  <colgroup></colgroup>\n</table>"};
-      tagPairs[i++] = new String[]{"<caption></caption>",    ""};
-      tagPairs[i++] = new String[]{"<table><caption></caption></table>",
-          "<table>\n  <caption></caption>\n</table>"};
+    // Orphaned table child elements (no surrounding <table>) are dropped
+    tagPairs[i++] = new String[] {"<colgroup></colgroup>", ""};
+    tagPairs[i++] =
+        new String[] {
+          "<table><colgroup></colgroup></table>", "<table>\n  <colgroup></colgroup>\n</table>"
+        };
+    tagPairs[i++] = new String[] {"<caption></caption>", ""};
+    tagPairs[i++] =
+        new String[] {
+          "<table><caption></caption></table>", "<table>\n  <caption></caption>\n</table>"
+        };
 
-      // ─── 8. FORMS ───────────────────────────────────────────────────────────────
+    // ─── 8. FORMS ───────────────────────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<form></form>",          "<form></form>"};
-      tagPairs[i++] = new String[]{"<button></button>",      "<button></button>"};
-      tagPairs[i++] = new String[]{"<label></label>",        "<label></label>"};
-      tagPairs[i++] = new String[]{"<select></select>",      "<select></select>"};
-      tagPairs[i++] = new String[]{"<option></option>",      "<option></option>"};
-      tagPairs[i++] = new String[]{"<optgroup></optgroup>",  "<optgroup></optgroup>"};
-      tagPairs[i++] = new String[]{"<textarea></textarea>",  "<textarea></textarea>"};
-      tagPairs[i++] = new String[]{"<fieldset></fieldset>",  "<fieldset></fieldset>"};
-      tagPairs[i++] = new String[]{"<legend></legend>",      "<legend></legend>"};
-      tagPairs[i++] = new String[]{"<datalist></datalist>",  "<datalist></datalist>"};
-      tagPairs[i++] = new String[]{"<output></output>",      "<output></output>"};
-      tagPairs[i++] = new String[]{"<progress></progress>",  "<progress></progress>"};
-      tagPairs[i++] = new String[]{"<meter></meter>",        "<meter></meter>"};
+    tagPairs[i++] = new String[] {"<form></form>", "<form></form>"};
+    tagPairs[i++] = new String[] {"<button></button>", "<button></button>"};
+    tagPairs[i++] = new String[] {"<label></label>", "<label></label>"};
+    tagPairs[i++] = new String[] {"<select></select>", "<select></select>"};
+    tagPairs[i++] = new String[] {"<option></option>", "<option></option>"};
+    tagPairs[i++] = new String[] {"<optgroup></optgroup>", "<optgroup></optgroup>"};
+    tagPairs[i++] = new String[] {"<textarea></textarea>", "<textarea></textarea>"};
+    tagPairs[i++] = new String[] {"<fieldset></fieldset>", "<fieldset></fieldset>"};
+    tagPairs[i++] = new String[] {"<legend></legend>", "<legend></legend>"};
+    tagPairs[i++] = new String[] {"<datalist></datalist>", "<datalist></datalist>"};
+    tagPairs[i++] = new String[] {"<output></output>", "<output></output>"};
+    tagPairs[i++] = new String[] {"<progress></progress>", "<progress></progress>"};
+    tagPairs[i++] = new String[] {"<meter></meter>", "<meter></meter>"};
 
-      // ─── 9. INLINE ELEMENTS ─────────────────────────────────────────────────────
+    // ─── 9. INLINE ELEMENTS ─────────────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<span></span>",          "<span></span>"};
-      tagPairs[i++] = new String[]{"<a></a>",                "<a rel=\"nofollow\"></a>"};
+    tagPairs[i++] = new String[] {"<span></span>", "<span></span>"};
+    tagPairs[i++] = new String[] {"<a></a>", "<a rel=\"nofollow\"></a>"};
 
-      // Text formatting
-      tagPairs[i++] = new String[]{"<strong></strong>",      "<strong></strong>"};
-      tagPairs[i++] = new String[]{"<em></em>",              "<em></em>"};
-      tagPairs[i++] = new String[]{"<b></b>",                "<b></b>"};
-      tagPairs[i++] = new String[]{"<i></i>",                "<i></i>"};
-      tagPairs[i++] = new String[]{"<u></u>",                "<u></u>"};
-      tagPairs[i++] = new String[]{"<s></s>",                "<s></s>"};
-      tagPairs[i++] = new String[]{"<del></del>",            "<del></del>"};
-      tagPairs[i++] = new String[]{"<ins></ins>",            "<ins></ins>"};
-      tagPairs[i++] = new String[]{"<small></small>",        "<small></small>"};
-      tagPairs[i++] = new String[]{"<mark></mark>",          "<mark></mark>"};
-      tagPairs[i++] = new String[]{"<sub></sub>",            "<sub></sub>"};
-      tagPairs[i++] = new String[]{"<sup></sup>",            "<sup></sup>"};
+    // Text formatting
+    tagPairs[i++] = new String[] {"<strong></strong>", "<strong></strong>"};
+    tagPairs[i++] = new String[] {"<em></em>", "<em></em>"};
+    tagPairs[i++] = new String[] {"<b></b>", "<b></b>"};
+    tagPairs[i++] = new String[] {"<i></i>", "<i></i>"};
+    tagPairs[i++] = new String[] {"<u></u>", "<u></u>"};
+    tagPairs[i++] = new String[] {"<s></s>", "<s></s>"};
+    tagPairs[i++] = new String[] {"<del></del>", "<del></del>"};
+    tagPairs[i++] = new String[] {"<ins></ins>", "<ins></ins>"};
+    tagPairs[i++] = new String[] {"<small></small>", "<small></small>"};
+    tagPairs[i++] = new String[] {"<mark></mark>", "<mark></mark>"};
+    tagPairs[i++] = new String[] {"<sub></sub>", "<sub></sub>"};
+    tagPairs[i++] = new String[] {"<sup></sup>", "<sup></sup>"};
 
-      // Semantic inline
-      tagPairs[i++] = new String[]{"<abbr></abbr>",          "<abbr></abbr>"};
-      tagPairs[i++] = new String[]{"<cite></cite>",          "<cite></cite>"};
-      tagPairs[i++] = new String[]{"<q></q>",                "<q></q>"};
-      tagPairs[i++] = new String[]{"<dfn></dfn>",            "<dfn></dfn>"};
-      tagPairs[i++] = new String[]{"<time></time>",          "<time></time>"};
-      tagPairs[i++] = new String[]{"<var></var>",            "<var></var>"};
-      tagPairs[i++] = new String[]{"<kbd></kbd>",            "<kbd></kbd>"};
-      tagPairs[i++] = new String[]{"<samp></samp>",          "<samp></samp>"};
+    // Semantic inline
+    tagPairs[i++] = new String[] {"<abbr></abbr>", "<abbr></abbr>"};
+    tagPairs[i++] = new String[] {"<cite></cite>", "<cite></cite>"};
+    tagPairs[i++] = new String[] {"<q></q>", "<q></q>"};
+    tagPairs[i++] = new String[] {"<dfn></dfn>", "<dfn></dfn>"};
+    tagPairs[i++] = new String[] {"<time></time>", "<time></time>"};
+    tagPairs[i++] = new String[] {"<var></var>", "<var></var>"};
+    tagPairs[i++] = new String[] {"<kbd></kbd>", "<kbd></kbd>"};
+    tagPairs[i++] = new String[] {"<samp></samp>", "<samp></samp>"};
 
-      // Code
-      tagPairs[i++] = new String[]{"<code></code>",          "<code></code>"};
+    // Code
+    tagPairs[i++] = new String[] {"<code></code>", "<code></code>"};
 
-      // ─── 10. INTERACTIVE / DETAILS ──────────────────────────────────────────────
+    // ─── 10. INTERACTIVE / DETAILS ──────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<details></details>",    "<details></details>"};
-      tagPairs[i++] = new String[]{"<summary></summary>",    "<summary></summary>"};
-      tagPairs[i++] = new String[]{"<dialog></dialog>",      "<dialog></dialog>"};
+    tagPairs[i++] = new String[] {"<details></details>", "<details></details>"};
+    tagPairs[i++] = new String[] {"<summary></summary>", "<summary></summary>"};
+    tagPairs[i++] = new String[] {"<dialog></dialog>", "<dialog></dialog>"};
 
-      // ─── 11. SCRIPTING & METADATA ───────────────────────────────────────────────
+    // ─── 11. SCRIPTING & METADATA ───────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<script></script>",      "<script></script>"};
-      tagPairs[i++] = new String[]{"<style></style>",        "<style></style>"};
-      tagPairs[i++] = new String[]{"<noscript></noscript>",  "<noscript></noscript>"};
+    tagPairs[i++] = new String[] {"<script></script>", "<script></script>"};
+    tagPairs[i++] = new String[] {"<style></style>", "<style></style>"};
+    tagPairs[i++] = new String[] {"<noscript></noscript>", "<noscript></noscript>"};
 
-      URL url = getClass().getResource("/antisamy-allowAllEmptyTags.xml");
-      Policy ourPolicy = TestPolicy.getInstance(url);
+    URL url = getClass().getResource("/antisamy-allowAllEmptyTags.xml");
+    Policy ourPolicy = TestPolicy.getInstance(url);
 
-      for (int j = 0; j < i; j++) {
-          System.out.println("(" + j + ") " + tagPairs[j][0]);
-          String output = as.scan(tagPairs[j][0], ourPolicy, AntiSamy.DOM).getCleanHTML();
-          assertEquals(tagPairs[j][1], output);
-      }
+    for (int j = 0; j < i; j++) {
+      System.out.println("(" + j + ") " + tagPairs[j][0]);
+      String output = as.scan(tagPairs[j][0], ourPolicy, AntiSamy.DOM).getCleanHTML();
+      assertEquals(tagPairs[j][1], output);
+    }
   }
 
   @Test
   public void testEmptyTagsSax() throws ScanException, PolicyException {
-      // Input -> Expected XHTML output pairs
-      // Void elements emit self-closing <tag />, non-void empty tags emit <tag></tag>
+    // Input -> Expected XHTML output pairs
+    // Void elements emit self-closing <tag />, non-void empty tags emit <tag></tag>
 
-      String[][] tagPairs = new String[200][2];
-      int i = 0;
+    String[][] tagPairs = new String[200][2];
+    int i = 0;
 
-      // ─── 1. VOID ELEMENTS (self-closing) ────────────────────────────────────────
-      // These have no content model; AntiSamy/Neko always emits <tag />
+    // ─── 1. VOID ELEMENTS (self-closing) ────────────────────────────────────────
+    // These have no content model; AntiSamy/Neko always emits <tag />
 
-      tagPairs[i++] = new String[]{"<br>",                   "<br/>"};
-      tagPairs[i++] = new String[]{"<hr>",                   "<hr/>"};
-      tagPairs[i++] = new String[]{"<input>",                "<input/>"};
-      tagPairs[i++] = new String[]{"<input></input>",        "<input/>"};
-      tagPairs[i++] = new String[]{"<img>",                  "<img/>"};
-      tagPairs[i++] = new String[]{"<img></img>",            "<img/>"};
-      tagPairs[i++] = new String[]{"<meta>",                 "<meta/>"};
-      tagPairs[i++] = new String[]{"<meta></meta>",          "<meta/>"};
-      tagPairs[i++] = new String[]{"<link>",                 "<link/>"};
-      tagPairs[i++] = new String[]{"<link></link>",          "<link/>"};
-      tagPairs[i++] = new String[]{"<param>",                "<param/>"};
-      tagPairs[i++] = new String[]{"<param></param>",        "<param/>"};
-      tagPairs[i++] = new String[]{"<area>",                 "<area/>"};
-      tagPairs[i++] = new String[]{"<area></area>",          "<area/>"};
-      tagPairs[i++] = new String[]{"<base>",                 "<base/>"};
-      tagPairs[i++] = new String[]{"<base></base>",          "<base/>"};
+    tagPairs[i++] = new String[] {"<br>", "<br/>"};
+    tagPairs[i++] = new String[] {"<hr>", "<hr/>"};
+    tagPairs[i++] = new String[] {"<input>", "<input/>"};
+    tagPairs[i++] = new String[] {"<input></input>", "<input/>"};
+    tagPairs[i++] = new String[] {"<img>", "<img/>"};
+    tagPairs[i++] = new String[] {"<img></img>", "<img/>"};
+    tagPairs[i++] = new String[] {"<meta>", "<meta/>"};
+    tagPairs[i++] = new String[] {"<meta></meta>", "<meta/>"};
+    tagPairs[i++] = new String[] {"<link>", "<link/>"};
+    tagPairs[i++] = new String[] {"<link></link>", "<link/>"};
+    tagPairs[i++] = new String[] {"<param>", "<param/>"};
+    tagPairs[i++] = new String[] {"<param></param>", "<param/>"};
+    tagPairs[i++] = new String[] {"<area>", "<area/>"};
+    tagPairs[i++] = new String[] {"<area></area>", "<area/>"};
+    tagPairs[i++] = new String[] {"<base>", "<base/>"};
+    tagPairs[i++] = new String[] {"<base></base>", "<base/>"};
 
-      // col is void and must be inside colgroup inside table
-      tagPairs[i++] = new String[]{"<col>",                  ""};
-      tagPairs[i++] = new String[]{"<col></col>",            ""};
-      tagPairs[i++] = new String[]{"<table><colgroup><col></colgroup></table>",
-                          "<table>\n  <colgroup>\n    <col/>\n  </colgroup>\n</table>"};
-      tagPairs[i++] = new String[]{"<table><colgroup><col></col></colgroup></table>",
-          "<table>\n  <colgroup>\n    <col/>\n  </colgroup>\n</table>"};
+    // col is void and must be inside colgroup inside table
+    tagPairs[i++] = new String[] {"<col>", ""};
+    tagPairs[i++] = new String[] {"<col></col>", ""};
+    tagPairs[i++] =
+        new String[] {
+          "<table><colgroup><col></colgroup></table>",
+          "<table>\n  <colgroup>\n    <col/>\n  </colgroup>\n</table>"
+        };
+    tagPairs[i++] =
+        new String[] {
+          "<table><colgroup><col></col></colgroup></table>",
+          "<table>\n  <colgroup>\n    <col/>\n  </colgroup>\n</table>"
+        };
 
-      tagPairs[i++] = new String[]{"<embed>",                "<embed/>"};
-      tagPairs[i++] = new String[]{"<embed></embed>",        "<embed/>"};
-      tagPairs[i++] = new String[]{"<source>",               "<source/>"};
-      tagPairs[i++] = new String[]{"<source></source>",      "<source/>"};
-      tagPairs[i++] = new String[]{"<track>",                "<track/>"};
-      tagPairs[i++] = new String[]{"<track></track>",        "<track/>"};
-      tagPairs[i++] = new String[]{"<wbr>",                  "<wbr/>"};
-      tagPairs[i++] = new String[]{"<wbr></wbr>",            "<wbr/>"};
+    tagPairs[i++] = new String[] {"<embed>", "<embed/>"};
+    tagPairs[i++] = new String[] {"<embed></embed>", "<embed/>"};
+    tagPairs[i++] = new String[] {"<source>", "<source/>"};
+    tagPairs[i++] = new String[] {"<source></source>", "<source/>"};
+    tagPairs[i++] = new String[] {"<track>", "<track/>"};
+    tagPairs[i++] = new String[] {"<track></track>", "<track/>"};
+    tagPairs[i++] = new String[] {"<wbr>", "<wbr/>"};
+    tagPairs[i++] = new String[] {"<wbr></wbr>", "<wbr/>"};
 
-      // ─── 2. DOCUMENT STRUCTURE ──────────────────────────────────────────────────
-      // Neko reconstructs full document structure when these appear
+    // ─── 2. DOCUMENT STRUCTURE ──────────────────────────────────────────────────
+    // Neko reconstructs full document structure when these appear
 
-      tagPairs[i++] = new String[]{"<html></html>",          "<html></html>"};
-      tagPairs[i++] = new String[]{"<head></head>",          "<html>\n  <head></head>\n</html>"};
-      tagPairs[i++] = new String[]{"<body></body>",          "<html>\n  <head></head>\n  <body></body>\n</html>"};
-      tagPairs[i++] = new String[]{"<title></title>",        "<title></title>"};
+    tagPairs[i++] = new String[] {"<html></html>", "<html></html>"};
+    tagPairs[i++] = new String[] {"<head></head>", "<html>\n  <head></head>\n</html>"};
+    tagPairs[i++] =
+        new String[] {"<body></body>", "<html>\n  <head></head>\n  <body></body>\n</html>"};
+    tagPairs[i++] = new String[] {"<title></title>", "<title></title>"};
 
-      // ─── 3. BLOCK-LEVEL ELEMENTS ────────────────────────────────────────────────
+    // ─── 3. BLOCK-LEVEL ELEMENTS ────────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<div></div>",            "<div></div>"};
-      tagPairs[i++] = new String[]{"<p></p>",                "<p></p>"};
-      tagPairs[i++] = new String[]{"<pre></pre>",            "<pre></pre>"};
-      tagPairs[i++] = new String[]{"<blockquote></blockquote>", "<blockquote></blockquote>"};
+    tagPairs[i++] = new String[] {"<div></div>", "<div></div>"};
+    tagPairs[i++] = new String[] {"<p></p>", "<p></p>"};
+    tagPairs[i++] = new String[] {"<pre></pre>", "<pre></pre>"};
+    tagPairs[i++] = new String[] {"<blockquote></blockquote>", "<blockquote></blockquote>"};
 
-      // Headings
-      tagPairs[i++] = new String[]{"<h1></h1>",              "<h1></h1>"};
-      tagPairs[i++] = new String[]{"<h2></h2>",              "<h2></h2>"};
-      tagPairs[i++] = new String[]{"<h3></h3>",              "<h3></h3>"};
-      tagPairs[i++] = new String[]{"<h4></h4>",              "<h4></h4>"};
-      tagPairs[i++] = new String[]{"<h5></h5>",              "<h5></h5>"};
-      tagPairs[i++] = new String[]{"<h6></h6>",              "<h6></h6>"};
+    // Headings
+    tagPairs[i++] = new String[] {"<h1></h1>", "<h1></h1>"};
+    tagPairs[i++] = new String[] {"<h2></h2>", "<h2></h2>"};
+    tagPairs[i++] = new String[] {"<h3></h3>", "<h3></h3>"};
+    tagPairs[i++] = new String[] {"<h4></h4>", "<h4></h4>"};
+    tagPairs[i++] = new String[] {"<h5></h5>", "<h5></h5>"};
+    tagPairs[i++] = new String[] {"<h6></h6>", "<h6></h6>"};
 
-      // ─── 4. SECTIONING (HTML5) ──────────────────────────────────────────────────
+    // ─── 4. SECTIONING (HTML5) ──────────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<header></header>",      "<header></header>"};
-      tagPairs[i++] = new String[]{"<footer></footer>",      "<footer></footer>"};
-      tagPairs[i++] = new String[]{"<nav></nav>",            "<nav></nav>"};
-      tagPairs[i++] = new String[]{"<main></main>",          "<main></main>"};
-      tagPairs[i++] = new String[]{"<section></section>",    "<section></section>"};
-      tagPairs[i++] = new String[]{"<article></article>",    "<article></article>"};
-      tagPairs[i++] = new String[]{"<aside></aside>",        "<aside></aside>"};
+    tagPairs[i++] = new String[] {"<header></header>", "<header></header>"};
+    tagPairs[i++] = new String[] {"<footer></footer>", "<footer></footer>"};
+    tagPairs[i++] = new String[] {"<nav></nav>", "<nav></nav>"};
+    tagPairs[i++] = new String[] {"<main></main>", "<main></main>"};
+    tagPairs[i++] = new String[] {"<section></section>", "<section></section>"};
+    tagPairs[i++] = new String[] {"<article></article>", "<article></article>"};
+    tagPairs[i++] = new String[] {"<aside></aside>", "<aside></aside>"};
 
-      // ─── 5. FIGURE & MEDIA ──────────────────────────────────────────────────────
+    // ─── 5. FIGURE & MEDIA ──────────────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<figure></figure>",      "<figure></figure>"};
-      tagPairs[i++] = new String[]{"<figcaption></figcaption>", "<figcaption></figcaption>"};
-      tagPairs[i++] = new String[]{"<picture></picture>",    "<picture></picture>"};
-      tagPairs[i++] = new String[]{"<video></video>",        "<video></video>"};
-      tagPairs[i++] = new String[]{"<audio></audio>",        "<audio></audio>"};
-      tagPairs[i++] = new String[]{"<canvas></canvas>",      "<canvas></canvas>"};
-      tagPairs[i++] = new String[]{"<map></map>",            "<map></map>"};
-      tagPairs[i++] = new String[]{"<object></object>",      "<object></object>"};
-      tagPairs[i++] = new String[]{"<iframe></iframe>",      "<iframe></iframe>"};
+    tagPairs[i++] = new String[] {"<figure></figure>", "<figure></figure>"};
+    tagPairs[i++] = new String[] {"<figcaption></figcaption>", "<figcaption></figcaption>"};
+    tagPairs[i++] = new String[] {"<picture></picture>", "<picture></picture>"};
+    tagPairs[i++] = new String[] {"<video></video>", "<video></video>"};
+    tagPairs[i++] = new String[] {"<audio></audio>", "<audio></audio>"};
+    tagPairs[i++] = new String[] {"<canvas></canvas>", "<canvas></canvas>"};
+    tagPairs[i++] = new String[] {"<map></map>", "<map></map>"};
+    tagPairs[i++] = new String[] {"<object></object>", "<object></object>"};
+    tagPairs[i++] = new String[] {"<iframe></iframe>", "<iframe></iframe>"};
 
-      // ─── 6. LISTS ───────────────────────────────────────────────────────────────
+    // ─── 6. LISTS ───────────────────────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<ul></ul>",              "<ul></ul>"};
-      tagPairs[i++] = new String[]{"<ol></ol>",              "<ol></ol>"};
-      tagPairs[i++] = new String[]{"<li></li>",              "<li></li>"};
-      tagPairs[i++] = new String[]{"<dl></dl>",              "<dl></dl>"};
-      tagPairs[i++] = new String[]{"<dt></dt>",              "<dt></dt>"};
-      tagPairs[i++] = new String[]{"<dd></dd>",              "<dd></dd>"};
+    tagPairs[i++] = new String[] {"<ul></ul>", "<ul></ul>"};
+    tagPairs[i++] = new String[] {"<ol></ol>", "<ol></ol>"};
+    tagPairs[i++] = new String[] {"<li></li>", "<li></li>"};
+    tagPairs[i++] = new String[] {"<dl></dl>", "<dl></dl>"};
+    tagPairs[i++] = new String[] {"<dt></dt>", "<dt></dt>"};
+    tagPairs[i++] = new String[] {"<dd></dd>", "<dd></dd>"};
 
-      // ─── 7. TABLES ──────────────────────────────────────────────────────────────
-      // Neko auto-inserts <tbody> and normalizes table structure with indentation
+    // ─── 7. TABLES ──────────────────────────────────────────────────────────────
+    // Neko auto-inserts <tbody> and normalizes table structure with indentation
 
-      tagPairs[i++] = new String[]{"<table></table>",        "<table></table>"};
+    tagPairs[i++] = new String[] {"<table></table>", "<table></table>"};
 
-      // Orphaned table child elements (no surrounding <table>) are dropped
-      tagPairs[i++] = new String[]{"<tr></tr>",              ""};
-      tagPairs[i++] = new String[]{"<td></td>",              ""};
-      tagPairs[i++] = new String[]{"<th></th>",              ""};
-      tagPairs[i++] = new String[]{"<thead></thead>",        ""};
-      tagPairs[i++] = new String[]{"<tbody></tbody>",        ""};
-      tagPairs[i++] = new String[]{"<tfoot></tfoot>",        ""};
+    // Orphaned table child elements (no surrounding <table>) are dropped
+    tagPairs[i++] = new String[] {"<tr></tr>", ""};
+    tagPairs[i++] = new String[] {"<td></td>", ""};
+    tagPairs[i++] = new String[] {"<th></th>", ""};
+    tagPairs[i++] = new String[] {"<thead></thead>", ""};
+    tagPairs[i++] = new String[] {"<tbody></tbody>", ""};
+    tagPairs[i++] = new String[] {"<tfoot></tfoot>", ""};
 
-      // Properly nested table elements — Neko adds <tbody> and indentation
-      tagPairs[i++] = new String[]{"<table><tr></tr></table>",
-                          "<table>\n  <tbody>\n    <tr></tr>\n  </tbody>\n</table>"};
+    // Properly nested table elements — Neko adds <tbody> and indentation
+    tagPairs[i++] =
+        new String[] {
+          "<table><tr></tr></table>", "<table>\n  <tbody>\n    <tr></tr>\n  </tbody>\n</table>"
+        };
 
-      tagPairs[i++] = new String[]{"<table><tr><td></td></tr></table>",
-                          "<table>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n</table>"};
+    tagPairs[i++] =
+        new String[] {
+          "<table><tr><td></td></tr></table>",
+          "<table>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n</table>"
+        };
 
-      tagPairs[i++] = new String[]{"<table><tr><th></th></tr></table>",
-                          "<table>\n  <tbody>\n    <tr>\n      <th></th>\n    </tr>\n  </tbody>\n</table>"};
+    tagPairs[i++] =
+        new String[] {
+          "<table><tr><th></th></tr></table>",
+          "<table>\n  <tbody>\n    <tr>\n      <th></th>\n    </tr>\n  </tbody>\n</table>"
+        };
 
-      tagPairs[i++] = new String[]{"<table><thead><tr><th></th></tr></thead></table>",
-                          "<table>\n  <thead>\n    <tr>\n      <th></th>\n    </tr>\n  </thead>\n</table>"};
+    tagPairs[i++] =
+        new String[] {
+          "<table><thead><tr><th></th></tr></thead></table>",
+          "<table>\n  <thead>\n    <tr>\n      <th></th>\n    </tr>\n  </thead>\n</table>"
+        };
 
-      tagPairs[i++] = new String[]{"<table><tbody><tr><td></td></tr></tbody></table>",
-                          "<table>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n</table>"};
+    tagPairs[i++] =
+        new String[] {
+          "<table><tbody><tr><td></td></tr></tbody></table>",
+          "<table>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n</table>"
+        };
 
-      tagPairs[i++] = new String[]{"<table><tfoot><tr><td></td></tr></tfoot></table>",
-                          "<table>\n  <tfoot>\n    <tr>\n      <td></td></tr>\n  </tfoot>\n</table>"};
+    tagPairs[i++] =
+        new String[] {
+          "<table><tfoot><tr><td></td></tr></tfoot></table>",
+          "<table>\n  <tfoot>\n    <tr>\n      <td></td></tr>\n  </tfoot>\n</table>"
+        };
 
-      // Full table with all sections
-      tagPairs[i++] = new String[]{
+    // Full table with all sections
+    tagPairs[i++] =
+        new String[] {
           "<table><thead><tr><th></th></tr></thead><tbody><tr><td></td></tr></tbody><tfoot><tr><td></td></tr></tfoot></table>",
-          "<table>\n  <thead>\n    <tr>\n      <th></th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n  <tfoot>\n    <tr>\n      <td></td></tr>\n  </tfoot>\n</table>"};
+          "<table>\n  <thead>\n    <tr>\n      <th></th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td></td></tr>\n  </tbody>\n  <tfoot>\n    <tr>\n      <td></td></tr>\n  </tfoot>\n</table>"
+        };
 
-      // Orphaned table child elements (no surrounding <table>) are dropped
-      tagPairs[i++] = new String[]{"<colgroup></colgroup>",  ""};
-      tagPairs[i++] = new String[]{"<table><colgroup></colgroup></table>",
-          "<table>\n  <colgroup></colgroup>\n</table>"};
-      tagPairs[i++] = new String[]{"<caption></caption>",    ""};
-      tagPairs[i++] = new String[]{"<table><caption></caption></table>",
-          "<table>\n  <caption></caption>\n</table>"};
+    // Orphaned table child elements (no surrounding <table>) are dropped
+    tagPairs[i++] = new String[] {"<colgroup></colgroup>", ""};
+    tagPairs[i++] =
+        new String[] {
+          "<table><colgroup></colgroup></table>", "<table>\n  <colgroup></colgroup>\n</table>"
+        };
+    tagPairs[i++] = new String[] {"<caption></caption>", ""};
+    tagPairs[i++] =
+        new String[] {
+          "<table><caption></caption></table>", "<table>\n  <caption></caption>\n</table>"
+        };
 
-      // ─── 8. FORMS ───────────────────────────────────────────────────────────────
+    // ─── 8. FORMS ───────────────────────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<form></form>",          "<form></form>"};
-      tagPairs[i++] = new String[]{"<button></button>",      "<button></button>"};
-      tagPairs[i++] = new String[]{"<label></label>",        "<label></label>"};
-      tagPairs[i++] = new String[]{"<select></select>",      "<select></select>"};
-      tagPairs[i++] = new String[]{"<option></option>",      "<option></option>"};
-      tagPairs[i++] = new String[]{"<optgroup></optgroup>",  "<optgroup></optgroup>"};
-      tagPairs[i++] = new String[]{"<textarea></textarea>",  "<textarea></textarea>"};
-      tagPairs[i++] = new String[]{"<fieldset></fieldset>",  "<fieldset></fieldset>"};
-      tagPairs[i++] = new String[]{"<legend></legend>",      "<legend></legend>"};
-      tagPairs[i++] = new String[]{"<datalist></datalist>",  "<datalist></datalist>"};
-      tagPairs[i++] = new String[]{"<output></output>",      "<output></output>"};
-      tagPairs[i++] = new String[]{"<progress></progress>",  "<progress></progress>"};
-      tagPairs[i++] = new String[]{"<meter></meter>",        "<meter></meter>"};
+    tagPairs[i++] = new String[] {"<form></form>", "<form></form>"};
+    tagPairs[i++] = new String[] {"<button></button>", "<button></button>"};
+    tagPairs[i++] = new String[] {"<label></label>", "<label></label>"};
+    tagPairs[i++] = new String[] {"<select></select>", "<select></select>"};
+    tagPairs[i++] = new String[] {"<option></option>", "<option></option>"};
+    tagPairs[i++] = new String[] {"<optgroup></optgroup>", "<optgroup></optgroup>"};
+    tagPairs[i++] = new String[] {"<textarea></textarea>", "<textarea></textarea>"};
+    tagPairs[i++] = new String[] {"<fieldset></fieldset>", "<fieldset></fieldset>"};
+    tagPairs[i++] = new String[] {"<legend></legend>", "<legend></legend>"};
+    tagPairs[i++] = new String[] {"<datalist></datalist>", "<datalist></datalist>"};
+    tagPairs[i++] = new String[] {"<output></output>", "<output></output>"};
+    tagPairs[i++] = new String[] {"<progress></progress>", "<progress></progress>"};
+    tagPairs[i++] = new String[] {"<meter></meter>", "<meter></meter>"};
 
-      // ─── 9. INLINE ELEMENTS ─────────────────────────────────────────────────────
+    // ─── 9. INLINE ELEMENTS ─────────────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<span></span>",          "<span></span>"};
-      tagPairs[i++] = new String[]{"<a></a>",                "<a rel=\"nofollow\"></a>"};
+    tagPairs[i++] = new String[] {"<span></span>", "<span></span>"};
+    tagPairs[i++] = new String[] {"<a></a>", "<a rel=\"nofollow\"></a>"};
 
-      // Text formatting
-      tagPairs[i++] = new String[]{"<strong></strong>",      "<strong></strong>"};
-      tagPairs[i++] = new String[]{"<em></em>",              "<em></em>"};
-      tagPairs[i++] = new String[]{"<b></b>",                "<b></b>"};
-      tagPairs[i++] = new String[]{"<i></i>",                "<i></i>"};
-      tagPairs[i++] = new String[]{"<u></u>",                "<u></u>"};
-      tagPairs[i++] = new String[]{"<s></s>",                "<s></s>"};
-      tagPairs[i++] = new String[]{"<del></del>",            "<del></del>"};
-      tagPairs[i++] = new String[]{"<ins></ins>",            "<ins></ins>"};
-      tagPairs[i++] = new String[]{"<small></small>",        "<small></small>"};
-      tagPairs[i++] = new String[]{"<mark></mark>",          "<mark></mark>"};
-      tagPairs[i++] = new String[]{"<sub></sub>",            "<sub></sub>"};
-      tagPairs[i++] = new String[]{"<sup></sup>",            "<sup></sup>"};
+    // Text formatting
+    tagPairs[i++] = new String[] {"<strong></strong>", "<strong></strong>"};
+    tagPairs[i++] = new String[] {"<em></em>", "<em></em>"};
+    tagPairs[i++] = new String[] {"<b></b>", "<b></b>"};
+    tagPairs[i++] = new String[] {"<i></i>", "<i></i>"};
+    tagPairs[i++] = new String[] {"<u></u>", "<u></u>"};
+    tagPairs[i++] = new String[] {"<s></s>", "<s></s>"};
+    tagPairs[i++] = new String[] {"<del></del>", "<del></del>"};
+    tagPairs[i++] = new String[] {"<ins></ins>", "<ins></ins>"};
+    tagPairs[i++] = new String[] {"<small></small>", "<small></small>"};
+    tagPairs[i++] = new String[] {"<mark></mark>", "<mark></mark>"};
+    tagPairs[i++] = new String[] {"<sub></sub>", "<sub></sub>"};
+    tagPairs[i++] = new String[] {"<sup></sup>", "<sup></sup>"};
 
-      // Semantic inline
-      tagPairs[i++] = new String[]{"<abbr></abbr>",          "<abbr></abbr>"};
-      tagPairs[i++] = new String[]{"<cite></cite>",          "<cite></cite>"};
-      tagPairs[i++] = new String[]{"<q></q>",                "<q></q>"};
-      tagPairs[i++] = new String[]{"<dfn></dfn>",            "<dfn></dfn>"};
-      tagPairs[i++] = new String[]{"<time></time>",          "<time></time>"};
-      tagPairs[i++] = new String[]{"<var></var>",            "<var></var>"};
-      tagPairs[i++] = new String[]{"<kbd></kbd>",            "<kbd></kbd>"};
-      tagPairs[i++] = new String[]{"<samp></samp>",          "<samp></samp>"};
+    // Semantic inline
+    tagPairs[i++] = new String[] {"<abbr></abbr>", "<abbr></abbr>"};
+    tagPairs[i++] = new String[] {"<cite></cite>", "<cite></cite>"};
+    tagPairs[i++] = new String[] {"<q></q>", "<q></q>"};
+    tagPairs[i++] = new String[] {"<dfn></dfn>", "<dfn></dfn>"};
+    tagPairs[i++] = new String[] {"<time></time>", "<time></time>"};
+    tagPairs[i++] = new String[] {"<var></var>", "<var></var>"};
+    tagPairs[i++] = new String[] {"<kbd></kbd>", "<kbd></kbd>"};
+    tagPairs[i++] = new String[] {"<samp></samp>", "<samp></samp>"};
 
-      // Code
-      tagPairs[i++] = new String[]{"<code></code>",          "<code></code>"};
+    // Code
+    tagPairs[i++] = new String[] {"<code></code>", "<code></code>"};
 
-      // ─── 10. INTERACTIVE / DETAILS ──────────────────────────────────────────────
+    // ─── 10. INTERACTIVE / DETAILS ──────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<details></details>",    "<details></details>"};
-      tagPairs[i++] = new String[]{"<summary></summary>",    "<summary></summary>"};
-      tagPairs[i++] = new String[]{"<dialog></dialog>",      "<dialog></dialog>"};
+    tagPairs[i++] = new String[] {"<details></details>", "<details></details>"};
+    tagPairs[i++] = new String[] {"<summary></summary>", "<summary></summary>"};
+    tagPairs[i++] = new String[] {"<dialog></dialog>", "<dialog></dialog>"};
 
-      // ─── 11. SCRIPTING & METADATA ───────────────────────────────────────────────
+    // ─── 11. SCRIPTING & METADATA ───────────────────────────────────────────────
 
-      tagPairs[i++] = new String[]{"<script></script>",      "<script></script>"};
-      tagPairs[i++] = new String[]{"<noscript></noscript>",  "<noscript></noscript>"};
+    tagPairs[i++] = new String[] {"<script></script>", "<script></script>"};
+    tagPairs[i++] = new String[] {"<noscript></noscript>", "<noscript></noscript>"};
 
-      // for style tags, the MagicSAXFilter does some special handling,
-      // the code docu at line 206 stats:
-      //   if the CSS is unscannable, we report the error, but skip the style element
-      // therefore the result her is empty
-      tagPairs[i++] = new String[]{"<style></style>",        ""};
+    // for style tags, the MagicSAXFilter does some special handling,
+    // the code docu at line 206 stats:
+    //   if the CSS is unscannable, we report the error, but skip the style element
+    // therefore the result her is empty
+    tagPairs[i++] = new String[] {"<style></style>", ""};
 
-      URL url = getClass().getResource("/antisamy-allowAllEmptyTags.xml");
-      Policy ourPolicy = TestPolicy.getInstance(url);
+    URL url = getClass().getResource("/antisamy-allowAllEmptyTags.xml");
+    Policy ourPolicy = TestPolicy.getInstance(url);
 
-      for (int j = 0; j < i; j++) {
-          String output = as.scan(tagPairs[j][0], ourPolicy, AntiSamy.SAX).getCleanHTML();
-          assertEquals(tagPairs[j][1], output);
-      }
+    for (int j = 0; j < i; j++) {
+      String output = as.scan(tagPairs[j][0], ourPolicy, AntiSamy.SAX).getCleanHTML();
+      assertEquals(tagPairs[j][1], output);
+    }
+  }
+
+  /** ReDoS Validation for offsiteURL: Tests <a href="..."> and <img src="..."> HTML attributes. */
+  @Test(timeout = 2000)
+  public void testOffsiteUrlReDoSPerformance() throws Exception {
+    // 8 KB malicious payload in an href attribute
+    String payload8k =
+        "<a href=\"http://"
+            + String.join("", Collections.nCopies(5000, "a"))
+            + String.join("", Collections.nCopies(3000, " "))
+            + "^\">link</a>";
+
+    // 80 KB extreme payload
+    String payload80k =
+        "<a href=\"http://"
+            + String.join("", Collections.nCopies(50000, "a"))
+            + String.join("", Collections.nCopies(30000, " "))
+            + "^\">link</a>";
+
+    long start = System.currentTimeMillis();
+
+    as.scan(payload8k, policy);
+    as.scan(payload80k, policy);
+
+    long elapsed = System.currentTimeMillis() - start;
+
+    assertTrue("offsiteURL ReDoS detected! Scanning took " + elapsed + " ms", elapsed < 500);
+  }
+
+  /** ReDoS Validation for cssOffsiteUri: Tests style attributes with url(...). */
+  @Test(timeout = 2000)
+  public void testCssOffsiteUriReDoSPerformance() throws Exception {
+    String payload8k =
+        "<div style=\"background: url('http://"
+            + String.join("", Collections.nCopies(5000, "a"))
+            + String.join("", Collections.nCopies(3000, " "))
+            + "^')\">x</div>";
+
+    String payload80k =
+        "<div style=\"background: url('http://"
+            + String.join("", Collections.nCopies(50000, "a"))
+            + String.join("", Collections.nCopies(30000, " "))
+            + "^')\">x</div>";
+
+    long start = System.currentTimeMillis();
+
+    as.scan(payload8k, policy);
+    as.scan(payload80k, policy);
+
+    long elapsed = System.currentTimeMillis() - start;
+
+    assertTrue("cssOffsiteUri ReDoS detected! Scanning took " + elapsed + " ms", elapsed < 500);
+  }
+
+  /** Functional Acceptance for offsiteURL: Valid HTML links, sources, and mailto schemes. */
+  @Test
+  public void testValidOffsiteUrls() throws Exception {
+    String[] validUrls = {
+      // Supported Schemes (http, https, ftp, ftps, mailto)
+      "<a href=\"http://example.com/index.html\">link</a>",
+      "<a href=\"https://example.com/index.html\">link</a>",
+      "<a href=\"ftp://files.example.com/doc.pdf\">link</a>",
+      "<a href=\"ftps://secure.example.com/doc.pdf\">link</a>",
+      "<a href=\"mailto:user@example.com\">email</a>",
+
+      // User Info, Ports, Subdomains, Query Params & Anchors
+      "<a href=\"https://admin:pass@sub.domain.example.co.uk:8080/path?a=1&b=2#section\">link</a>",
+
+      // Permitted Symbols
+      "<a href=\"https://example.com/~user/@file_name$123.jpg?a=1+2&b=3%204\">link</a>",
+
+      // Unicode Domains & Paths
+      "<a href=\"https://münchen.de/bild.jpg\">link</a>",
+
+      // Images with valid src
+      "<img src=\"https://example.com/image.png\" />"
+    };
+
+    for (String html : validUrls) {
+      CleanResults cr = as.scan(html, policy);
+      assertTrue(
+          "Valid offsiteURL was unexpectedly stripped: " + html,
+          cr.getCleanHTML().contains("href=") || cr.getCleanHTML().contains("src="));
+      assertEquals("Errors produced for valid offsiteURL: " + html, 0, cr.getNumberOfErrors());
+    }
+  }
+
+  /** Negative Assertions for offsiteURL: Invalid/Dangerous protocols and syntax. */
+  @Test
+  public void testInvalidOffsiteUrls() throws Exception {
+    String[] invalidUrls = {
+      "<a href=\"javascript:alert(1)\">click</a>",
+      "<a href=\"file:///etc/passwd\">click</a>",
+      "<a href=\"data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==\">click</a>",
+      "<a href=\"http://example.com^\">click</a>",
+      "<a href=\"http://ex<script>ample.com\">click</a>"
+    };
+
+    for (String html : invalidUrls) {
+      CleanResults cr = as.scan(html, policy);
+      assertFalse(
+          "Invalid or dangerous offsiteURL was allowed: " + html,
+          cr.getCleanHTML().contains("href="));
+    }
   }
 }

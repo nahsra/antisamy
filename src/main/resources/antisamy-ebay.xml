@@ -39,7 +39,7 @@
         <regexp name="onsiteURL"
             value="^(?!//)(?![\p{L}\p{N}\\\.\#@\$%\+&amp;;\-_~,\?=/!]*(&amp;colon))[\p{L}\p{N}\\\.\#@\$%\+&amp;;\-_~,\?=/!]*" />
         <regexp name="offsiteURL"
-            value="(\s)*((ht|f)tp(s?)://|mailto:)[\p{L}\p{N}]+[\p{L}\p{N}\p{Zs}\.\#@\$%\+&amp;;:\-_~,\?=/!\(\)]*(\s)*" />
+            value="\s*+(?:(?:https?|ftps?)://|mailto:)[\p{L}\p{N}]++[\p{L}\p{N}\p{Zs}\.\#@\$%\+&amp;:,\-_~,\?=/!\(\)]*+\s*+" />
 
         <regexp name="boolean" value="(true|false)" />
         <regexp name="singlePrintable" value="[a-zA-Z0-9]{1}" /> <!-- \w allows the '_' character -->
@@ -77,7 +77,7 @@
         <!-- This is for resources referenced from CSS (such as background images and other imported stylesheets) -->
         <regexp name="cssOnsiteUri" value="url\(([\p{L}\p{N}\\/\.\?=\#&amp;;\-_~]+|\#(\w)+)\)" />
         <regexp name="cssOffsiteUri"
-            value="url\((\s)*((ht|f)tp(s?)://)[\p{L}\p{N}]+[~\p{L}\p{N}\p{Zs}\-_\.@#$%&amp;;:,\?=/\+!]*(\s)*\)" />
+            value="url\(\s*+(?:https?|ftps?)://[\p{L}\p{N}]++[~\p{L}\p{N}\p{Zs}\-_\.@#$%&amp;:,\?=/\+!]*+\s*+\)" />
 
         <!-- This if for CSS Identifiers -->
         <regexp name="cssIdentifier" value="[a-zA-Z0-9\-_]+" />

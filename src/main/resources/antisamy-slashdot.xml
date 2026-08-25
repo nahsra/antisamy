@@ -25,7 +25,7 @@
         <regexp name="onsiteURL"
             value="^(?!//)(?![\p{L}\p{N}\\\.\#@\$%\+&amp;;\-_~,\?=/!]*(&amp;colon))[\p{L}\p{N}\\\.\#@\$%\+&amp;;\-_~,\?=/!]*" />
         <regexp name="offsiteURL"
-            value="(\s)*((ht|f)tp(s?)://|mailto:)[\p{L}\p{N}]+[~\p{L}\p{N}\p{Zs}\-_\.@\#\$%&amp;;:,\?=/\+!\(\)]*(\s)*" />
+            value="\s*+(?:(?:https?|ftps?)://|mailto:)[\p{L}\p{N}]++[\p{L}\p{N}\p{Zs}\.\#@\$%\+&amp;:,\-_~,\?=/!\(\)]*+\s*+" />
 
     </common-regexps>
 
