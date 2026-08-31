@@ -55,7 +55,7 @@ public class PolicyTest {
   private Policy policy;
 
   private static final String HEADER =
-      "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n"
+      "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
           + "<anti-samy-rules xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
           + "xsi:noNamespaceSchemaLocation=\"antisamy.xsd\">\n";
   private static final String DIRECTIVES = "<directives>\n</directives>\n";
