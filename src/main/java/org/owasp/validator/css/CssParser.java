@@ -120,7 +120,8 @@ public class CssParser extends org.apache.batik.css.parser.Parser {
   }
 
   private boolean hasAnotherMediaQuery() {
-    return current == LexicalUnits.COMMA || (current == LexicalUnits.IDENTIFIER && scanner.getStringValue().equals(OR.toString()));
+    return current == LexicalUnits.COMMA
+        || (current == LexicalUnits.IDENTIFIER && scanner.getStringValue().equals(OR.toString()));
   }
 
   protected CssMediaQuery parseMediaQuery() {
@@ -165,7 +166,8 @@ public class CssParser extends org.apache.batik.css.parser.Parser {
       query.addMediaFeature(parseMediaFeature());
     }
 
-    while (current == LexicalUnits.IDENTIFIER && CssMediaQueryLogicalOperator.parse(scanner.getStringValue()) == AND) {
+    while (current == LexicalUnits.IDENTIFIER
+        && CssMediaQueryLogicalOperator.parse(scanner.getStringValue()) == AND) {
       nextIgnoreSpaces();
       query.addMediaFeature(parseMediaFeature());
     }
