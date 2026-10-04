@@ -3,7 +3,6 @@ package org.owasp.validator.html.scan;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Locale;
-
 import org.apache.xml.serialize.ElementState;
 import org.apache.xml.serialize.HTMLdtd;
 import org.apache.xml.serialize.OutputFormat;
@@ -43,8 +42,8 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
    * Overrides the base class to fix a bug where comment nodes that are direct children of a
    * DocumentFragment (i.e. at the document root level) are silently dropped even when
    * preserveComments=true. The Xerces HTMLSerializer only handles COMMENT_NODE inside element
-   * serialization, never when isDocumentState() is true. We intercept comment nodes here and
-   * print them directly; all other node types fall through to the base implementation.
+   * serialization, never when isDocumentState() is true. We intercept comment nodes here and print
+   * them directly; all other node types fall through to the base implementation.
    */
   @Override
   protected void serializeNode(Node node) throws IOException {
@@ -173,8 +172,7 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
       if (!elem.hasChildNodes() && isAllowedEmptyTag(tagName))
         if (isSelfClosingTag(tagName) && !requiresClosingTag(tagName)) {
           _printer.printText("/>");
-        }
-        else {
+        } else {
           _printer.printText("></");
           _printer.printText(tagName);
           _printer.printText('>');
@@ -201,8 +199,7 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
     if (state.empty && isAllowedEmptyTag(rawName)) {
       if (isSelfClosingTag(rawName) && !requiresClosingTag(rawName)) {
         _printer.printText("/>");
-      }
-      else {
+      } else {
         _printer.printText("></");
         _printer.printText(rawName);
         _printer.printText('>');
@@ -259,12 +256,12 @@ public class ASHTMLSerializer extends org.apache.xml.serialize.HTMLSerializer {
   }
 
   private boolean isSelfClosingTag(String rawName) {
-      return HTMLdtd.isEmptyTag(rawName)
-              || "link".equals(rawName)
-              || "wbr".equals(rawName)
-              || "embed".equals(rawName)
-              || "area".equals(rawName)
-              || "source".equals(rawName)
-              || "track".equals(rawName);
+    return HTMLdtd.isEmptyTag(rawName)
+        || "link".equals(rawName)
+        || "wbr".equals(rawName)
+        || "embed".equals(rawName)
+        || "area".equals(rawName)
+        || "source".equals(rawName)
+        || "track".equals(rawName);
   }
 }
