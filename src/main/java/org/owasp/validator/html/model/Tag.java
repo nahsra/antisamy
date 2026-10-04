@@ -141,7 +141,9 @@ public class Tag {
   private static final String CLOSE_TAG_ATTRIBUTES = ")*";
   private static final String REGEXP_CHARACTERS = "\\(){}.*?$^-+";
 
-  /** @return The String name of the tag. */
+  /**
+   * @return The String name of the tag.
+   */
   public String getName() {
     return name;
   }
