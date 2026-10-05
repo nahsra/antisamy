@@ -45,7 +45,7 @@
             value="^(?!//)(?![\p{L}\p{N}\\\.\#@\$%\+&amp;;\-_~,\?=/!]*(&amp;colon))[\p{L}\p{N}\\\.\#@\$%\+&amp;;\-_~,\?=/!]*" />
         <regexp name="anchoredURL" value="#(\w)+" />
         <regexp name="offsiteURL"
-            value="(\s)*((ht|f)tp(s?)://|mailto:)[\p{L}\p{N}]+[\p{L}\p{N}\p{Zs}\.\#@\$%\+&amp;;:\-_~,\?=/!\(\)]*(\s)*" />
+            value="\s*+(?:(?:https?|ftps?)://|mailto:)[\p{L}\p{N}]++[\p{L}\p{N}\p{Zs}\.\#@\$%\+&amp;:,\-_~,\?=/!\(\)]*+\s*+" />
 
         <regexp name="boolean" value="(true|false)" />
         <regexp name="singlePrintable" value="[a-zA-Z0-9]{1}" /> <!-- \w allows the '_' character -->
@@ -83,7 +83,7 @@
         <!-- This is for resources referenced from CSS (such as background images and other imported stylesheets) -->
         <regexp name="cssOnsiteUri" value="url\(([\p{L}\p{N}\\/\.\?=\#&amp;;\-_~]+|\#(\w)+)\)" />
         <regexp name="cssOffsiteUri"
-            value="url\((\s)*((ht|f)tp(s?)://)[\p{L}\p{N}]+[~\p{L}\p{N}\p{Zs}\-_\.@#$%&amp;;:,\?=/\+!]*(\s)*\)" />
+            value="url\(\s*+(?:https?|ftps?)://[\p{L}\p{N}]++[~\p{L}\p{N}\p{Zs}\-_\.@#$%&amp;:,\?=/\+!]*+\s*+\)" />
 
         <!-- This if for CSS Identifiers -->
         <regexp name="cssIdentifier" value="[a-zA-Z0-9\-_]+" />
@@ -110,8 +110,7 @@
             value="rgb\(([1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),([1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),([1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\)" />
 
         <!-- Relative color values between 0%-100% are also allowed -->
-        <regexp name="rgbPercentage"
-                value="rgb\(([0-9][0-9]?|100)\.?\d*%,([0-9][0-9]?|100)\.?\d*%,([0-9][0-9]?|100)\.?\d*%\)" />
+        <regexp name="rgbPercentage" value="rgb\(([0-9][0-9]?|100)\.?\d*%,([0-9][0-9]?|100)\.?\d*%,([0-9][0-9]?|100)\.?\d*%\)" />
 
         <!-- CSS2 Allowed System Color Values -->
         <regexp name="systemColor"
@@ -2871,7 +2870,7 @@
 
         </literal-list>
     </allowed-empty-tags>
-    
+
     <require-closing-tags>
     </require-closing-tags>
 
