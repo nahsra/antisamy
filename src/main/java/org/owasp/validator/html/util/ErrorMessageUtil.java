@@ -23,6 +23,8 @@
  */
 package org.owasp.validator.html.util;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
@@ -87,6 +89,10 @@ public final class ErrorMessageUtil {
   private ErrorMessageUtil() {}
 
   public static String getMessage(ResourceBundle messages, String msgKey, Object[] arguments) {
-    return MessageFormat.format(messages.getString(msgKey), arguments);
+    return MessageFormat.format(
+        new String(
+            messages.getString(msgKey).getBytes(StandardCharsets.ISO_8859_1),
+            Charset.defaultCharset()),
+        arguments);
   }
 }
