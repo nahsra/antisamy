@@ -3571,4 +3571,108 @@ public class AntiSamyTest {
       assertEquals(tagPairs[j][1], output);
     }
   }
+
+  /** ReDoS Validation for offsiteURL: Tests <a href="..."> and <img src="..."> HTML attributes. */
+  @Test(timeout = 2000)
+  public void testOffsiteUrlReDoSPerformance() throws Exception {
+    // 8 KB malicious payload in an href attribute
+    String payload8k =
+        "<a href=\"http://"
+            + String.join("", Collections.nCopies(5000, "a"))
+            + String.join("", Collections.nCopies(3000, " "))
+            + "^\">link</a>";
+
+    // 80 KB extreme payload
+    String payload80k =
+        "<a href=\"http://"
+            + String.join("", Collections.nCopies(50000, "a"))
+            + String.join("", Collections.nCopies(30000, " "))
+            + "^\">link</a>";
+
+    long start = System.currentTimeMillis();
+
+    as.scan(payload8k, policy);
+    as.scan(payload80k, policy);
+
+    long elapsed = System.currentTimeMillis() - start;
+
+    assertTrue("offsiteURL ReDoS detected! Scanning took " + elapsed + " ms", elapsed < 500);
+  }
+
+  /** ReDoS Validation for cssOffsiteUri: Tests style attributes with url(...). */
+  @Test(timeout = 2000)
+  public void testCssOffsiteUriReDoSPerformance() throws Exception {
+    String payload8k =
+        "<div style=\"background: url('http://"
+            + String.join("", Collections.nCopies(5000, "a"))
+            + String.join("", Collections.nCopies(3000, " "))
+            + "^')\">x</div>";
+
+    String payload80k =
+        "<div style=\"background: url('http://"
+            + String.join("", Collections.nCopies(50000, "a"))
+            + String.join("", Collections.nCopies(30000, " "))
+            + "^')\">x</div>";
+
+    long start = System.currentTimeMillis();
+
+    as.scan(payload8k, policy);
+    as.scan(payload80k, policy);
+
+    long elapsed = System.currentTimeMillis() - start;
+
+    assertTrue("cssOffsiteUri ReDoS detected! Scanning took " + elapsed + " ms", elapsed < 500);
+  }
+
+  /** Functional Acceptance for offsiteURL: Valid HTML links, sources, and mailto schemes. */
+  @Test
+  public void testValidOffsiteUrls() throws Exception {
+    String[] validUrls = {
+      // Supported Schemes (http, https, ftp, ftps, mailto)
+      "<a href=\"http://example.com/index.html\">link</a>",
+      "<a href=\"https://example.com/index.html\">link</a>",
+      "<a href=\"ftp://files.example.com/doc.pdf\">link</a>",
+      "<a href=\"ftps://secure.example.com/doc.pdf\">link</a>",
+      "<a href=\"mailto:user@example.com\">email</a>",
+
+      // User Info, Ports, Subdomains, Query Params & Anchors
+      "<a href=\"https://admin:pass@sub.domain.example.co.uk:8080/path?a=1&b=2#section\">link</a>",
+
+      // Permitted Symbols
+      "<a href=\"https://example.com/~user/@file_name$123.jpg?a=1+2&b=3%204\">link</a>",
+
+      // Unicode Domains & Paths
+      "<a href=\"https://münchen.de/bild.jpg\">link</a>",
+
+      // Images with valid src
+      "<img src=\"https://example.com/image.png\" />"
+    };
+
+    for (String html : validUrls) {
+      CleanResults cr = as.scan(html, policy);
+      assertTrue(
+          "Valid offsiteURL was unexpectedly stripped: " + html,
+          cr.getCleanHTML().contains("href=") || cr.getCleanHTML().contains("src="));
+      assertEquals("Errors produced for valid offsiteURL: " + html, 0, cr.getNumberOfErrors());
+    }
+  }
+
+  /** Negative Assertions for offsiteURL: Invalid/Dangerous protocols and syntax. */
+  @Test
+  public void testInvalidOffsiteUrls() throws Exception {
+    String[] invalidUrls = {
+      "<a href=\"javascript:alert(1)\">click</a>",
+      "<a href=\"file:///etc/passwd\">click</a>",
+      "<a href=\"data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==\">click</a>",
+      "<a href=\"http://example.com^\">click</a>",
+      "<a href=\"http://ex<script>ample.com\">click</a>"
+    };
+
+    for (String html : invalidUrls) {
+      CleanResults cr = as.scan(html, policy);
+      assertFalse(
+          "Invalid or dangerous offsiteURL was allowed: " + html,
+          cr.getCleanHTML().contains("href="));
+    }
+  }
 }
