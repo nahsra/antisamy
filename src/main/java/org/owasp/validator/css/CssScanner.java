@@ -57,8 +57,6 @@ public class CssScanner {
 
   protected static final Logger logger = LoggerFactory.getLogger(CssScanner.class);
 
-  protected static final Timeout DEFAULT_TIMEOUT = Timeout.ofMilliseconds(1000);
-
   private static final String CDATA = "^\\s*<!\\[CDATA\\[(.*)\\]\\]>\\s*$";
 
   /** The parser to be used in any scanning */
