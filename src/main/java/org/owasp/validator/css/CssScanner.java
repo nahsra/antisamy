@@ -37,7 +37,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.batik.css.parser.ParseException;
 import org.apache.batik.css.parser.Parser;
-import org.apache.hc.core5.util.Timeout;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.ScanException;
