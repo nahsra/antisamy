@@ -26,6 +26,7 @@ public class InternalPolicy extends Policy {
   private final Tag styleTag;
   private final String onUnknownTag;
   private final boolean preserveComments;
+  private final boolean embedStyleSheets;
   private final boolean isEncodeUnknownTag;
   private final boolean allowDynamicAttributes;
 
@@ -45,6 +46,7 @@ public class InternalPolicy extends Policy {
     this.isEncodeUnknownTag = Policy.ACTION_ENCODE.equals(onUnknownTag);
     this.preserveComments = isTrue(Policy.PRESERVE_COMMENTS);
     this.styleTag = getTagByLowercaseName("style");
+    this.embedStyleSheets = isTrue(Policy.EMBED_STYLESHEETS);
     this.allowDynamicAttributes = isTrue(Policy.ALLOW_DYNAMIC_ATTRIBUTES);
 
     if (!isNoopenerAndNoreferrerAnchors) {
@@ -75,6 +77,7 @@ public class InternalPolicy extends Policy {
     this.isEncodeUnknownTag = Policy.ACTION_ENCODE.equals(onUnknownTag);
     this.preserveComments = isTrue(Policy.PRESERVE_COMMENTS);
     this.styleTag = getTagByLowercaseName("style");
+    this.embedStyleSheets = isTrue(Policy.EMBED_STYLESHEETS);
     this.allowDynamicAttributes = isTrue(Policy.ALLOW_DYNAMIC_ATTRIBUTES);
 
     if (!isNoopenerAndNoreferrerAnchors) {
@@ -91,6 +94,17 @@ public class InternalPolicy extends Policy {
 
   public Tag getStyleTag() {
     return styleTag;
+  }
+
+  /**
+   * Returns whether remote CSS can be imported. NOTE: This is dangerous and should not be enabled.
+   *
+   * @return True if remote CSS is allowed, false otherwise.
+   * @deprecated Remote styles import feature to be removed and along with this error message.
+   */
+  @Deprecated
+  public boolean isEmbedStyleSheets() {
+    return embedStyleSheets;
   }
 
   public boolean isPreserveComments() {

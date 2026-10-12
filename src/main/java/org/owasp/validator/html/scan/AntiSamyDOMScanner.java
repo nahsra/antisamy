@@ -447,7 +447,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
     /*
      * Invoke the css parser on this element.
      */
-    CssScanner styleScanner = new CssScanner(policy, messages);
+    CssScanner styleScanner = new CssScanner(policy, messages, policy.isEmbedStyleSheets());
 
     try {
       int childNodesCount = ele.getChildNodes().getLength();
@@ -462,7 +462,7 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
           toScan.append(childNode.getTextContent());
         }
 
-        CleanResults cr = styleScanner.scanStyleSheet(toScan.toString());
+        CleanResults cr = styleScanner.scanStyleSheet(toScan.toString(), policy.getMaxInputSize());
         errorMessages.addAll(cr.getErrorMessages());
 
         /*
@@ -579,10 +579,10 @@ public class AntiSamyDOMScanner extends AbstractAntiSamyScanner {
         /*
          * Invoke the CSS parser on this element.
          */
-        CssScanner styleScanner = new CssScanner(policy, messages);
+        CssScanner styleScanner = new CssScanner(policy, messages, false);
 
         try {
-          CleanResults cr = styleScanner.scanInlineStyle(value, tagName);
+          CleanResults cr = styleScanner.scanInlineStyle(value, tagName, policy.getMaxInputSize());
           attribute.setNodeValue(cr.getCleanHTML());
           List<String> cssScanErrorMessages = cr.getErrorMessages();
           errorMessages.addAll(cssScanErrorMessages);

@@ -75,6 +75,8 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
   private boolean inCdata = false;
   // From policy
   private boolean preserveComments;
+  private int maxInputSize;
+  private boolean shouldParseImportedStyles;
 
   public MagicSAXFilter(ResourceBundle messages) {
     this.messages = messages;
@@ -86,6 +88,8 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
     isNoopenerAndNoreferrerAnchors = policy.isNoopenerAndNoreferrerAnchors();
     isValidateParamAsEmbed = policy.isValidateParamAsEmbed();
     preserveComments = policy.isPreserveComments();
+    maxInputSize = policy.getMaxInputSize();
+    shouldParseImportedStyles = policy.isEmbedStyleSheets();
     operations.clear();
     errorMessages.clear();
     cssContent = null;
@@ -173,7 +177,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
       // now scan the CSS.
       CssScanner cssScanner = makeCssScanner();
       try {
-        CleanResults results = cssScanner.scanStyleSheet(cssContent.toString());
+        CleanResults results = cssScanner.scanStyleSheet(cssContent.toString(), maxInputSize);
         // report all errors found
         errorMessages.addAll(results.getErrorMessages());
         /*
@@ -220,7 +224,7 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
 
   private CssScanner makeCssScanner() {
     if (cssScanner == null) {
-      cssScanner = new CssScanner(policy, messages);
+      cssScanner = new CssScanner(policy, messages, shouldParseImportedStyles);
     }
     return cssScanner;
   }
@@ -318,7 +322,8 @@ public class MagicSAXFilter extends DefaultFilter implements XMLDocumentFilter {
         if ("style".equalsIgnoreCase(name)) {
           CssScanner styleScanner = makeCssScanner();
           try {
-            CleanResults cr = styleScanner.scanInlineStyle(value, element.getLocalpart());
+            CleanResults cr =
+                styleScanner.scanInlineStyle(value, element.getLocalpart(), maxInputSize);
             attributes.setValue(i, cr.getCleanHTML());
             validattributes.addAttribute(makeSimpleQname(name), "CDATA", cr.getCleanHTML());
             errorMessages.addAll(cr.getErrorMessages());

@@ -59,8 +59,7 @@ import org.w3c.css.sac.SimpleSelector;
  */
 public class CssValidator {
 
-  private static final LexicalUnit EMPTYSTRINGLEXICALUNIT =
-      CSSLexicalUnit.createString(LexicalUnit.SAC_STRING_VALUE, "", null);
+  private static final LexicalUnit EMPTYSTRINGLEXICALUNIT = CSSLexicalUnit.createString(LexicalUnit.SAC_STRING_VALUE, "", null);
 
   private final Policy policy;
 
@@ -432,8 +431,7 @@ public class CssValidator {
     for (Pattern pattern : mediatype.getAllowedRegExp()) {
       isRegExpAllowed |= pattern.matcher(mediaTypeString).matches();
     }
-    boolean isValidMediaType =
-        mediatype.getAllowedValues().contains(mediaTypeString) || isRegExpAllowed;
+    boolean isValidMediaType = mediatype.getAllowedValues().contains(mediaTypeString) || isRegExpAllowed;
     if (!isValidMediaType) {
       return false;
     }
@@ -455,8 +453,9 @@ public class CssValidator {
   }
 
   /**
-   * Returns color value as int. Maps percentages to values between 0 and 255. Negative percentages
-   * are mapped to 0, values bigger than 100% to 255.
+   * Returns color value as int.
+   * Maps percentages to values between 0 and 255.
+   * Negative percentages are mapped to 0, values bigger than 100% to 255.
    *
    * @param param LexicalUnit
    * @return color value as int
