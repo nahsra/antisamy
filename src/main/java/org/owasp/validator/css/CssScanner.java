@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -327,11 +327,7 @@ public class CssScanner {
         try {
           String responseBody = httpClient.execute(new HttpGet(stylesheetUri), responseHandler);
           // pull down stylesheet, observing size limit.
-          // Note: There is a SpotBugs warning on the next line: "Found reliance on default encoding
-          // in org.owasp.validator.css.CssScanner.parseImportedStylesheets(LinkedList, List, int):
-          // String.getBytes()" but since this method is deprecated, not going to address it as it
-          // will 'go away' eventually.
-          stylesheet = responseBody.getBytes();
+          stylesheet = responseBody.getBytes(StandardCharsets.UTF_8);
           if (stylesheet != null && stylesheet.length > sizeLimit) {
             errorMessages.add(
                 ErrorMessageUtil.getMessage(
@@ -359,7 +355,7 @@ public class CssScanner {
             InputSource nextStyleSheet =
                 new InputSource(
                     new InputStreamReader(
-                        new ByteArrayInputStream(stylesheet), Charset.forName("UTF8")));
+                        new ByteArrayInputStream(stylesheet), StandardCharsets.UTF_8));
             parser.parseStyleSheet(nextStyleSheet);
 
           } catch (IOException ioe) {
