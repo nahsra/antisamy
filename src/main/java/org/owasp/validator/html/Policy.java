@@ -37,7 +37,7 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -392,14 +392,14 @@ public class Policy {
    */
   private static InputStream toByteArrayStream(InputStream in) throws PolicyException {
     byte[] byteArray;
-    try (Reader reader = new InputStreamReader(in, Charset.forName("UTF8"))) {
+    try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
       char[] charArray = new char[8 * 1024];
       StringBuilder builder = new StringBuilder();
       int numCharsRead;
       while ((numCharsRead = reader.read(charArray, 0, charArray.length)) != -1) {
         builder.append(charArray, 0, numCharsRead);
       }
-      byteArray = builder.toString().getBytes(Charset.forName("UTF8"));
+      byteArray = builder.toString().getBytes(StandardCharsets.UTF_8);
     } catch (IOException ioe) {
       throw new PolicyException(ioe);
     }
