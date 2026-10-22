@@ -37,7 +37,9 @@ import org.owasp.validator.html.PolicyException;
 import org.owasp.validator.html.model.Property;
 import org.owasp.validator.html.model.Tag;
 
-/** @author Kristian Rosenvold */
+/**
+ * @author Kristian Rosenvold
+ */
 public class TestPolicy extends InternalPolicy {
 
   protected TestPolicy(Policy.ParseContext parseContext) {
