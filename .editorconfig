@@ -1,0 +1,5 @@
+root = true
+
+# Everything is UTF-8, including .properties files, which IDEs otherwise default to ISO-8859-1.
+[*]
+charset = utf-8
