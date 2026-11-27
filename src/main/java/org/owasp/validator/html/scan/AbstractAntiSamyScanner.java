@@ -25,11 +25,17 @@
 
 package org.owasp.validator.html.scan;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import org.apache.xml.serialize.OutputFormat;
 import org.owasp.validator.html.CleanResults;
@@ -85,10 +91,44 @@ public abstract class AbstractAntiSamyScanner {
 
   private static ResourceBundle getResourceBundle() {
     try {
-      return ResourceBundle.getBundle("AntiSamy", Locale.getDefault());
+      return loadResourceBundle(Locale.getDefault());
     } catch (MissingResourceException mre) {
-      return ResourceBundle.getBundle(
-          "AntiSamy", new Locale(Constants.DEFAULT_LOCALE_LANG, Constants.DEFAULT_LOCALE_LOC));
+      return loadResourceBundle(
+          new Locale(Constants.DEFAULT_LOCALE_LANG, Constants.DEFAULT_LOCALE_LOC));
+    }
+  }
+
+  private static ResourceBundle loadResourceBundle(Locale locale) {
+    ResourceBundle.Control control =
+        ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES);
+    List<Locale> candidates = control.getCandidateLocales("AntiSamy", locale);
+    ResourceBundle bundle = null;
+    // Keep locale inheritance, but avoid Java 8's shared cache of Latin-1-decoded bundles.
+    for (int i = candidates.size() - 1; i >= 0; i--) {
+      String resource =
+          control.toResourceName(control.toBundleName("AntiSamy", candidates.get(i)), "properties");
+      InputStream input =
+          AbstractAntiSamyScanner.class.getClassLoader().getResourceAsStream(resource);
+      if (input != null) {
+        // newDecoder() reports malformed UTF-8, so a corrupt bundle fails class
+        // initialization instead of loading replacement characters.
+        try (Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8.newDecoder())) {
+          bundle = new Utf8Bundle(reader, bundle);
+        } catch (IOException e) {
+          throw new IllegalStateException("Could not read message bundle " + resource, e);
+        }
+      }
+    }
+    if (bundle == null) {
+      throw new MissingResourceException("No AntiSamy messages for " + locale, "AntiSamy", "");
+    }
+    return bundle;
+  }
+
+  private static final class Utf8Bundle extends PropertyResourceBundle {
+    private Utf8Bundle(Reader reader, ResourceBundle parent) throws IOException {
+      super(reader);
+      setParent(parent);
     }
   }
 
